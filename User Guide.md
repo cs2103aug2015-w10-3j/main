@@ -10,7 +10,7 @@ Todoer is a keystroke-orientated task scheduler that provides functionality for 
   - [Deleting a task](#deleting-a-task)
   - [Updating a task](#updating-a-task)
   - [Viewing tasks](#viewing-tasks)
-  - [Changing settings](#changing-settings)
+  - [Settings](#settings)
   - [Exiting](#exiting)
   - [Help Panel](#help-panel)
 - [Cheatsheet](#cheatsheet)
@@ -41,7 +41,8 @@ To learn more details of Todoer features, refer to the 'Feature Details' section
 ## Adding a task
 ###### Add a task using the console wizard
 1. Type `add <task_name>` into the command bar (replace \<task_name> with the name of your task).
-2. The console will display instructions: **Specify a task description:**. Type in a suitable task description in the command bar
+2. The console will display instructions: **Specify a task description:**. Type in a suitable task description in the command bar. <br>
+![add image](doc/images/add_sample.png)
 3. Follow the remaning console instructions to finish adding the task. Note you can enter a `-` if you wish to leave a field blank.
 
 > Tip: Enter `Ctrl + C` during the console wizard prompts to abort the current operation.
@@ -86,7 +87,8 @@ To learn more details of Todoer features, refer to the 'Feature Details' section
 
 ###### Show tasks in a certain group:
 1. Type `show <group_name>` into the command bar (replace <group_name> with the name of the group of tasks you wish to see).
-2. The console will display all the tasks in that particular group in the ascending order of their deadlines.
+2. The console will display all the tasks in that particular group in the ascending order of their deadlines. <br>
+![show image](doc/images/show_sample.png)
 
 ###### Show tasks with deadlines within a certain time period:
 1. Type `show <deadline>` into the command bar. See below for possible arguments:
@@ -119,8 +121,10 @@ Examples:
 ## Help Panel
 ###### Guide to using the help panel found on the left side of the UI
 1. The help panel displays the cheatsheet by default.
-2. Type `help <command>` in the command bar to get detailed help about <command>
-   > Example: `help update`
+2. Type `help <command>` in the command bar to get detailed help about \<command>.
+
+   > Example: `help add` <br>
+   ![help image](doc/images/help_sample.png)
 3. Type `help` to reset the help panel to the default cheatsheet.
 
 # Cheatsheet
