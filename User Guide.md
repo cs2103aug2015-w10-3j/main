@@ -4,13 +4,13 @@ Todoer is a keystroke-orientated task scheduler that provides functionality for 
 # Table of Contents
 <!-- MarkdownTOC -->
 
-- [Installation and Setup](#setup)
+- [Installation and Setup](#installation-and-setup)
 - [Feature Details](#feature-details)
-  - [Adding a task](#add-task)
-  - [Deleting a task](#delete-task)
-  - [Updating a task](#update-task)
-  - [Viewing tasks](#view-tasks)
-  - [Changing settings](#settings)
+  - [Adding a task](#adding-a-task)
+  - [Deleting a task](#deleting-a-task)
+  - [Updating a task](#updating-a-task)
+  - [Viewing tasks](#viewing-tasks)
+  - [Changing settings](#changing-settings)
   - [Exiting](#exiting)
   - [Help Panel](#help-panel)
 - [Cheatsheet](#cheatsheet)
@@ -58,7 +58,8 @@ To learn more details of Todoer features, refer to the 'Feature Details' section
    | group       | Assign the task to a group                               |
 	
 
-> For example: `add 'do assignment 1' 'algebra homework' '251015' '10' 'MA1101'`
+   Example: 
+   * `add 'do assignment 1' 'algebra homework' '251015' '10' 'MA1101'`
 
 ## Deleting a task
 1. Type `delete <task_name>` into the command bar (replace \<task_name> with the name of the task you wish to delete).
@@ -126,7 +127,7 @@ Examples:
 
 | Command            | Description                                                                                      |
 |--------------------|--------------------------------------------------------------------------------------------------|
-| add \<task_name>    | Add a task called \<task_name> with optional description, deadline, priority and group parameters |
+| add \<task_name>    | Add a task called \<task_name> with optional parameters: <ul><li>description</li><li>deadline</li><li>priority</li><li>group</li></ul> |
 | delete \<task_name> | Deletes \<task_name> from your tasks                                                              |
 | update \<task_name> | Updates the details of \<task_name>                                                               |
 | show               | View all tasks (in a group or those due within a certain time period)                            |
