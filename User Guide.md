@@ -12,7 +12,7 @@ Todoer is a keystroke-orientated task scheduler that provides functionality for 
   - [Viewing tasks](#view-tasks)
   - [Changing settings](#settings)
   - [Exiting](#exiting)
-- [Help Panel](#help-panel)
+  - [Help Panel](#help-panel)
 - [Cheatsheet](#cheatsheet)
 
 <!-- /MarkdownTOC -->
@@ -40,63 +40,96 @@ To learn more details of Todoer features, refer to the 'Feature Details' section
 # Feature Details
 ## Adding a task
 ###### Add a task using the console wizard
-1. Type `add` into the command bar. 
-2. The console will display instructions: **Specify a task name:**. Type in a suitable task name in the command bar
-3. Follow the remaning console instructions to finish adding the task. Note you can enter a `-` if you wish to leave a field (such as 'Priority') blank.
+1. Type `add <task_name>` into the command bar (replace \<task_name> with the name of your task).
+2. The console will display instructions: **Specify a task description:**. Type in a suitable task description in the command bar
+3. Follow the remaning console instructions to finish adding the task. Note you can enter a `-` if you wish to leave a field blank.
 
 > Tip: Enter `Ctrl + C` during the console wizard prompts to abort the current operation.
 
 ###### Add a task using a one-line command
-1. Type `add <task_name> <description> <deadline> <priority> <group>
-   Parameters:
-| task_name   | Name of task                                             |
-|-------------|----------------------------------------------------------|
-| description | Short description of the task for additional reference   |
-| deadline    | Format: `DDMMYY` > e.g. 270915 for (27th September 2015) |
-| priority    | Scale: 1 (lowest) - 10 (highest)                         |
-| group       |                                                          |
+1. Type `add <task_name> <description> <deadline> <priority> <group>` in the command bar.
+
+   | Parameter	 | Usage	                                            |
+   |-------------|----------------------------------------------------------|
+   | task_name   | Name of task to be added                                 |
+   | description | Short description of the task for additional reference   |
+   | deadline    | Format: `DDMMYY` > e.g. 270915 for (27th September 2015) |
+   | priority    | Scale: 1 (lowest) - 10 (highest)                         |
+   | group       | Assign the task to a group                               |
 	
 
 > For example: `add 'do assignment 1' 'algebra homework' '251015' '10' 'MA1101'`
 
 ## Deleting a task
-###### Delete a task using the console wizard
-1. Type `delete` into the command bar.
-2. The console will display instructions: **Specify which task to delete:**. Enter the task name you wish to delete into the command bar.
+1. Type `delete <task_name>` into the command bar (replace \<task_name> with the name of the task you wish to delete).
 
-###### Delete a task using a one-line command
-1. Type `delete <task_name>`
+## Updating a task
+###### Update a task using the console wizard
+1. Type `update <task_name>` in the command bar (replace \<task_name> with the name of the task you wish to update).
+2. The console will display the task that you wished to update along with instructions: **Enter the detail you wish to update:**. 
+3. Follow the remaning console instructions to finish updating the task.
+
+###### Add a task using a one-line command
+1. Type `update <task_name> <field_to_update> <new_value>` in the command bar.
+   
+   | Parameter	 | Usage	                                            |
+   |-------------|----------------------------------------------------------|
+   | task_name   | Name of task to be updated                              |
+   | field_to_update | Possible fields: task_name, description, deadline, priority or group |
+   | new_value    | Value that will replace previous value for the field_to_update |
+
+## Viewing tasks
+###### Show all the tasks:
+1. Type `show` or `show all`  into the command bar.
+2. The console will display all the tasks in the ascending order of their deadlines. Tasks with no deadlines will be displayed in a **Tasks with no Deadline** section.
+
+###### Show tasks in a certain group:
+1. Type `show <group_name>` into the command bar (replace <group_name> with the name of the group of tasks you wish to see).
+2. The console will display all the tasks in that particular group in the ascending order of their deadlines.
+
+###### Show tasks with deadlines within a certain time period:
+1. Type `show <deadline>` into the command bar. See below for possible arguments:
+
+  | \<deadline>	| Usage	                                            |
+  |-------------|----------------------------------------------------------|
+  | \<DDMMYY>   | Show all tasks due on <DDMMYY>  |
+  | today | show all tasks due today |
+  | tomorrow	| show all tasks due tomorrow |
+  | this week	| show all tasks due this week |
+  | no deadline	| show all tasks that have no deadline |
+
+
+The console will display tasks with deadlines that fall within the respective time period, in ascending order of their deadlines.
+
+###### Show tasks in order of importance instead of deadlines:
+Simply append `important` to any of the above commands. The tasks will be displayed in order of their priority.
+
+Examples:  
+* `show tomorrow important`
+* `show 271115 important`
+
+## Settings
+###### Change notification settings, and adjust other UI options
+1. Type `settings` in the command bar.
+
+## Exiting
+1. Type `exit` in the command bar. The program will exit.
+
+## Help Panel
+###### Guide to using the help panel found on the left side of the UI
+1. The help panel displays the cheatsheet by default.
+2. Type `help <command>` in the command bar to get detailed help about <command>
+   > Example: `help update`
+3. Type `help` to reset the help panel to the default cheatsheet.
 
 # Cheatsheet
 
-| ID                 | I can … (i.e. Functionality)                                                                            | so that I … (i.e. Value)                                                                                                                           |
-|--------------------|---------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| addTask            | add a task by specifying a task name only                                                               | can record tasks that I want to do                                                                                                                 |
-| addTaskDeadline    | add a task by specifying a task name and deadline only                                                  | can record tasks that I want to do by a certain date                                                                                               |
-| addTaskDescription | add a task by specifying task name and task description (and/or deadline)                               | can record tasks that I want to do followed by some additional details that I need to remind myself of                                             |
-| addTaskPriority    | add a task by specifying task name and priority (and/or deadline + description)                         | can record tasks that I want to do and attach a priority rating to it to remind myself of its importance                                           |
-| addTaskGroup       | add a task by specifying task name and group (and/or deadline + description + priority)                 | can record tasks that I want to do and place it under a group (e.g. Placing a documentation task under Group: Project A) for organization purposes |
-| deleteTask         | delete a task by specifying the task name                                                               | mark the task as done or remove it from the schedule                                                                                               |
-| deleteGroup        | delete a group and all the tasks inside                                                                 | mark the group (and all its tasks) as done or remove the group from the schedule                                                                   |
-| updateTaskName     | update a task’s name                                                                                    | rename a task to a more appropriate name                                                                                                           |
-| updateTaskDeadline | update a task’s deadline                                                                                | set extra time for the task                                                                                                                        |
-| updateTaskDesc     | update a task’s description                                                                             | give myself a better description of the task                                                                                                       |
-| updateTaskPriority | update a task’s priority                                                                                | lower or raise the priority of a task according to my updated circumstances                                                                        |
-| updateTaskGroup    | update a task’s group                                                                                   | reassign the task to a more relevant group                                                                                                         |
-| showAll            | show every task that is contained in the scheduler                                                      | review all the tasks I have as a whole                                                                                                             |
-| showAllAuto        | Implements the above command ‘showAll’ each time bashlist is opened                                     | can quickly review all my tasks as soon as I launch the application                                                                                |
-| showGroup          | show every task that is contained in the specified group                                                | review all the tasks in that particular group                                                                                                      |
-| showPriority       | show every task that is above the specified priority                                                    | review all tasks that are urgent to me                                                                                                             |
-| showToday          | show every task that is due today                                                                       | review all tasks that must be completed by this day                                                                                                |
-| showThisWeek       | show every task that is due this week                                                                   | review all tasks that must be completed by this week                                                                                               |
-| showPeriod         | show every task that is due within the specified period                                                 | review all tasks that must be completed within this period                                                                                         |
-| show…SortPriority  | show tasks according to any of the above show commands, but sorts the tasks by priority (highest first) | review specific list of tasks, ordered by priority so that I know which ones are urgent and important                                              |
-| settings           | review the settings                                                                                     | view the presets for notifications, format display, and additional parameters                                                                      |
-| setNotification    | turn on the notification system                                                                         | set automatic reminders for myself for the tasks that are close to due                                                                             |
-| setNotifAudio      | turn on notification audio                                                                              | get an audible reminder that I have tasks due soon                                                                                                 |
-| setNotifFreq       | set the notification frequency                                                                          | adjust how often and when I want to be reminded of the tasks that are nearing due date                                                             |
-| exit               | exits the program                                                                                       | shut down the program and save system resources                                                                                                    |
-| minimize           | minimizes the program                                                                                   | allow the program to run in the background                                                                                                         |
-| help…              | displays documentation in the help panel in the UI                                                      | easily see how to type commands in the UI                                                                                                          |
-
-
+| Command            | Description                                                                                      |
+|--------------------|--------------------------------------------------------------------------------------------------|
+| add \<task_name>    | Add a task called \<task_name> with optional description, deadline, priority and group parameters |
+| delete \<task_name> | Deletes \<task_name> from your tasks                                                              |
+| update \<task_name> | Updates the details of \<task_name>                                                               |
+| show               | View all tasks (in a group or those due within a certain time period)                            |
+| settings           | Modify Todoer settings                                                                           |
+| help               | Get help for a particular command                                                                |
+| exit               | Exit Todoer                                                                                      |
