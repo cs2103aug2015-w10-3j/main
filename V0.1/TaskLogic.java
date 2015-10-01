@@ -1,8 +1,12 @@
 
 import java.io.*;
 
+
 public class TaskLogic {
 
+
+	private static String ENTER = "Enter";
+    
 	TaskCommandParse mTaskCommandParse = new TaskCommandParse();
 	private final String messageSuccessful = "Successful";
 
@@ -10,14 +14,14 @@ public class TaskLogic {
 
 	}
 
-	protected String process() {
+	protected String process(String userCommand) {
 		String command = "", taskInfo = "";
-		String[] userCommand = mTaskCommandParse.getCommand();
-		command = userCommand[0];  taskInfo = userCommand[1];
+		String[] commandInfo = mTaskCommandParse.getCommandInfo(userCommand);
+		command = commandInfo[0];  taskInfo = commandInfo[1];
 		if (command.equals("exit")) {
 			return null;
 		} else {
-			return messageSuccessful + command + taskInfo;
+			return command + ' ' + taskInfo + '\n';
 		}
 	}
 

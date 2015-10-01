@@ -1,17 +1,13 @@
-import java.util.Scanner;
 import java.util.ArrayList;
 import java.io.*;
 
 public class TaskCommandParse {
 	
-	Scanner scanner = new Scanner(System.in);
-
 	public TaskCommandParse() {
 		
 	}
 
-	protected String[] getCommand() {
-		String userCommand = scanner.nextLine();
+	protected String[] getCommandInfo(String userCommand) {
 		String command = getCommandType(userCommand);
 		String taskInfo = getCommandArgument(userCommand);
         String[] result = new String[10];
