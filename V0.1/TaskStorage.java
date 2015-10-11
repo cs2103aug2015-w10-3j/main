@@ -45,7 +45,10 @@ public class TaskStorage {
 		try {
 			readFileByLine();
         } catch (IOException e) {
-        	handleException(e);
+        	//if its the first time working with the file, it doesnt exist yet
+        	//simply return an empty ArrayList
+        	if (e instanceof FileNotFoundException) return new ArrayList<String>();
+        	//handleException(e);
         } finally {
         	closeReader();
         }
