@@ -1,9 +1,9 @@
 import java.util.ArrayList;
 import java.io.*;
 
-public class TaskCommandParse {
+public class TaskCommandParser {
 	
-	public TaskCommandParse() {
+	public TaskCommandParser() {
 		
 	}
 

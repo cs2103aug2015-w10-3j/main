@@ -8,7 +8,7 @@ public class TaskLogic {
 	private static String ENTER = "Enter";
     private String dataFile = "data2";
 
-	TaskCommandParse mTaskCommandParse = new TaskCommandParse();
+	TaskCommandParser mTaskCommandParse = new TaskCommandParser();
 	private final String messageSuccessful = "Successful";
 	private ArrayList<String> allTasksInStrings;
 	private ArrayList<Task> allTasks;
