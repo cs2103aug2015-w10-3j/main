@@ -6,11 +6,12 @@ import java.util.*;
 public class TaskLogic {
 
 	private static String ENTER = "Enter";
-    private String dataFile = "data";
+    private String dataFile = "data2";
 
 	TaskCommandParse mTaskCommandParse = new TaskCommandParse();
 	private final String messageSuccessful = "Successful";
-	private ArrayList<String> allTasks;
+	private ArrayList<String> allTasksInStrings;
+	private ArrayList<Task> allTasks;
 	private TaskStorage mTaskStorage;
 
 	
@@ -19,13 +20,15 @@ public class TaskLogic {
 		mTaskStorage = new TaskStorage();
 		mTaskStorage.setFileURL(dataFile);
 
+		allTasks = new ArrayList<Task>();
 		try{
-			allTasks = mTaskStorage.readContent();
+			allTasksInStrings = mTaskStorage.readContent();
+			for (int i=0;i<allTasksInStrings.size();i++){
+				allTasks.add(Task.stringToTask(allTasksInStrings.get(i)));
+			}
 		}
 		catch (Exception e){
-			if (e instanceof FileNotFoundException){
-				allTasks = new ArrayList<String>();
-			}
+			e.printStackTrace();
 		}
 	}
 
@@ -36,17 +39,21 @@ public class TaskLogic {
 		
 		switch (command){
 			case "add":
-				allTasks.add(taskInfo);
-				mTaskStorage.rewriteContent(allTasks);
+				Task newTask = new Task(taskInfo);
+				allTasks.add(newTask);
+				allTasksInStrings.add(newTask.toString());
+
+				mTaskStorage.rewriteContent(allTasksInStrings);
 				return "Successfully added '" + taskInfo + "'\n";
 			case "showall":
 				return showAll();
 			case "delete":
 				String deleted;
 				for (int i=0;i<allTasks.size();i++){
-					if (allTasks.get(i).equals(taskInfo)){
-						deleted = allTasks.get(i);
+					if (allTasks.get(i).getName().equals(taskInfo)){
+						deleted = allTasks.get(i).getName();
 						allTasks.remove(i);
+						allTasksInStrings.remove(i);
 						return "'"+deleted+"' was removed successfully\n";
 					}
 				}
@@ -58,9 +65,11 @@ public class TaskLogic {
 
 				if (arguments.length != 2) return "Syntax error\n";
 				for (int i=0;i<allTasks.size();i++){
-					if (allTasks.get(i).equals(arguments[0])){
-						updated = allTasks.get(i);
-						allTasks.set(i,arguments[1]);
+					if (allTasks.get(i).getName().equals(arguments[0])){
+						updated = allTasks.get(i).getName();
+						allTasks.get(i).setName(arguments[1]);
+						allTasksInStrings.set(i, allTasks.get(i).toString() );
+
 						return "'"+updated+"' was updated successfully to '" + arguments[1] + "'\n";
 					}
 				}
@@ -77,7 +86,7 @@ public class TaskLogic {
 	protected String showAll() {
 		String result = "";
 		for (int i=0;i<allTasks.size();i++){
-			result += allTasks.get(i)+"\n";
+			result += allTasks.get(i).getName()+"\n";
 		}
 		return result;
 	}
