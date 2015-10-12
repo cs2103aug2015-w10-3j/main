@@ -74,7 +74,7 @@ At the heart of the Logic component is the `MainLogic` class that is responsible
 
 ## `MainLogic` Class 
 
-The `MainLogic` class has a public method `process()` for the UI to call and pass the user’s input into. `MainLogic` will then pass the user’s input to the `TaskCommandParser` class to get back the command’s details. Finally, it will execute the command depending on what type of command it is and return the feedback to the UI. While executing the command, `MainLogic` makes use of the TaskStorage class to do any input/output operation.
+The `MainLogic` class has a public method `process()` for the UI to call and pass the user’s input into. `MainLogic` will then pass the user’s input to the `TaskCommandParser` class to get back the command’s details. Finally, it will execute the command depending on what type of command it is and return the feedback to the UI. While executing the command, `MainLogic` makes use of the `TaskStorage` class to do any input/output operation.
 
 ``` java
 public MainLogic() {
@@ -111,6 +111,8 @@ String command = "", taskInfo = "";
 ```
 The code snippets above show how the list of all tasks is represented as an ArrayList of Task object in the `MainLogic`. When processing a command, `MainLogic` will add/delete/update these `Task` objects accordingly and rewrite the data to the files when necessary.
 
+The diagram (see Figure 3) below demonstrates how the major components of the software interact in a typical cycle of command execution. The raw user command “delete task1” in this example would first be fed from the UI to the Logic, and then to the CommandParser. Upon receiving the command’s details from the CommandParser, the Logic can either read or write the tasks’ content from the Storage however it sees fit and finally, return a feedback string to the UI to be displayed to the user.
+
 <br>
 ![add image](doc/images/del seqDiagram.png)
 > Figure 3: Object interactions for execution of 'delete' command in Todoer
@@ -136,7 +138,7 @@ The code snippets above show how the list of all tasks is represented as an Arra
 
 # CommandParser Component
 
-The `CommandParser` component only consists of a `TaskCommandParser` class which receives the raw user input and returns the details of the command in the form of an ArrayList of String objects.
+The CommandParser component only consists of a `TaskCommandParser` class which receives the raw user input and returns the details of the command in the form of an ArrayList of String objects.
 
 The first element of the ArrayList is always the command keyword, while the remaining elements could be the task name or deadline, depending on the type of the command.
 
