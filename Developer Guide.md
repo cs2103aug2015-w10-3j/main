@@ -35,7 +35,7 @@ Architecture is made up of 4 main components. Users can use Todoer through the U
 
 3. The **`parser`** component is responsible for processing the raw user commands and passing the semantics of the command to the logic component to handle its execution.
 
-4. The **`storage`** component contains the cache that saves users’ tasks as well as configuration files.
+4. The **`storage`** component reads and writes the tasks' content to the file system. It also stores configuration files for to store user settings.
 
 # UI Component
 The UI component consists of a `MainApp` class that is responsible for managing the input obtained from the UI and output to be displayed on the UI. The UI itself is created by the `UIController` class which manages the appearance and behaviour of the UI.
@@ -137,7 +137,7 @@ The diagram (see Figure 3) below demonstrates how the major components of the so
 
 # CommandParser Component
 
-The CommandParser component only consists of a `TaskCommandParser` class which receives the raw user input and returns the details of the command in the form of an ArrayList of String objects.
+The Parser component only consists of a `CommandParser` class which receives the raw user input and returns the details of the command in the form of an ArrayList of String objects.
 
 The first element of the ArrayList is always the command keyword, while the remaining elements could be the task name or deadline, depending on the type of the command.
 
