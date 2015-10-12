@@ -25,6 +25,7 @@ This guide describes the design and implementation of Todoer. It will help you u
 
 <br>
 ![add image](doc/images/architecture.jpg)
+> Figure 1: Top-level component architecture of Todoer
 
 Architecture is made up of 4 main components. Users can use Todoer through the UI component.
 
@@ -67,13 +68,13 @@ This class defines the looks and feels of the Text field (or command bar) and Di
 
 <br>
 ![add image](doc/images/logicDiagram.png)
+> Figure 2: Structure of the Logic Component
 
 At the heart of the Logic component is the MainLogic class that is responsible for executing the user’s commands. A Task class is also used to represent the tasks to be done. 
 
 ## `MainLogic` Class 
 
 The MainLogic class has a public method process() for the UI to call and pass the user’s input into. MainLogic will then pass the user’s input to the TaskCommandParser class to get back the command’s details. Finally, it will execute the command depending on what type of command it is and return the feedback to the UI. While executing the command, MainLogic makes use of the TaskStorage class to do any input/output operation.
-
 
 ``` java
 public MainLogic() {
@@ -82,6 +83,8 @@ public MainLogic() {
 	allTasks = new ArrayList<Task>();
 	…
 }
+```
+``` java
 protected String process(String userCommand) {
 String command = "", taskInfo = "";
 	String[] commandInfo = mTaskCommandParser.getCommandInfo(userCommand);
@@ -110,6 +113,7 @@ The code snippets above show how the list of all tasks is represented as an Arra
 
 <br>
 ![add image](doc/images/del seqDiagram.png)
+> Figure 3: Object interactions for execution of 'delete' command in Todoer
 
 ###### Notable API
 
@@ -136,20 +140,17 @@ The Parser component only consists of a CommandParser class which receives the r
 
 The first element of the ArrayList is always the command keyword, while the remaining elements could be the task name or deadline, depending on the type of the command.
 
-| Return type   | Method and Description                                            |
-|-------------|----------------------------------------------------------|
-| String[] | getCommandInfo(String userCommand): return the details of the user’s command  |
-
 ###### Notable API
 
 | Return type   | Method and Description                                            |
 |-------------|----------------------------------------------------------|
-| String[] | getCommandInfo(String)   |
+| String[] | getCommandInfo(String userCommand): return the details of the user’s command  |
 
 # Storage Component
 
 <br>
 ![add image](doc/images/storageDiagram.png)
+> Figure 4: Structure of the Storage Component
 
 The Storage component consists of a Storage class that manages the reading and writing of data between the program and the file system. Since we are storing tasks as JSON strings in the data files, there is also a JSONConverter classes that encodes and decodes between JSON strings and Task objects.
 
