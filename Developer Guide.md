@@ -113,7 +113,6 @@ The code snippets above show how the list of all tasks is represented as an Arra
 
 The diagram (see Figure 3) below demonstrates how the major components of the software interact in a typical cycle of command execution. The raw user command “delete task1” in this example would first be fed from the UI to the Logic, and then to the CommandParser. Upon receiving the command’s details from the CommandParser, the Logic can either read or write the tasks’ content from the Storage however it sees fit and finally, return a feedback string to the UI to be displayed to the user.
 
-<br>
 ![add image](doc/images/del seqDiagram.png)
 > Figure 3: Object interactions for execution of 'delete' command in Todoer
 
