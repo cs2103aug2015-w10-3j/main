@@ -38,15 +38,14 @@ Architecture is made up of 4 main components. Users can use Todoer through the U
 4. The **`storage`** component contains the cache that saves users’ tasks as well as configuration files.
 
 # UI Component
-The UI component consists of a MainApp class that is responsible for managing the input obtained from the UI and output to be displayed on the UI. The UI itself is created by the UIController class which manages the appearance and behaviour of the UI.
+The UI component consists of a `MainApp` class that is responsible for managing the input obtained from the UI and output to be displayed on the UI. The UI itself is created by the `UIController` class which manages the appearance and behaviour of the UI.
 
-Todoer’s UI consists of two parts: Text field and Display field.
+Todoer’s UI consists of two parts: `Text field` and `Display field`.
 
-Both fields are implemented using Java’s JFrame class to create a simple Window where the Text field gets the user’s command, and Display field displays messages to the user (scrollable). 
-UI maintains a reference to Logic, calling Logic’s methods directly to trigger processing of user-entered commands.
+Both fields are implemented using Java’s JFrame class to create a simple Window where the Text field gets the user’s command, and Display field displays messages to the user (scrollable). UI maintains a reference to Logic, calling Logic’s methods directly to trigger processing of user-entered commands.
 
 ## `MainApp` Class
-This is the starting point of the whole program. It initialises an instance of the MainLogic class and an instance of the UIController class to be used throughout the lifetime of the program. It has a public method handleKeyPress() to be called by the UIController whenever the user presses a key on the command bar. Depending on the key pressed, the MainApp can pass the value of the user input to the MainLogic class to get back a feedback string. The MainApp then decide what to be displayed on the UI through calling methods of the UIController class.
+This is the starting point of the whole program. It initialises an instance of the `MainLogic` class and an instance of the `UIController` class to be used throughout the lifetime of the program. It has a public method `handleKeyPress()` to be called by the `UIController` whenever the user presses a key on the command bar. Depending on the key pressed, the `MainApp` can pass the value of the user input to the `MainLogic` class to get back a feedback string. The `MainApp` then decide what to be displayed on the UI through calling methods of the `UIController` class.
 
 ###### Notable API
 
@@ -55,8 +54,9 @@ This is the starting point of the whole program. It initialises an instance of t
 | void | handleKeyPress(char key, String userInput): handler for when a key is pressed in the command bar   |
 
 ## `UIController` Class
-This class defines the looks and feels of the Text field (or command bar) and Display field. It signals the MainApp whenever a key is pressed by calling the method handleKeyPress(). It also has public methods for the MainApp to change the content of the fields.
+This class defines the looks and feels of the `Text field` (or command bar) and `Display field`. It signals the `MainApp` whenever a key is pressed by calling the method `handleKeyPress()`. It also has public methods for the `MainApp` to change the content of the fields.
 
+###### Notable API
 
 | Return type   | Method and Description                                            |
 |-------------|----------------------------------------------------------|
@@ -70,11 +70,11 @@ This class defines the looks and feels of the Text field (or command bar) and Di
 ![add image](doc/images/logicDiagram.png)
 > Figure 2: Structure of the Logic Component
 
-At the heart of the Logic component is the MainLogic class that is responsible for executing the user’s commands. A Task class is also used to represent the tasks to be done. 
+At the heart of the Logic component is the `MainLogic` class that is responsible for executing the user’s commands. A `Task` class is also used to represent the tasks to be done. 
 
 ## `MainLogic` Class 
 
-The MainLogic class has a public method process() for the UI to call and pass the user’s input into. MainLogic will then pass the user’s input to the TaskCommandParser class to get back the command’s details. Finally, it will execute the command depending on what type of command it is and return the feedback to the UI. While executing the command, MainLogic makes use of the TaskStorage class to do any input/output operation.
+The `MainLogic` class has a public method `process()` for the UI to call and pass the user’s input into. `MainLogic` will then pass the user’s input to the `TaskCommandParser` class to get back the command’s details. Finally, it will execute the command depending on what type of command it is and return the feedback to the UI. While executing the command, `MainLogic` makes use of the TaskStorage class to do any input/output operation.
 
 ``` java
 public MainLogic() {
@@ -109,7 +109,7 @@ String command = "", taskInfo = "";
 		
 }
 ```
-The code snippets above show how the list of all tasks is represented as an ArrayList of Task object in the MainLogic. When processing a command, MainLogic will add/delete/update these Task objects accordingly and rewrite the data to the files when necessary.
+The code snippets above show how the list of all tasks is represented as an ArrayList of Task object in the `MainLogic`. When processing a command, `MainLogic` will add/delete/update these `Task` objects accordingly and rewrite the data to the files when necessary.
 
 <br>
 ![add image](doc/images/del seqDiagram.png)
@@ -136,7 +136,7 @@ The code snippets above show how the list of all tasks is represented as an Arra
 
 # CommandParser Component
 
-The Parser component only consists of a CommandParser class which receives the raw user input and returns the details of the command in the form of an ArrayList of String objects.
+The `CommandParser` component only consists of a `TaskCommandParser` class which receives the raw user input and returns the details of the command in the form of an ArrayList of String objects.
 
 The first element of the ArrayList is always the command keyword, while the remaining elements could be the task name or deadline, depending on the type of the command.
 
@@ -152,10 +152,10 @@ The first element of the ArrayList is always the command keyword, while the rema
 ![add image](doc/images/storageDiagram.png)
 > Figure 4: Structure of the Storage Component
 
-The Storage component consists of a Storage class that manages the reading and writing of data between the program and the file system. Since we are storing tasks as JSON strings in the data files, there is also a JSONConverter classes that encodes and decodes between JSON strings and Task objects.
+The `Storage` component consists of a `Storage` class that manages the reading and writing of data between the program and the file system. Since we are storing tasks as JSON strings in the data files, there is also a `JSONConverter` class that encodes and decodes between JSON strings and `Task` objects.
 
 ## `Storage` class
-This class has public methods for the MainLogic to call to read and write the content of the tasks to the data files. The data files consist of a cache (default to be cache.txt) that stores the users’ tasks to disk as well as a configuration file (config.txt) that remembers the user’s settings for Todoer. The Storage class also has a private internal arrayList entryList that mirrors the content in the cache file.
+This class has public methods for the `MainLogic` to call to read and write the content of the tasks to the data files. The data files consist of a cache (default to be cache.txt) that stores the users’ tasks to disk as well as a configuration file (config.txt) that remembers the user’s settings for Todoer. The `Storage` class also has a private internal arrayList entryList that mirrors the content in the cache file.
 
 ###### Notable API
 
@@ -166,7 +166,7 @@ This class has public methods for the MainLogic to call to read and write the co
 | void | setFileURL(String fileURL): set the URL for the data file   |
 
 ## `JSONConverter` Class
-The `JSONConverter` class provide an encodeTask method to encode the details of a Task object to a JSON string and a decodeJSON method to decode a JSON string to get a Task object.
+The `JSONConverter` class provide an `encodeTask` method to encode the details of a Task object to a JSON string and a `decodeJSON` method to decode a JSON string to get a `Task` object.
 
 | Return type   | Method and Description                                            |
 |-------------|----------------------------------------------------------|
