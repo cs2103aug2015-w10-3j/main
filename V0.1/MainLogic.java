@@ -14,7 +14,10 @@ public class MainLogic {
 	private int currentState;
 	private ArrayList<String> allTasksInStrings;
 	private ArrayList<Task> allTasks;
+	private ArrayList<String> allUserCommands;
 	private Storage mStorage;
+
+	private int mBigNum = 100000;
 
 	
 	public MainLogic() {
@@ -22,6 +25,7 @@ public class MainLogic {
 		mStorage = new Storage();
 		mStorage.setFileURL(dataFile);
 
+		allUserCommands = new ArrayList<String>();
 		allTasks = new ArrayList<Task>();
 		history = new ArrayList<DataState>();
 		try{
@@ -53,6 +57,8 @@ public class MainLogic {
 		reloadDataInStrings();
 		
 	}
+
+
 	private class TaskDeadlineCompare implements Comparator<Task> {
 
 	    @Override
@@ -64,10 +70,13 @@ public class MainLogic {
 	    }
 	}
 	protected String process(String userCommand) {
+
+		addNewUserCommand(userCommand);
+
 		String command = "", taskInfo = "";
 		String[] commandInfo = mTaskCommandParse.getCommandInfo(userCommand);
 		command = commandInfo[0];  String field1 = commandInfo[1]; String field2 = commandInfo.length > 2 ? commandInfo[2]:"";
-		
+		taskInfo = field1;
 		switch (command){
 			case "add":
 				Task newTask = new Task(field1);
@@ -145,12 +154,84 @@ public class MainLogic {
 					return "redid successfully\n";
 				}
 				else return "No more operations to redo !\n";
+			case "search":
+				return searchForKey(field1);
 			case "exit":
 				return null;
 			default:
 				return "Syntax error: command(" + command + ") not found.\n";
 		}
 		
+	}
+
+	
+	//supported simple search API
+	private class MatchCount {
+		int id, count;
+	}
+
+	private String searchForKey(String arg) {
+		String[] arguments = arg.split(" ");
+		String args = "";
+		for(int i=0; i<arguments.length; i++) {
+			args = args + arguments[i];
+		}
+		args = args.toLowerCase();
+
+		ArrayList<MatchCount> matchCount = new ArrayList<>();
+		for(int i=0; i<allTasks.size(); i++) {
+			matchCount.add(i, new MatchCount());
+			matchCount.get(i).id = i;
+			matchCount.get(i).count = 0;
+			arguments = allTasks.get(i).getDisplay().split(" ");
+			String task = "";
+			for(int j=0; j<arguments.length; j++) {
+				task = task + arguments[j];
+			}
+			task = task.toLowerCase();
+
+			if (task.contains(arg)) {
+				matchCount.get(i).count = mBigNum;
+				continue;
+			}
+			for(int j=0; j<args.length(); j++) {
+				String st = "";
+				for(int k=j; k<args.length(); k++) {
+					st = st + args.charAt(k);
+					if (task.contains(st)) {
+						matchCount.get(i).count++;
+					}
+				}
+			}
+
+		}
+		Collections.sort(matchCount, new TaskSearchMatchCountCompare());
+		String result = "";
+		for(int i=0; i<matchCount.size(); i++) {
+			if (matchCount.get(i).count > 0) {
+				int id = matchCount.get(i).id;
+				result = result + allTasks.get(id).getDisplay(); 
+			}
+		}
+		if (result.isEmpty()) {
+			result = "Nothing matched!";
+		}
+
+		return result;
+
+	}
+
+	private class TaskSearchMatchCountCompare implements Comparator<MatchCount> {
+
+	    @Override
+	    public int compare(MatchCount o1, MatchCount o2) {
+	        // write comparison logic here like below , it's just a sample
+	        if (o1.count <= o2.count) {
+	        	return 1;
+	        }
+	        return -1;
+	    }
+
 	}
 	
 	protected ArrayList<Task> duplicate(ArrayList<Task> tasks){
@@ -168,5 +249,26 @@ public class MainLogic {
 		return result;
 	}
 
+	//supported key up/down to show old command
+	private void addNewUserCommand(String userCommand) {
+		allUserCommands.add(userCommand);
+	}
+
+	protected String getOldUserCommand(int pos) {
+		if (pos > allUserCommands.size()) {
+			return allUserCommands.get(0);
+		} else if (pos == 0) {
+			return "";
+		}
+		return allUserCommands.get(allUserCommands.size()-pos);
+	}
+
+	protected void deleteAllUserCommands() {
+		allUserCommands = new ArrayList<String>();
+	}
+
+	protected int getOldUserCommandSize() {
+		return allUserCommands.size();
+	}
 
 }
