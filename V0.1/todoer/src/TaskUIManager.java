@@ -36,7 +36,7 @@ public class TaskUIManager {
 
 	}
 
-	static MainLogic mMainLogic = new MainLogic();
+	static TaskLogic mTaskLogic = new TaskLogic();
 	public static void main(String[] argv) {
 
 		try
@@ -50,7 +50,7 @@ public class TaskUIManager {
         openToDoListWindow();
 
         displayMessage(welcomeMessage);
-        String message = mMainLogic.process("showall");
+        String message = mTaskLogic.showAll();
         displayMessage(message);
 	}
 
@@ -108,7 +108,7 @@ public class TaskUIManager {
                 {
 
                 	String userCommand = input.getText();
-                	String message = mMainLogic.process(userCommand);
+                	String message = mTaskLogic.process(userCommand);
                 	if (message == null) {
                 		displayMessage(goodByeMessage);
                 		frame.setVisible(false);
