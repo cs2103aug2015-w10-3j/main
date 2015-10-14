@@ -48,8 +48,7 @@ public class Task{
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM");
         try {
             deadline = formatter.parse(dline);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
         	deadline = null;
         }
 	}

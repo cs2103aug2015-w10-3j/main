@@ -4,22 +4,22 @@ import java.util.*;
 
 public class Storage {
 
-	private static String fileName = "default.txt";
-	private static BufferedReader br = null;
-	private static BufferedWriter bw = null;
+	private   String fileName = "default.txt";
+	private   BufferedReader br = null;
+	private   BufferedWriter bw = null;
 	
 	// Temporary internal arrayList for storage
-	private static ArrayList<String> taskList = new ArrayList<String>();
+	private   ArrayList<String> taskList = new ArrayList<String>();
 	
 	public Storage() {
 		//Initialise the variables;		
 	}
 
-	public static void setFileURL(String fileURL){
+	public   void setFileURL(String fileURL){
 		fileName = fileURL + ".txt";
 	}
 
-	public static void rewriteContent(ArrayList<String> allTasks) {
+	public   void rewriteContent(ArrayList<String> allTasks) {
 		taskList = allTasks;
 		try {  
 			writeFileByLine();
@@ -36,12 +36,12 @@ public class Storage {
 		}
 	}
 	
-	private static void handleException(IOException e) {
+	private   void handleException(IOException e) {
 		e.printStackTrace();
 		System.exit(0);
 	}
 
-	public static ArrayList<String> readContent() throws IOException {
+	public   ArrayList<String> readContent() throws IOException {
 		try {
 			readFileByLine();
         } catch (IOException e) {
@@ -55,7 +55,7 @@ public class Storage {
 		return taskList;
 	}
 	
-	private static void readFileByLine() throws FileNotFoundException,
+	private   void readFileByLine() throws FileNotFoundException,
 	IOException {
 		BufferedReader br = new BufferedReader(new FileReader(fileName));
 		ArrayList<String> updatedTaskList = new ArrayList<String>();
@@ -67,7 +67,7 @@ public class Storage {
 		br.close();
 	}
 	
-	private static void writeFileByLine() throws IOException {
+	private   void writeFileByLine() throws IOException {
 		bw = new BufferedWriter(new FileWriter(fileName));
 		for (int i = 0; i < taskList.size(); i++) { 
 		  bw.write(taskList.get(i));
@@ -75,7 +75,7 @@ public class Storage {
 		}
 	}
 
-	private static void closeReader() throws IOException {
+	private   void closeReader() throws IOException {
 		if (br != null) {
 			br.close();
 		}

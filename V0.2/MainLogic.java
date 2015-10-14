@@ -6,7 +6,7 @@ import java.util.*;
 public class MainLogic {
 
 	private static String ENTER = "Enter";
-    private String dataFile = "data3";
+    private String dataFile = "data4";
 
 	CommandParser mTaskCommandParse = new CommandParser();
 	private final String messageSuccessful = "Successful";
@@ -16,7 +16,7 @@ public class MainLogic {
 	private ArrayList<Task> allTasks;
 	private ArrayList<String> allUserCommands;
 	private Storage mStorage;
-
+	
 	private int mBigNum = 100000;
 
 	
@@ -35,8 +35,7 @@ public class MainLogic {
 			}
 			history.add(new DataState(allTasks));
 			currentState = 0;
-		}
-		catch (Exception e){
+		} catch (Exception e){
 			e.printStackTrace();
 		}
 	}
@@ -75,7 +74,7 @@ public class MainLogic {
 
 		String command = "", taskInfo = "";
 		String[] commandInfo = mTaskCommandParse.getCommandInfo(userCommand);
-		Assertion.assert(commandInfo.length>0,"Error is parsing the command");
+		assert commandInfo.length>0;
 		command = commandInfo[0];  String field1 = commandInfo[1]; String field2 = commandInfo.length > 2 ? commandInfo[2]:"";
 		taskInfo = field1;
 		switch (command){

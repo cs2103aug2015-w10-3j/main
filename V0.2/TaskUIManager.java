@@ -60,6 +60,7 @@ public class TaskUIManager {
 
         displayMessage(WELCOME_MESSAGE);
         String message = mMainLogic.process(SHOWALL_COMMAND);
+        assert message != null;
         displayMessage(message);
         displayMessage(NEW_LINE);
         displayMessage(COMMAND_MESSAGE);
@@ -152,6 +153,7 @@ public class TaskUIManager {
                         userCommandCount = 0;
                     } else {
                     	String message = mMainLogic.process(userCommand);
+
                         displayMessage(userCommand);
                         displayMessage(NEW_LINE);
                     	if (message == null) {
