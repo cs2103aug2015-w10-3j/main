@@ -75,6 +75,7 @@ public class MainLogic {
 
 		String command = "", taskInfo = "";
 		String[] commandInfo = mTaskCommandParse.getCommandInfo(userCommand);
+		
 		command = commandInfo[0];  String field1 = commandInfo[1]; String field2 = commandInfo.length > 2 ? commandInfo[2]:"";
 		taskInfo = field1;
 		switch (command){
