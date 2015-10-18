@@ -1,6 +1,7 @@
 
 import java.io.*;
 import java.util.*;
+import java.lang.*;
 
 
 public class MainLogic {
@@ -9,13 +10,14 @@ public class MainLogic {
     private String dataFile = "data4";
 
 	CommandParser mTaskCommandParse = new CommandParser();
-	private final String messageSuccessful = "Successful";
-	private ArrayList<DataState> history;
-	private int currentState;
-	private ArrayList<String> allTasksInStrings;
-	private ArrayList<Task> allTasks;
-	private ArrayList<String> allUserCommands;
+	private final String mMessageSuccessful = "Successful";
+	private ArrayList<DataState> mHistory;
+	private int mCurrentState;
+	private ArrayList<String> mAllTasksInStrings;
+	private ArrayList<Task> mAllTasks;
+	private ArrayList<String> mAllUserCommands;
 	private Storage mStorage;
+	private int mSeparateLine = 84;
 	
 	private int mBigNum = 100000;
 
@@ -25,34 +27,34 @@ public class MainLogic {
 		mStorage = new Storage();
 		mStorage.setFileURL(dataFile);
 
-		allUserCommands = new ArrayList<String>();
-		allTasks = new ArrayList<Task>();
-		history = new ArrayList<DataState>();
+		mAllUserCommands = new ArrayList<String>();
+		mAllTasks = new ArrayList<Task>();
+		mHistory = new ArrayList<DataState>();
 		try{
-			allTasksInStrings = mStorage.readContent();
-			for (int i=0;i<allTasksInStrings.size();i++){
-				allTasks.add(Task.stringToTask(allTasksInStrings.get(i)));
+			mAllTasksInStrings = mStorage.readContent();
+			for (int i=0;i<mAllTasksInStrings.size();i++){
+				mAllTasks.add(Task.stringToTask(mAllTasksInStrings.get(i)));
 			}
-			history.add(new DataState(allTasks));
-			currentState = 0;
+			mHistory.add(new DataState(mAllTasks));
+			mCurrentState = 0;
 		} catch (Exception e){
 			e.printStackTrace();
 		}
 	}
 
 	protected void reloadDataInStrings(){
-		allTasksInStrings = new ArrayList<String>();
-		for (int i=0;i<allTasks.size();i++){
-			allTasksInStrings.add(allTasks.get(i).toString());
+		mAllTasksInStrings = new ArrayList<String>();
+		for (int i=0;i<mAllTasks.size();i++){
+			mAllTasksInStrings.add(mAllTasks.get(i).toString());
 		}
 	}
 	protected void updateHistory(){
-		if (currentState < history.size()-1){
-			while (history.size()>currentState+1)
-				history.remove(currentState+1);
+		if (mCurrentState < mHistory.size()-1){
+			while (mHistory.size()>mCurrentState+1)
+				mHistory.remove(mCurrentState+1);
 		}
-		history.add(new DataState(allTasks));
-		currentState++;
+		mHistory.add(new DataState(mAllTasks));
+		mCurrentState++;
 		reloadDataInStrings();
 		
 	}
@@ -81,23 +83,49 @@ public class MainLogic {
 			case "add":
 				Task newTask = new Task(field1);
 				newTask.setDeadline(field2);
-
-				allTasks.add(newTask);
+				boolean isExisted = false;
+				for(int i=0; i<mAllTasks.size(); i++) {
+					if (mAllTasks.get(i).getName().equals(field1)) {
+						isExisted = true; 
+						break;
+					}
+				}
+				if (isExisted) {
+					return "This task already existed!";
+				}
+				mAllTasks.add(newTask);
 				updateHistory();
-				mStorage.rewriteContent(allTasksInStrings);
+				mStorage.rewriteContent(mAllTasksInStrings);
 				return "Successfully added '" + field1 + "'\n";
 			case "showall":
-				return showAll(allTasks);
+				return showAll(mAllTasks);
 			case "delete":
-				String deleted;
-				for (int i=0;i<allTasks.size();i++){
-					if (allTasks.get(i).getName().equals(taskInfo)){
-						deleted = allTasks.get(i).getName();
-						allTasks.remove(i);
+				String message = "Do you mean one of these? \n" + getSeparateLine();
+				int numberMatched = 0, position = 0;
+				String deleted = "";
+				for (int i=0;i<mAllTasks.size();i++){
+					String taskName = mAllTasks.get(i).getName();
+					if (taskName.equals(taskInfo)){
+						mAllTasks.remove(i);
 						updateHistory();
-						mStorage.rewriteContent(allTasksInStrings);
-						return "'"+deleted+"' was removed successfully\n";
+						mStorage.rewriteContent(mAllTasksInStrings);
+						return "'" + taskInfo + "' was removed successfully!\n";
 					}
+					if (taskName.startsWith(taskInfo)) {
+						numberMatched++;
+						deleted = taskName;
+						position = i;
+						message += mAllTasks.get(i).getDisplay() + getSeparateLine();
+					}
+				}
+				if (numberMatched > 0) {
+					if (numberMatched == 1) {
+						mAllTasks.remove(position);
+						updateHistory();
+						mStorage.rewriteContent(mAllTasksInStrings);
+						return "'" + deleted + "' was removed successfully!\n";
+					}
+					return message;
 				}
 				return "Error: task '" + taskInfo +"' not found.\n";
 
@@ -106,51 +134,51 @@ public class MainLogic {
 				String [] arguments = taskInfo.split(" ");
 
 				if (arguments.length != 2) return "Syntax error\n";
-				for (int i=0;i<allTasks.size();i++){
-					if (allTasks.get(i).getName().equals(arguments[0])){
-						updated = allTasks.get(i).getName();
-						allTasks.get(i).setName(arguments[1]);
+				for (int i=0;i<mAllTasks.size();i++){
+					if (mAllTasks.get(i).getName().equals(arguments[0])){
+						updated = mAllTasks.get(i).getName();
+						mAllTasks.get(i).setName(arguments[1]);
 
 						updateHistory();
-						mStorage.rewriteContent(allTasksInStrings);
+						mStorage.rewriteContent(mAllTasksInStrings);
 
-						return "'"+updated+"' was updated successfully to '" + arguments[1] + "'\n";
+						return "'" + updated + "' was updated successfully to '" + arguments[1] + "'\n";
 					}
 				}
 				return "Error: task '" + taskInfo +"' not found.\n";
 			case "showby":
 				switch (field1){
 					case "deadline":
-						ArrayList<Task> tempTasks = duplicate(allTasks);
+						ArrayList<Task> tempTasks = duplicate(mAllTasks);
 						Collections.sort(tempTasks,new TaskDeadlineCompare());
 						return showAll(tempTasks);
 					default:break;
 				}
 			case "showday":
-				String res = "";
-				for (int i=0;i<allTasks.size();i++){
-					if (allTasks.get(i).getDeadlineString().equals(field1)){
-						res += allTasks.get(i).getDisplay();
+				String res = getSeparateLine();
+				for (int i=0;i<mAllTasks.size();i++){
+					if (mAllTasks.get(i).getDeadlineString().equals(field1)){
+						res += mAllTasks.get(i).getDisplay() + getSeparateLine();
 					}
 				}
 				if (res.equals("")) return "no task found\n";
 				else return res;
 			case "undo":
-				if (currentState>0) {
-					currentState--;
-					allTasks = history.get(currentState).getAllTasks();
+				if (mCurrentState>0) {
+					mCurrentState--;
+					mAllTasks = mHistory.get(mCurrentState).getAllTasks();
 					reloadDataInStrings();
-					mStorage.rewriteContent(allTasksInStrings);
+					mStorage.rewriteContent(mAllTasksInStrings);
 					return "undid successfully\n";
 				}else{
 					return "Nothing to be undone !\n";
 				}
 			case "redo":
-				if (currentState < history.size()-1){
-					currentState++;
-					allTasks = history.get(currentState).getAllTasks();
+				if (mCurrentState < mHistory.size()-1){
+					mCurrentState++;
+					mAllTasks = mHistory.get(mCurrentState).getAllTasks();
 					reloadDataInStrings();
-					mStorage.rewriteContent(allTasksInStrings);
+					mStorage.rewriteContent(mAllTasksInStrings);
 					return "redid successfully\n";
 				}
 				else return "No more operations to redo !\n";
@@ -172,21 +200,16 @@ public class MainLogic {
 
 	private String searchForKey(String arg) {
 		String[] arguments = arg.split(" ");
-		String args = "";
-		for(int i=0; i<arguments.length; i++) {
-			args = args + arguments[i];
-		}
-		args = args.toLowerCase();
 
 		ArrayList<MatchCount> matchCount = new ArrayList<>();
-		for(int i=0; i<allTasks.size(); i++) {
+		for(int i=0; i<mAllTasks.size(); i++) {
 			matchCount.add(i, new MatchCount());
 			matchCount.get(i).id = i;
 			matchCount.get(i).count = 0;
-			arguments = allTasks.get(i).getDisplay().split(" ");
+			String[] args = mAllTasks.get(i).getDisplay().split(" ");
 			String task = "";
-			for(int j=0; j<arguments.length; j++) {
-				task = task + arguments[j];
+			for(int j=0; j<args.length; j++) {
+				task = task + args[j] + " ";
 			}
 			task = task.toLowerCase();
 
@@ -194,27 +217,40 @@ public class MainLogic {
 				matchCount.get(i).count = mBigNum;
 				continue;
 			}
-			for(int j=0; j<args.length(); j++) {
+			for(int j=0; j<arguments.length; j++) {
 				String st = "";
-				for(int k=j; k<args.length(); k++) {
-					st = st + args.charAt(k);
+				for(int k=j; k<arguments.length; k++) {
+					st = st + arguments[k];
 					if (task.contains(st)) {
-						matchCount.get(i).count++;
+						matchCount.get(i).count += k-j+1;
 					}
 				}
 			}
 
 		}
 		Collections.sort(matchCount, new TaskSearchMatchCountCompare());
-		String result = "";
-		for(int i=0; i<matchCount.size(); i++) {
-			if (matchCount.get(i).count > 0) {
+		String result = getSeparateLine();
+		boolean isMatched = false;
+		for(int i=0; i<Math.min(matchCount.size(), 10); i++) {
+			if (i == 0 && matchCount.get(i).count == 0) {
+				//Nothing matched!
+				result = "";
+				break;
+			}
+			int point = matchCount.get(i).count;
+			if (point >= mBigNum) {
+				isMatched = true;
+			}
+			if (point < mBigNum && isMatched) {
+				break;
+			}
+			if (point > 0) {
 				int id = matchCount.get(i).id;
-				result = result + allTasks.get(id).getDisplay(); 
+				result = result + mAllTasks.get(id).getDisplay() + getSeparateLine();
 			}
 		}
 		if (result.isEmpty()) {
-			result = "Nothing matched!";
+			result = "Nothing matched! Use 'showall' to show all your tasks! \n";
 		}
 
 		return result;
@@ -242,33 +278,43 @@ public class MainLogic {
 	}
 
 	protected String showAll(ArrayList<Task> tasks) {
-		String result = "";
+		String result = getSeparateLine();
 		for (int i=0;i<tasks.size();i++){
-			result += tasks.get(i).getDisplay();
+			result += tasks.get(i).getDisplay() + getSeparateLine();
 		}
+		return result;
+	}
+
+	private String getSeparateLine() {
+		String result = "";
+		for(int i=0; i<mSeparateLine; i++) {
+			result = result + "=";
+		}
+		result = result + "\n";
 		return result;
 	}
 
 	//supported key up/down to show old command
 	private void addNewUserCommand(String userCommand) {
-		allUserCommands.add(userCommand);
+		mAllUserCommands.add(userCommand);
 	}
 
 	protected String getOldUserCommand(int pos) {
-		if (pos > allUserCommands.size()) {
-			return allUserCommands.get(0);
+		if (pos > mAllUserCommands.size()) {
+			return mAllUserCommands.get(0);
 		} else if (pos == 0) {
 			return "";
 		}
-		return allUserCommands.get(allUserCommands.size()-pos);
+		return mAllUserCommands.get(mAllUserCommands.size()-pos);
 	}
 
 	protected void deleteAllUserCommands() {
-		allUserCommands = new ArrayList<String>();
+		mAllUserCommands = new ArrayList<String>();
 	}
 
 	protected int getOldUserCommandSize() {
-		return allUserCommands.size();
+		return mAllUserCommands.size();
 	}
+
 
 }

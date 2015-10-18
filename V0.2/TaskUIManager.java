@@ -9,15 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.FlowLayout;
 import java.awt.event.*;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JTextArea;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JScrollPane;
-import javax.swing.UIManager;
-import javax.swing.BoxLayout;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 
 public class TaskUIManager {
@@ -37,8 +29,8 @@ public class TaskUIManager {
     static JFrame frame;
     static JPanel panel;
 
-	static int windowHigh = 20;
-	static int windowWidth = 69;
+	static int windowHigh = 30;
+	static int windowWidth = 70;
     static int userCommandCount = 0;
 
 	public TaskUIManager() {
@@ -73,25 +65,35 @@ public class TaskUIManager {
 
 	private static void openToDoListWindow()
     {
+        // Create a windown for app
         frame = new JFrame(APP_NAME);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setOpaque(true);
         
+        // Create text area to display message to users
         ButtonListener buttonListener = new ButtonListener();
         output = new JTextArea(windowHigh, windowWidth);
+        output.setBackground(Color.green);
+        output.setForeground(Color.blue);
+        output.setLineWrap(true);
         output.setWrapStyleWord(true);
         output.setEditable(false);
         
+        // Create scroll bar if text area is full
         JScrollPane scroller = new JScrollPane(output);
         scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         
+        // Create input pannel to get user's command
         JPanel inputpanel = new JPanel();
         inputpanel.setLayout(new FlowLayout());
         input = new JTextField(windowWidth);
-        input.setActionCommand(ENTER);
+        input.setBackground(Color.green);
+        input.setForeground(Color.blue);
+        input.setCaretColor(Color.red);
+        input.setActionCommand(ENTER);  
         input.addActionListener(buttonListener);
         input.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent evt) {
@@ -117,23 +119,26 @@ public class TaskUIManager {
     }  
 
     private static void panelKeyPressAction(KeyEvent event) {
-        if (event.getKeyCode() == KeyEvent.VK_UP) {
-            userCommandCount++;
-            if (userCommandCount > mMainLogic.getOldUserCommandSize()) {
-                userCommandCount--;
-            }
-            String userCommand = mMainLogic.getOldUserCommand(userCommandCount);
-            input.setText(userCommand);
-        } else if (event.getKeyCode() == KeyEvent.VK_DOWN) {
-            userCommandCount--;
-            if (userCommandCount < 0) {
-                userCommandCount = 0;
+        if (event.getKeyCode() == KeyEvent.VK_UP || event.getKeyCode() == KeyEvent.VK_DOWN) {
+            String userCommand = "";
+            if (event.getKeyCode() == KeyEvent.VK_UP) {
+                userCommandCount++;
+                if (userCommandCount > mMainLogic.getOldUserCommandSize()) {
+                    userCommandCount--;
+                }
+                userCommand = mMainLogic.getOldUserCommand(userCommandCount);
             } else {
-                String userCommand = mMainLogic.getOldUserCommand(userCommandCount);
-                input.setText(userCommand);
+                userCommandCount--;
+                if (userCommandCount < 0) {
+                    userCommandCount = 0;
+                } else {
+                    userCommand = mMainLogic.getOldUserCommand(userCommandCount);
+                }
             }
+            input.requestFocus();
+            input.setText(userCommand);
+            input.setCaretPosition(userCommand.length());
         }
-        input.requestFocus();
     }
 
     public static class ButtonListener implements ActionListener
