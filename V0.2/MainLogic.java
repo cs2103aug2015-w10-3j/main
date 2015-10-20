@@ -96,9 +96,13 @@ public class MainLogic {
 				mAllTasks.add(newTask);
 				updateHistory();
 				mStorage.rewriteContent(mAllTasksInStrings);
-				return "Successfully added '" + field1 + "'\n";
+				return "Successfully added '" + field1 + "'\n\n" + showAll(mAllTasks);
 			case "showall":
-				return showAll(mAllTasks);
+				if (mAllTasks.size() > 0) {
+					return showAll(mAllTasks);
+				} else {
+					return "You don't have any tasks! Use 'add' to add a new task!\n";
+				}
 			case "delete":
 				String message = "Do you mean one of these? \n" + getSeparateLine();
 				int numberMatched = 0, position = 0;
@@ -109,7 +113,7 @@ public class MainLogic {
 						mAllTasks.remove(i);
 						updateHistory();
 						mStorage.rewriteContent(mAllTasksInStrings);
-						return "'" + taskInfo + "' was removed successfully!\n";
+						return "'" + taskInfo + "' was removed successfully!\n\n" + showAll(mAllTasks);
 					}
 					if (taskName.startsWith(taskInfo)) {
 						numberMatched++;
@@ -123,11 +127,11 @@ public class MainLogic {
 						mAllTasks.remove(position);
 						updateHistory();
 						mStorage.rewriteContent(mAllTasksInStrings);
-						return "'" + deleted + "' was removed successfully!\n";
+						return "'" + deleted + "' was removed successfully!\n\n" + showAll(mAllTasks);
 					}
 					return message;
 				}
-				return "Error: task '" + taskInfo +"' not found.\n";
+				return "Error: task '" + taskInfo +"' not found.\n\n" + showAll(mAllTasks);
 
 			case "update":
 				String updated;
@@ -142,27 +146,36 @@ public class MainLogic {
 						updateHistory();
 						mStorage.rewriteContent(mAllTasksInStrings);
 
-						return "'" + updated + "' was updated successfully to '" + arguments[1] + "'\n";
+						return "'" + updated + "' was updated successfully to '" + arguments[1] + "'\n\n" + showAll(mAllTasks);
 					}
 				}
-				return "Error: task '" + taskInfo +"' not found.\n";
+				return "Error: task '" + taskInfo +"' not found.\n\n" + showAll(mAllTasks);
 			case "showby":
 				switch (field1){
 					case "deadline":
 						ArrayList<Task> tempTasks = duplicate(mAllTasks);
 						Collections.sort(tempTasks,new TaskDeadlineCompare());
-						return showAll(tempTasks);
+						if (tempTasks.size() > 0) {
+							return showAll(tempTasks);
+						} else {
+							return "Nothing to show! Use 'add' to add a new task!\n";
+						}
 					default:break;
 				}
 			case "showday":
 				String res = getSeparateLine();
+				int count = 0;
 				for (int i=0;i<mAllTasks.size();i++){
 					if (mAllTasks.get(i).getDeadlineString().equals(field1)){
 						res += mAllTasks.get(i).getDisplay() + getSeparateLine();
+						count++;
 					}
 				}
-				if (res.equals("")) return "no task found\n";
-				else return res;
+				if (count == 0) {
+					return "Nothing to show! Using 'showall' to show all your tasks! \n";
+				} else {
+					return res;
+				}
 			case "undo":
 				if (mCurrentState>0) {
 					mCurrentState--;
@@ -230,6 +243,7 @@ public class MainLogic {
 		}
 		Collections.sort(matchCount, new TaskSearchMatchCountCompare());
 		String result = getSeparateLine();
+		int count = 0;
 		boolean isMatched = false;
 		for(int i=0; i<Math.min(matchCount.size(), 10); i++) {
 			if (i == 0 && matchCount.get(i).count == 0) {
@@ -246,10 +260,11 @@ public class MainLogic {
 			}
 			if (point > 0) {
 				int id = matchCount.get(i).id;
+				count++;
 				result = result + mAllTasks.get(id).getDisplay() + getSeparateLine();
 			}
 		}
-		if (result.isEmpty()) {
+		if (count == 0) {
 			result = "Nothing matched! Use 'showall' to show all your tasks! \n";
 		}
 
@@ -278,7 +293,10 @@ public class MainLogic {
 	}
 
 	protected String showAll(ArrayList<Task> tasks) {
-		String result = getSeparateLine();
+		if (tasks.size() == 0) {
+			return "";
+		}
+		String result = "These are all your tasks!\n" + getSeparateLine();
 		for (int i=0;i<tasks.size();i++){
 			result += tasks.get(i).getDisplay() + getSeparateLine();
 		}

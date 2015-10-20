@@ -19,7 +19,7 @@ public class TaskUIManager {
     private static String APP_NAME = "To-Do";
     private static String SHOWALL_COMMAND = "showall";
 	private static String GOOBYE_MESSAGE = "Goodbye!";
-	private static String WELCOME_MESSAGE = "Welcome to To-Do list. These are your tasks: \n";
+	private static String WELCOME_MESSAGE = "Welcome to To-Do list. ";
     private static String COMMAND_MESSAGE = "$" + APP_NAME + ": ";
     private static String NEW_LINE = "\n";
 
