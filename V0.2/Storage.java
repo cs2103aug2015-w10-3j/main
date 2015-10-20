@@ -9,7 +9,7 @@ public class Storage {
 	private   BufferedWriter bw = null;
 	
 	// Temporary internal arrayList for storage
-	private   ArrayList<String> taskList = new ArrayList<String>();
+	private   ArrayList<Task> taskList = new ArrayList<Task>();
 	
 	public Storage() {
 		//Initialise the variables;		
@@ -19,9 +19,9 @@ public class Storage {
 		fileName = fileURL + ".txt";
 	}
 
-	public   void rewriteContent(ArrayList<String> allTasks) {
+	public	 void rewriteContent(ArrayList<Task> allTasks) {
 		taskList = allTasks;
-		try {  
+		try {
 			writeFileByLine();
 		} catch (IOException e) {
 			handleException(e);
@@ -34,6 +34,7 @@ public class Storage {
 				e.printStackTrace();
 			}
 		}
+		
 	}
 	
 	private   void handleException(IOException e) {
@@ -41,14 +42,15 @@ public class Storage {
 		System.exit(0);
 	}
 
-	public   ArrayList<String> readContent() throws IOException {
+	public   ArrayList<Task> readContent() throws IOException {
 		try {
 			readFileByLine();
         } catch (IOException e) {
+        	handleException(e);
+        } catch (FileNotFoundException e) {
         	//if its the first time working with the file, it doesnt exist yet
         	//simply return an empty ArrayList
-        	if (e instanceof FileNotFoundException) return new ArrayList<String>();
-        	//handleException(e);
+        	return new ArrayList<Task>();
         } finally {
         	closeReader();
         }
@@ -58,10 +60,10 @@ public class Storage {
 	private   void readFileByLine() throws FileNotFoundException,
 	IOException {
 		BufferedReader br = new BufferedReader(new FileReader(fileName));
-		ArrayList<String> updatedTaskList = new ArrayList<String>();
+		ArrayList<Task> updatedTaskList = new ArrayList<Task>();
 		String line = null;
 		while ((line = br.readLine()) != null) {
-			updatedTaskList.add(line);
+			updatedTaskList.add(Task.stringToTask(line));
 		}
 		taskList = updatedTaskList;
 		br.close();
@@ -70,7 +72,7 @@ public class Storage {
 	private   void writeFileByLine() throws IOException {
 		bw = new BufferedWriter(new FileWriter(fileName));
 		for (int i = 0; i < taskList.size(); i++) { 
-		  bw.write(taskList.get(i));
+		  bw.write(taskList.get(i).toString());
 		  bw.newLine();
 		}
 	}
@@ -80,6 +82,6 @@ public class Storage {
 			br.close();
 		}
 	}
-
+	
 }
 
