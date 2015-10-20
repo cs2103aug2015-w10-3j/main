@@ -1,5 +1,0 @@
-{"name":"task1 by 01\/12","deadline":"01\/12"}
-{"name":"task2 by 02\/12","deadline":"02\/12"}
-{"name":"go school by bus by 20\/11","deadline":"20\/11"}
-{"name":"go visit my uncle by 22\/11","deadline":"22\/11"}
-{"name":"cs2101 presentation by 31\/12","deadline":"31\/12"}

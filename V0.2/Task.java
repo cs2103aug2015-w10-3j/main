@@ -10,6 +10,7 @@ public class Task{
 	private String name;
 	private Date deadline=null;
 	private String deadlineString="";
+	private String taskInfo = "";
 
 	public Task(String newname) {
 		//Initialise the variables;		
@@ -32,14 +33,24 @@ public class Task{
 		return deadlineString;
 	}
 
+	public void setTaskInfo(String taskInfos) {
+		taskInfo = taskInfos;
+	}
+
+	public String getTaskInfo() {
+		return taskInfo;
+	}
+
+
 	public String getDisplay(){
-		return name + "\n";
+		return taskInfo + "\n";
 
 		//return deadlineString.equals("") ? name : name + " by " + deadlineString;
 	}
 	public Task copy(){
 		Task newTask = new Task(name);
 		newTask.setDeadline(deadlineString);
+		newTask.setTaskInfo(taskInfo);
 		return newTask;
 	}
 
@@ -58,6 +69,7 @@ public class Task{
 		JSONObject task = new JSONObject();
 		task.put("name",name);
 		task.put("deadline",deadlineString);
+		task.put("task_info", taskInfo);
 		
 		try{
 			StringWriter out = new StringWriter();
@@ -79,6 +91,7 @@ public class Task{
 		    JSONObject jsonObj = (JSONObject)obj;
 		    Task task = new Task((String)jsonObj.get("name"));
 		    task.setDeadline((String)jsonObj.get("deadline"));
+		    task.setTaskInfo((String)jsonObj.get("task_info"));
 		    return task;
 
       	}catch(ParseException pe){

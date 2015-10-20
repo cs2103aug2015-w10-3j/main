@@ -78,9 +78,10 @@ public class MainLogic {
 			case "add":
 				Task newTask = new Task(field1);
 				newTask.setDeadline(field2);
+				newTask.setTaskInfo(getTaskInfo(userCommand));
 				boolean isExisted = false;
 				for(int i=0; i<mAllTasks.size(); i++) {
-					if (mAllTasks.get(i).getName().equals(field1)) {
+					if (mAllTasks.get(i).getTaskInfo().equals(getTaskInfo(userCommand))) {
 						isExisted = true; 
 						break;
 					}
@@ -91,7 +92,7 @@ public class MainLogic {
 				mAllTasks.add(newTask);
 				updateHistory();
 				mStorage.rewriteContent(mAllTasks);
-				return "Successfully added '" + field1 + "'\n\n" + showAll(mAllTasks);
+				return "Successfully added '" + newTask.getTaskInfo() + "'\n\n" + showAll(mAllTasks);
 			case "showall":
 				if (mAllTasks.size() > 0) {
 					return showAll(mAllTasks);
@@ -103,7 +104,7 @@ public class MainLogic {
 				int numberMatched = 0, position = 0;
 				String deleted = "";
 				for (int i=0;i<mAllTasks.size();i++){
-					String taskName = mAllTasks.get(i).getName();
+					String taskName = mAllTasks.get(i).getTaskInfo();
 					if (taskName.equals(taskInfo)){
 						mAllTasks.remove(i);
 						updateHistory();
@@ -158,25 +159,19 @@ public class MainLogic {
 					default:break;
 				}
 			case "showday":
-				SimpleDateFormat dateFormate = new SimpleDateFormat("dd/MM");
-				try {
-					Date date = dateFormate.parse(field1);
-					String res = getSeparateLine();
-					int count = 0;
-					for (int i=0;i<mAllTasks.size();i++){
-						if (mAllTasks.get(i).getDeadlineString().equals(field1)){
-							res += mAllTasks.get(i).getDisplay() + getSeparateLine();
-							count++;
-						}
+				String res = getSeparateLine();
+				int count = 0;
+				for (int i=0;i<mAllTasks.size();i++){
+					if (mAllTasks.get(i).getDeadlineString().equals(field1)){
+						res += mAllTasks.get(i).getDisplay() + getSeparateLine();
+						count++;
 					}
-					if (count == 0) {
-						return "Nothing to show! Using 'showall' to show all your tasks! \n";
-					} else {
-						return res;
-					}	
-				} catch (ParseException e) {
-					return "'" + field1 + "' not a format of date.\n";
 				}
+				if (count == 0) {
+					return "Nothing to show! Using 'showall' to show all your tasks! \n";
+				} 
+				return res;
+					
 			case "setfile":
 				mStorage.setFileURL(field1);
 				initialiseTasks();
@@ -208,6 +203,17 @@ public class MainLogic {
 		
 	}
 
+	private String getTaskInfo(String userCommand) {
+		String[] splits = userCommand.split(" ");
+		String result = "";
+		for(int i = 1; i < splits.length; i++) {
+			if (i > 1) {
+				result += " ";
+			}
+			result += splits[i];
+		}
+		return result;
+	}
 	
 	//supported simple search API
 	private class MatchCount {
@@ -222,7 +228,7 @@ public class MainLogic {
 			matchCount.add(i, new MatchCount());
 			matchCount.get(i).id = i;
 			matchCount.get(i).count = 0;
-			String[] args = mAllTasks.get(i).getDisplay().split(" ");
+			String[] args = mAllTasks.get(i).getTaskInfo().split(" ");
 			String task = "";
 			for(int j=0; j<args.length; j++) {
 				task = task + args[j] + " ";
