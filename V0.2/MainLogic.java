@@ -19,7 +19,7 @@ public class MainLogic {
 	private ArrayList<Task> mAllTasks;
 	private ArrayList<String> mAllUserCommands;
 	private Storage mStorage;
-	private int mSeparateLine = 84;
+	private int mSeparateLine = 75;
 	
 	private int mBigNum = 100000;
 
@@ -28,8 +28,12 @@ public class MainLogic {
 		//Initialise the variables;
 		mStorage = new Storage();
 		mStorage.setFileURL(dataFile);
-
 		mAllUserCommands = new ArrayList<String>();
+
+ 		initialiseTasks();
+	}
+
+	protected void initialiseTasks(){
 		mAllTasks = new ArrayList<Task>();
 		mHistory = new ArrayList<DataState>();
 		try{
@@ -185,7 +189,10 @@ public class MainLogic {
 				} catch (ParseException e) {
 					return "'" + field1 + "' not a format of date.\n";
 				}
-				
+			case "setfile":
+				mStorage.setFileURL(field1);
+				initialiseTasks();
+				return "Successfully changed data file to "+ field1+".\n";
 			case "undo":
 				if (mCurrentState>0) {
 					mCurrentState--;
