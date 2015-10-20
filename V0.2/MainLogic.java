@@ -2,6 +2,8 @@
 import java.io.*;
 import java.util.*;
 import java.lang.*;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 
 
 public class MainLogic {
@@ -79,6 +81,7 @@ public class MainLogic {
 		assert commandInfo.length>0;
 		command = commandInfo[0];  String field1 = commandInfo[1]; String field2 = commandInfo.length > 2 ? commandInfo[2]:"";
 		taskInfo = field1;
+
 		switch (command){
 			case "add":
 				Task newTask = new Task(field1);
@@ -91,7 +94,7 @@ public class MainLogic {
 					}
 				}
 				if (isExisted) {
-					return "This task already existed!";
+					return "This task already existed!\n";
 				}
 				mAllTasks.add(newTask);
 				updateHistory();
@@ -163,19 +166,26 @@ public class MainLogic {
 					default:break;
 				}
 			case "showday":
-				String res = getSeparateLine();
-				int count = 0;
-				for (int i=0;i<mAllTasks.size();i++){
-					if (mAllTasks.get(i).getDeadlineString().equals(field1)){
-						res += mAllTasks.get(i).getDisplay() + getSeparateLine();
-						count++;
+				SimpleDateFormat dateFormate = new SimpleDateFormat("dd/MM");
+				try {
+					Date date = dateFormate.parse(field1);
+					String res = getSeparateLine();
+					int count = 0;
+					for (int i=0;i<mAllTasks.size();i++){
+						if (mAllTasks.get(i).getDeadlineString().equals(field1)){
+							res += mAllTasks.get(i).getDisplay() + getSeparateLine();
+							count++;
+						}
 					}
+					if (count == 0) {
+						return "Nothing to show! Using 'showall' to show all your tasks! \n";
+					} else {
+						return res;
+					}	
+				} catch (ParseException e) {
+					return "'" + field1 + "' not a format of date.\n";
 				}
-				if (count == 0) {
-					return "Nothing to show! Using 'showall' to show all your tasks! \n";
-				} else {
-					return res;
-				}
+				
 			case "undo":
 				if (mCurrentState>0) {
 					mCurrentState--;

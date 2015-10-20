@@ -37,7 +37,7 @@ public class CommandParser {
         String[] splits = taskInfo.split(" ");
         if (splits.length > 1) {
             for(int i=splits.length-1; i>=0; i--) {
-                if (splits[i].equals("by")) {
+                if (splits[i].equals("by") || splits[i].equals("before")) {
                     if (checkDateFormat(splits[i+1])) {
                         System.out.println(splits[i+1]);
                         return splits[i+1];
