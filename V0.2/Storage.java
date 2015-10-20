@@ -45,12 +45,12 @@ public class Storage {
 	public   ArrayList<Task> readContent() throws IOException {
 		try {
 			readFileByLine();
-        } catch (IOException e) {
-        	handleException(e);
         } catch (FileNotFoundException e) {
         	//if its the first time working with the file, it doesnt exist yet
         	//simply return an empty ArrayList
         	return new ArrayList<Task>();
+        } catch (IOException e) {
+        	handleException(e);
         } finally {
         	closeReader();
         }

@@ -15,7 +15,6 @@ public class MainLogic {
 	private final String mMessageSuccessful = "Successful";
 	private ArrayList<DataState> mHistory;
 	private int mCurrentState;
-	private ArrayList<String> mAllTasksInStrings;
 	private ArrayList<Task> mAllTasks;
 	private ArrayList<String> mAllUserCommands;
 	private Storage mStorage;
@@ -37,10 +36,7 @@ public class MainLogic {
 		mAllTasks = new ArrayList<Task>();
 		mHistory = new ArrayList<DataState>();
 		try{
-			mAllTasksInStrings = mStorage.readContent();
-			for (int i=0;i<mAllTasksInStrings.size();i++){
-				mAllTasks.add(Task.stringToTask(mAllTasksInStrings.get(i)));
-			}
+			mAllTasks = mStorage.readContent();
 			mHistory.add(new DataState(mAllTasks));
 			mCurrentState = 0;
 		} catch (Exception e){
@@ -48,12 +44,6 @@ public class MainLogic {
 		}
 	}
 
-	protected void reloadDataInStrings(){
-		mAllTasksInStrings = new ArrayList<String>();
-		for (int i=0;i<mAllTasks.size();i++){
-			mAllTasksInStrings.add(mAllTasks.get(i).toString());
-		}
-	}
 	protected void updateHistory(){
 		if (mCurrentState < mHistory.size()-1){
 			while (mHistory.size()>mCurrentState+1)
@@ -61,8 +51,6 @@ public class MainLogic {
 		}
 		mHistory.add(new DataState(mAllTasks));
 		mCurrentState++;
-		reloadDataInStrings();
-		
 	}
 
 
@@ -102,7 +90,7 @@ public class MainLogic {
 				}
 				mAllTasks.add(newTask);
 				updateHistory();
-				mStorage.rewriteContent(mAllTasksInStrings);
+				mStorage.rewriteContent(mAllTasks);
 				return "Successfully added '" + field1 + "'\n\n" + showAll(mAllTasks);
 			case "showall":
 				if (mAllTasks.size() > 0) {
@@ -119,7 +107,7 @@ public class MainLogic {
 					if (taskName.equals(taskInfo)){
 						mAllTasks.remove(i);
 						updateHistory();
-						mStorage.rewriteContent(mAllTasksInStrings);
+						mStorage.rewriteContent(mAllTasks);
 						return "'" + taskInfo + "' was removed successfully!\n\n" + showAll(mAllTasks);
 					}
 					if (taskName.startsWith(taskInfo)) {
@@ -133,7 +121,7 @@ public class MainLogic {
 					if (numberMatched == 1) {
 						mAllTasks.remove(position);
 						updateHistory();
-						mStorage.rewriteContent(mAllTasksInStrings);
+						mStorage.rewriteContent(mAllTasks);
 						return "'" + deleted + "' was removed successfully!\n\n" + showAll(mAllTasks);
 					}
 					return message;
@@ -151,7 +139,7 @@ public class MainLogic {
 						mAllTasks.get(i).setName(arguments[1]);
 
 						updateHistory();
-						mStorage.rewriteContent(mAllTasksInStrings);
+						mStorage.rewriteContent(mAllTasks);
 
 						return "'" + updated + "' was updated successfully to '" + arguments[1] + "'\n\n" + showAll(mAllTasks);
 					}
@@ -197,8 +185,7 @@ public class MainLogic {
 				if (mCurrentState>0) {
 					mCurrentState--;
 					mAllTasks = mHistory.get(mCurrentState).getAllTasks();
-					reloadDataInStrings();
-					mStorage.rewriteContent(mAllTasksInStrings);
+					mStorage.rewriteContent(mAllTasks);
 					return "undid successfully\n";
 				}else{
 					return "Nothing to be undone !\n";
@@ -207,8 +194,7 @@ public class MainLogic {
 				if (mCurrentState < mHistory.size()-1){
 					mCurrentState++;
 					mAllTasks = mHistory.get(mCurrentState).getAllTasks();
-					reloadDataInStrings();
-					mStorage.rewriteContent(mAllTasksInStrings);
+					mStorage.rewriteContent(mAllTasks);
 					return "redid successfully\n";
 				}
 				else return "No more operations to redo !\n";
