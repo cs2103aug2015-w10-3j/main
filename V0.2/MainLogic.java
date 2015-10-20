@@ -9,7 +9,7 @@ import java.text.ParseException;
 public class MainLogic {
 
 	private static String ENTER = "Enter";
-    private String dataFile = "data4";
+    private String dataFile = "data6";
 
 	CommandParser mTaskCommandParse = new CommandParser();
 	private final String mMessageSuccessful = "Successful";
@@ -54,6 +54,19 @@ public class MainLogic {
 	}
 
 
+	private class TaskPriorityCompare implements Comparator<Task> {
+
+	    @Override
+	    public int compare(Task o1, Task o2) {
+	        // write comparison logic here like below , it's just a sample
+	        String p1 = o1.getPriority();
+	        String p2 = o2.getPriority();
+	        if (p1.equals("low")) p1 = "n";
+	        if (p2.equals("low")) p2 = "n";
+	        
+	        return p1.compareTo(p2);
+	    }
+	}
 	private class TaskDeadlineCompare implements Comparator<Task> {
 
 	    @Override
@@ -64,6 +77,14 @@ public class MainLogic {
 	        return o1.getDeadline().compareTo(o2.getDeadline());
 	    }
 	}
+	private class TaskGroupCompare implements Comparator<Task> {
+
+	    @Override
+	    public int compare(Task o1, Task o2) {
+	        // write comparison logic here like below , it's just a sample
+	       	return o1.getGroup().compareTo(o2.getGroup());
+	    }
+	}
 	protected String process(String userCommand) {
 
 		addNewUserCommand(userCommand);
@@ -71,14 +92,18 @@ public class MainLogic {
 		String command = "", taskInfo = "";
 		String[] commandInfo = mTaskCommandParse.getCommandInfo(userCommand);
 		assert commandInfo.length>0;
-		command = commandInfo[0];  String field1 = commandInfo[1]; String field2 = commandInfo.length > 2 ? commandInfo[2]:"";
+		command = commandInfo[0];  String field1 = commandInfo[1];
 		taskInfo = field1;
-
+		int count;
+		String res;
 		switch (command){
 			case "add":
 				Task newTask = new Task(field1);
-				newTask.setDeadline(field2);
+				newTask.setDeadline(commandInfo[2]);
+				newTask.setPriority(commandInfo[3]);
+				newTask.setGroup(commandInfo[4]);
 				newTask.setTaskInfo(getTaskInfo(userCommand));
+
 				boolean isExisted = false;
 				for(int i=0; i<mAllTasks.size(); i++) {
 					if (mAllTasks.get(i).getTaskInfo().equals(getTaskInfo(userCommand))) {
@@ -92,7 +117,7 @@ public class MainLogic {
 				mAllTasks.add(newTask);
 				updateHistory();
 				mStorage.rewriteContent(mAllTasks);
-				return "Successfully added '" + newTask.getTaskInfo() + "'\n\n" + showAll(mAllTasks);
+				return "Successfully added '" + newTask.getDisplay() + "'\n\n" + showAll(mAllTasks);
 			case "showall":
 				if (mAllTasks.size() > 0) {
 					return showAll(mAllTasks);
@@ -147,10 +172,26 @@ public class MainLogic {
 				}
 				return "Error: task '" + taskInfo +"' not found.\n\n" + showAll(mAllTasks);
 			case "showby":
+				if (mAllTasks.size() == 0) {
+					return "Nothing to show! Use 'add' to add a new task!\n";
+				}			
+				ArrayList<Task> tempTasks;
 				switch (field1){
 					case "deadline":
-						ArrayList<Task> tempTasks = duplicate(mAllTasks);
+						tempTasks = duplicate(mAllTasks);
 						Collections.sort(tempTasks,new TaskDeadlineCompare());
+						if (tempTasks.size() > 0) {
+							return showAll(tempTasks);
+						} else {
+							return "Nothing to show! Use 'add' to add a new task!\n";
+						}
+					case "priority":
+						tempTasks = duplicate(mAllTasks);
+						Collections.sort(tempTasks,new TaskPriorityCompare());
+						return showAll(tempTasks);
+					case "group":
+						tempTasks = duplicate(mAllTasks);
+						Collections.sort(tempTasks,new TaskGroupCompare());
 						if (tempTasks.size() > 0) {
 							return showAll(tempTasks);
 						} else {
@@ -159,8 +200,8 @@ public class MainLogic {
 					default:break;
 				}
 			case "showday":
-				String res = getSeparateLine();
-				int count = 0;
+				res = getSeparateLine();
+				count = 0;
 				for (int i=0;i<mAllTasks.size();i++){
 					if (mAllTasks.get(i).getDeadlineString().equals(field1)){
 						res += mAllTasks.get(i).getDisplay() + getSeparateLine();
@@ -171,7 +212,33 @@ public class MainLogic {
 					return "Nothing to show! Using 'showall' to show all your tasks! \n";
 				} 
 				return res;
-					
+
+			case "showpriority":
+				res = getSeparateLine();
+				count = 0;
+				for (int i=0;i<mAllTasks.size();i++){
+					if (mAllTasks.get(i).getPriority().equals(field1)){
+						res += mAllTasks.get(i).getDisplay() + getSeparateLine();
+						count++;
+					}
+				}
+				if (count == 0) {
+					return "Nothing to show! Using 'showall' to show all your tasks! \n";
+				} 
+				return res;
+			case "showgroup":
+				res = getSeparateLine();
+				count = 0;
+				for (int i=0;i<mAllTasks.size();i++){
+					if (mAllTasks.get(i).getGroup().equals(field1)){
+						res += mAllTasks.get(i).getDisplay() + getSeparateLine();
+						count++;
+					}
+				}
+				if (count == 0) {
+					return "Nothing to show! Using 'showall' to show all your tasks! \n";
+				} 
+				return res;
 			case "setfile":
 				mStorage.setFileURL(field1);
 				initialiseTasks();
