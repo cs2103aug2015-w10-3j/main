@@ -63,7 +63,13 @@ public class Task{
 
 	public String getDisplay(){
 		String result = name;
+		int length = result.length();
+		System.out.println("_"+name+"_length:"+length);
+
+		for (int i=length;i<40;i++) result+=" ";
+
 		if (deadlineString!="") result+= " by " + dateFormat.format(deadline);
+		else result+="          ";
 		result += " priority " + priority;
 		if (group!="") result += " group " + group;
 		return result  + "\n";

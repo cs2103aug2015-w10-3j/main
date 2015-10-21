@@ -75,8 +75,8 @@ public class TaskUIManager {
         // Create text area to display message to users
         ButtonListener buttonListener = new ButtonListener();
         output = new JTextArea(windowHigh, windowWidth);
-        output.setBackground(Color.green);
-        output.setForeground(Color.blue);
+        output.setBackground(Color.white);
+        output.setForeground(Color.black);
         output.setLineWrap(true);
         output.setWrapStyleWord(true);
         output.setEditable(false);
@@ -90,9 +90,9 @@ public class TaskUIManager {
         JPanel inputpanel = new JPanel();
         inputpanel.setLayout(new FlowLayout());
         input = new JTextField(windowWidth);
-        input.setBackground(Color.green);
-        input.setForeground(Color.blue);
-        input.setCaretColor(Color.red);
+        input.setBackground(Color.white);
+        input.setForeground(Color.red);
+        input.setCaretColor(Color.blue);
         input.setActionCommand(ENTER);  
         input.addActionListener(buttonListener);
         input.addKeyListener(new KeyAdapter() {

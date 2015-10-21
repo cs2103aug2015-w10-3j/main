@@ -9,7 +9,7 @@ import java.text.ParseException;
 public class MainLogic {
 
 	private static String ENTER = "Enter";
-    private String dataFile = "data6";
+    private String dataFile = "data7";
 
 	CommandParser mTaskCommandParse = new CommandParser();
 	private final String mMessageSuccessful = "Successful";
