@@ -11,6 +11,7 @@ public class CommandParser {
 
 	protected String[] getCommandInfo(String userCommand) {
         String[] result = new String[10];
+        mPosition = 0;
         result[0] = getCommandType(userCommand);
         if (result[0].equals("add")) {
             result[2] = getDeadlineForTask(userCommand);

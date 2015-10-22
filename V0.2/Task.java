@@ -64,17 +64,15 @@ public class Task{
 	public String getDisplay(){
 		String result = name;
 		int length = result.length();
-		System.out.println("_"+name+"_length:"+length);
 
-		for (int i=length;i<40;i++) result+=" ";
+		for (int i=length;i<20;i++) result+=" ";
 
-		if (deadlineString!="") result+= " by " + dateFormat.format(deadline);
+		if (deadline!=null) result+= " by " + dateFormat.format(deadline);
 		else result+="          ";
 		result += " priority " + priority;
 		if (group!="") result += " group " + group;
 		return result  + "\n";
 
-		//return deadlineString.equals("") ? name : name + " by " + deadlineString;
 	}
 	public Task copy(){
 		Task newTask = new Task(name);
