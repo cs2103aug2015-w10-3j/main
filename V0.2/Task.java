@@ -8,15 +8,15 @@ import java.text.*;
 
 public class Task{
 	private String name;
-	private Date deadline=null;
-	private String deadlineString="";
 	private String priority="normal";
 	private String group="";
-	private String taskInfo = "";
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM");
+	private String done="done";
+	private Date deadline=null;
+	private Date startDate=null;
+	private Date endDate=null;
+	static SimpleDateFormat standardDateFormat = new SimpleDateFormat("dd/MM hh:mm");
 
 	public Task(String newname) {
-		//Initialise the variables;		
 		name = newname;
 	}
 
@@ -48,59 +48,65 @@ public class Task{
 		return deadline;
 	}
 
-	public String getDeadlineString(){
-		return deadlineString;
+	public void setDeadline(Date newDeadline){
+		deadline = newDeadline;
 	}
 
-	public void setTaskInfo(String taskInfos) {
-		taskInfo = taskInfos;
+	public Date getStartDate(){
+		return startDate;
 	}
 
-	public String getTaskInfo() {
-		return taskInfo;
+	public void setStartDate(Date newStartDate){
+		startDate = newStartDate;
 	}
 
-
-	public String getDisplay(){
-		String result = name;
-		int length = result.length();
-
-		for (int i=length;i<20;i++) result+=" ";
-
-		if (deadline!=null) result+= " by " + dateFormat.format(deadline);
-		else result+="          ";
-		result += " priority " + priority;
-		if (group!="") result += " group " + group;
-		return result  + "\n";
-
+	public Date getEndDate(){
+		return startDate;
 	}
+
+	public void setEndDate(Date newEndDate){
+		endDate = newEndDate;
+	}
+
+	public String getDone(){
+		return done;
+	}
+
+	public void setDone(String newDone){
+		done=newDone;
+	}
+
 	public Task copy(){
 		Task newTask = new Task(name);
-		newTask.setDeadline(deadlineString);
-		newTask.setTaskInfo(taskInfo);
+		newTask.setDeadline(deadline);
 		newTask.setGroup(group);
 		newTask.setPriority(priority);
+		newTask.setStartDate(startDate);
+		newTask.setEndDate(endDate);
+		newTask.setDone(done);
+
 		return newTask;
 	}
 
-	public void setDeadline(String dline){
-		deadlineString = dline;
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM");
+	//helper function to convert from String in dd/MM hh:mm format to Date
+	private static Date stringToDate(String dateString){
         try {
-            deadline = formatter.parse(dline);
+            return standardDateFormat.parse(dateString);
         } catch (Exception e) {
-        	deadline = null;
+        	return null;
         }
 	}
 
-	
+	//the standard date format dd/MM hh:mm is used in storage
 	public String toString(){
 		JSONObject task = new JSONObject();
 		task.put("name",name);
-		task.put("deadline",deadlineString);
-		task.put("task_info", taskInfo);
+		task.put("deadline",standardDateFormat.format(deadline));
+		task.put("startDate",standardDateFormat.format(startDate));
+		task.put("endDate",standardDateFormat.format(endDate));
 		task.put("priority",priority);
 		task.put("group",group);
+		task.put("done",done);
 		
 		try{
 			StringWriter out = new StringWriter();
@@ -121,10 +127,15 @@ public class Task{
 		    Object obj = parser.parse(str);
 		    JSONObject jsonObj = (JSONObject)obj;
 		    Task task = new Task((String)jsonObj.get("name"));
-		    task.setDeadline((String)jsonObj.get("deadline"));
-		    task.setTaskInfo((String)jsonObj.get("task_info"));
+		    
+		    task.setDeadline( stringToDate((String)jsonObj.get("deadline")) );
+		    task.setStartDate( stringToDate((String)jsonObj.get("startDate")) );
+		    task.setEndDate( stringToDate((String)jsonObj.get("endDate")) );
+		    
 		    task.setGroup((String)jsonObj.get("group"));
 		    task.setPriority((String)jsonObj.get("priority"));
+		    task.setDone((String)jsonObj.get("done"));
+
 		    return task;
 
       	}catch(ParseException pe){
