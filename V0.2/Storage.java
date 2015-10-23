@@ -42,6 +42,31 @@ public class Storage {
 		System.exit(0);
 	}
 
+	public Settings readSettings(){
+		try{
+			br = new BufferedReader(new FileReader(fileName));
+			br.close();
+			return Settings.stringToSettings( br.readLine() );
+			
+		}
+		catch (Exception e){
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public void writeSettings(Settings mSettings){
+		try{
+			bw = new BufferedWriter(new FileWriter(fileName));
+			bw.write(mSettings.toString());
+			bw.close();
+		}
+		catch (Exception e){
+			e.printStackTrace();
+		}
+
+	}
+
 	public   ArrayList<Task> readContent() throws IOException {
 		try {
 			readFileByLine();

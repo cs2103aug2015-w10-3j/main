@@ -10,7 +10,7 @@ public class Task{
 	private String name;
 	private String priority="normal";
 	private String group="";
-	private String done="done";
+	private String done="not done";
 	private Date deadline=null;
 	private Date startDate=null;
 	private Date endDate=null;
@@ -74,6 +74,16 @@ public class Task{
 
 	public void setDone(String newDone){
 		done=newDone;
+	}
+
+	public String getTaskInfo(){
+		String res = name;
+		if (deadline!=null) res += " by " + standardDateFormat.format(deadline);
+		if (startDate!=null) res += " from " + standardDateFormat.format(startDate);
+		if (endDate!=null) res += " to " + standardDateFormat.format(endDate);
+		if (group!="") res+= " group " + group;
+		res+= " priority " + priority;
+		return res;
 	}
 
 	public Task copy(){
