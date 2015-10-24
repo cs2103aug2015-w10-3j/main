@@ -8,17 +8,15 @@ import java.text.ParseException;
 
 public class MainLogic {
 
-	private static String ENTER = "Enter";
-    private String dataFile = "data7";
+    private String dataFile = "default.txt";
+   	private final String PRIORITY_LOW = "low";
 
 	CommandParser mTaskCommandParse = new CommandParser();
-	private final String mMessageSuccessful = "Successful";
 	private ArrayList<DataState> mHistory;
 	private int mCurrentState;
 	private ArrayList<Task> mAllTasks;
 	private ArrayList<String> mAllUserCommands;
 	private Storage mStorage;
-	private int mSeparateLine = 75;
 	
 	private int mBigNum = 100000;
 
@@ -61,8 +59,8 @@ public class MainLogic {
 	        // write comparison logic here like below , it's just a sample
 	        String p1 = o1.getPriority();
 	        String p2 = o2.getPriority();
-	        if (p1.equals("low")) p1 = "n";
-	        if (p2.equals("low")) p2 = "n";
+	        if (p1.equals(PRIORITY_LOW)) p1 = "n";
+	        if (p2.equals(PRIORITY_LOW)) p2 = "n";
 	        
 	        return p1.compareTo(p2);
 	    }
@@ -72,8 +70,8 @@ public class MainLogic {
 	    @Override
 	    public int compare(Task o1, Task o2) {
 	        // write comparison logic here like below , it's just a sample
-	        if (o1.getDeadlineString().equals("")) return 1;
-	        if (o2.getDeadlineString().equals("")) return -1;
+	        if (o1.getDeadline().equals("")) return 1;
+	        if (o2.getDeadline().equals("")) return -1;
 	        return o1.getDeadline().compareTo(o2.getDeadline());
 	    }
 	}
@@ -85,8 +83,9 @@ public class MainLogic {
 	       	return o1.getGroup().compareTo(o2.getGroup());
 	    }
 	}
-	protected String process(String userCommand) {
+	protected String process(String userCommand, ArrayList<Task> taskList) {
 
+		taskList = new ArrayList<Task>();
 		addNewUserCommand(userCommand);
 
 		String command = "", taskInfo = "";
@@ -97,7 +96,7 @@ public class MainLogic {
 		int count;
 		String res;
 		switch (command){
-			case "add":
+			case AppConst.COMMAND_TYPE.ADD:
 				Task newTask = new Task(field1);
 				newTask.setDeadline(commandInfo[2]);
 				newTask.setPriority(commandInfo[3]);
@@ -112,20 +111,24 @@ public class MainLogic {
 					}
 				}
 				if (isExisted) {
-					return "This task already existed!\n";
+					taskList = mAllTasks;
+					return AppConst.MESSAGE.TASK_EXISTS;
 				}
 				mAllTasks.add(newTask);
 				updateHistory();
 				mStorage.rewriteContent(mAllTasks);
-				return "Successfully added '" + newTask.getDisplay() + "'\n\n" + showAll(mAllTasks);
-			case "showall":
+				taskList = mAllTasks;
+				System.out.println(mAllTasks.size());
+				return String.format(AppConst.MESSAGE.TASK_ADDED, newTask.getTaskInfo());
+			case AppConst.COMMAND_TYPE.SHOW_ALL:
+				taskList = mAllTasks;
 				if (mAllTasks.size() > 0) {
-					return showAll(mAllTasks);
+					return AppConst.MESSAGE.TASK_TO_DO;
 				} else {
-					return "You don't have any tasks! Use 'add' to add a new task!\n";
+					return AppConst.MESSAGE.NO_TASK_FOUND;
 				}
-			case "delete":
-				String message = "Do you mean one of these? \n" + getSeparateLine();
+			case AppConst.COMMAND_TYPE.DELETE:
+				String message = AppConst.MESSAGE.MANY_TASKS_MATCHED;
 				int numberMatched = 0, position = 0;
 				String deleted = "";
 				for (int i=0;i<mAllTasks.size();i++){
@@ -134,13 +137,13 @@ public class MainLogic {
 						mAllTasks.remove(i);
 						updateHistory();
 						mStorage.rewriteContent(mAllTasks);
-						return "'" + taskInfo + "' was removed successfully!\n\n" + showAll(mAllTasks);
+						taskList = mAllTasks;
+						return String.format(AppConst.MESSAGE.REMOVED_SUCCESSFUL, taskName);
 					}
 					if (taskName.startsWith(taskInfo)) {
 						numberMatched++;
 						deleted = taskName;
 						position = i;
-						message += mAllTasks.get(i).getDisplay() + getSeparateLine();
 					}
 				}
 				if (numberMatched > 0) {
@@ -148,17 +151,21 @@ public class MainLogic {
 						mAllTasks.remove(position);
 						updateHistory();
 						mStorage.rewriteContent(mAllTasks);
-						return "'" + deleted + "' was removed successfully!\n\n" + showAll(mAllTasks);
+						taskList = mAllTasks;
+						return String.format(AppConst.MESSAGE.REMOVED_SUCCESSFUL, deleted);
 					}
 					return message;
 				}
-				return "Error: task '" + taskInfo +"' not found.\n\n" + showAll(mAllTasks);
+				taskList = mAllTasks;
+				return  String.format(AppConst.MESSAGE.TASK_NOT_FOUND, taskInfo);
 
-			case "update":
+			case AppConst.COMMAND_TYPE.UPDATE:
 				String updated;
 				String [] arguments = taskInfo.split(" ");
 
-				if (arguments.length != 2) return "Syntax error\n";
+				if (arguments.length != 2) {
+					return String.format(AppConst.MESSAGE.COMMAND_ERROR, taskInfo);
+				}
 				for (int i=0;i<mAllTasks.size();i++){
 					if (mAllTasks.get(i).getName().equals(arguments[0])){
 						updated = mAllTasks.get(i).getName();
@@ -166,106 +173,97 @@ public class MainLogic {
 
 						updateHistory();
 						mStorage.rewriteContent(mAllTasks);
-
-						return "'" + updated + "' was updated successfully to '" + arguments[1] + "'\n\n" + showAll(mAllTasks);
+						taskList = mAllTasks;
+						return AppConst.MESSAGE.UPDATED_SUCCESSFUL;
 					}
 				}
-				return "Error: task '" + taskInfo +"' not found.\n\n" + showAll(mAllTasks);
-			case "showby":
+				taskList = mAllTasks;
+				return String.format(AppConst.MESSAGE.TASK_NOT_FOUND, arguments[0]);
+			case AppConst.COMMAND_TYPE.SHOW_BY:
 				if (mAllTasks.size() == 0) {
-					return "Nothing to show! Use 'add' to add a new task!\n";
+					return AppConst.MESSAGE.NO_TASK_FOUND;
 				}			
-				ArrayList<Task> tempTasks;
 				switch (field1){
-					case "deadline":
-						tempTasks = duplicate(mAllTasks);
-						Collections.sort(tempTasks,new TaskDeadlineCompare());
-						if (tempTasks.size() > 0) {
-							return showAll(tempTasks);
-						} else {
-							return "Nothing to show! Use 'add' to add a new task!\n";
-						}
-					case "priority":
-						tempTasks = duplicate(mAllTasks);
-						Collections.sort(tempTasks,new TaskPriorityCompare());
-						return showAll(tempTasks);
-					case "group":
-						tempTasks = duplicate(mAllTasks);
-						Collections.sort(tempTasks,new TaskGroupCompare());
-						if (tempTasks.size() > 0) {
-							return showAll(tempTasks);
-						} else {
-							return "Nothing to show! Use 'add' to add a new task!\n";
-						}
-					default:break;
+					case AppConst.TASK_FIELD.DEADLINE:
+						taskList = duplicate(mAllTasks);
+						Collections.sort(taskList,new TaskDeadlineCompare());
+						break;
+					case AppConst.TASK_FIELD.PRIORITY:
+						taskList = duplicate(mAllTasks);
+						Collections.sort(taskList,new TaskPriorityCompare());
+						break;
+					case AppConst.TASK_FIELD.GROUP:
+						taskList = duplicate(mAllTasks);
+						Collections.sort(taskList,new TaskGroupCompare());
+						break;
+					default:
+						taskList = mAllTasks;
 				}
-			case "showday":
-				res = getSeparateLine();
-				count = 0;
+				return "";
+			case AppConst.COMMAND_TYPE.SHOW_DAY:
 				for (int i=0;i<mAllTasks.size();i++){
-					if (mAllTasks.get(i).getDeadlineString().equals(field1)){
-						res += mAllTasks.get(i).getDisplay() + getSeparateLine();
-						count++;
+					if (mAllTasks.get(i).getDeadline().equals(field1)){
+						taskList.add(mAllTasks.get(i));
 					}
 				}
-				if (count == 0) {
-					return "Nothing to show! Using 'showall' to show all your tasks! \n";
-				} 
-				return res;
+				if (taskList == null || taskList.size()==0) {
+					return AppConst.MESSAGE.NO_TASK_FOUND;
+				}
+				return "";
 
-			case "showpriority":
-				res = getSeparateLine();
-				count = 0;
+			case AppConst.COMMAND_TYPE.SHOW_PRIORITY:
 				for (int i=0;i<mAllTasks.size();i++){
 					if (mAllTasks.get(i).getPriority().equals(field1)){
-						res += mAllTasks.get(i).getDisplay() + getSeparateLine();
-						count++;
+						taskList.add(mAllTasks.get(i));
 					}
 				}
-				if (count == 0) {
-					return "Nothing to show! Using 'showall' to show all your tasks! \n";
+				if (taskList == null || taskList.size()==0) {
+					return AppConst.MESSAGE.NO_TASK_FOUND;
 				} 
-				return res;
-			case "showgroup":
-				res = getSeparateLine();
-				count = 0;
+				return "";
+			case AppConst.COMMAND_TYPE.SHOW_GROUP:
 				for (int i=0;i<mAllTasks.size();i++){
 					if (mAllTasks.get(i).getGroup().equals(field1)){
-						res += mAllTasks.get(i).getDisplay() + getSeparateLine();
-						count++;
+						taskList.add(mAllTasks.get(i));
 					}
 				}
-				if (count == 0) {
-					return "Nothing to show! Using 'showall' to show all your tasks! \n";
+				if (taskList == null || taskList.size()==0) {
+					return AppConst.MESSAGE.NO_TASK_FOUND;
 				} 
-				return res;
-			case "setfile":
+				return "";
+			case AppConst.COMMAND_TYPE.SET_FILE:
 				mStorage.setFileURL(field1);
 				initialiseTasks();
-				return "Successfully changed data file to "+ field1+".\n";
-			case "undo":
+				return String.format(AppConst.MESSAGE.CHANGED_SUCCESSFUL, field1);
+			case AppConst.COMMAND_TYPE.UNDO:
 				if (mCurrentState>0) {
 					mCurrentState--;
 					mAllTasks = mHistory.get(mCurrentState).getAllTasks();
 					mStorage.rewriteContent(mAllTasks);
-					return "undid successfully\n";
+					taskList = mAllTasks;
+					return AppConst.MESSAGE.UNDID_SUCCESSFUL;
 				}else{
-					return "Nothing to be undone !\n";
+					taskList = mAllTasks;
+					return AppConst.MESSAGE.NOTHING_UNDONE;
 				}
-			case "redo":
+			case AppConst.COMMAND_TYPE.REDO:
 				if (mCurrentState < mHistory.size()-1){
 					mCurrentState++;
 					mAllTasks = mHistory.get(mCurrentState).getAllTasks();
 					mStorage.rewriteContent(mAllTasks);
-					return "redid successfully\n";
+					taskList = mAllTasks;
+					return AppConst.MESSAGE.REDID_SUCCESSFUL;
+				} else {
+					taskList = mAllTasks;
+					return AppConst.MESSAGE.NOTHING_REDONE;
 				}
-				else return "No more operations to redo !\n";
-			case "search":
-				return searchForKey(field1);
-			case "exit":
+			case AppConst.COMMAND_TYPE.SEARCH:
+				return searchForKey(field1, taskList);
+			case AppConst.COMMAND_TYPE.EXIT:
 				return null;
 			default:
-				return "Syntax error: command(" + command + ") not found.\n";
+				taskList = mAllTasks;
+				return String.format(AppConst.MESSAGE.COMMAND_ERROR, command);
 		}
 		
 	}
@@ -287,10 +285,10 @@ public class MainLogic {
 		int id, count;
 	}
 
-	private String searchForKey(String arg) {
+	private String searchForKey(String arg, ArrayList<Task> taskList) {
 		String[] arguments = arg.split(" ");
 
-		ArrayList<MatchCount> matchCount = new ArrayList<>();
+		ArrayList<MatchCount> matchCount = new ArrayList<MatchCount>();
 		for(int i=0; i<mAllTasks.size(); i++) {
 			matchCount.add(i, new MatchCount());
 			matchCount.get(i).id = i;
@@ -318,7 +316,7 @@ public class MainLogic {
 
 		}
 		Collections.sort(matchCount, new TaskSearchMatchCountCompare());
-		String result = getSeparateLine();
+		String result = "";
 		int count = 0;
 		boolean isMatched = false;
 		for(int i=0; i<Math.min(matchCount.size(), 10); i++) {
@@ -336,12 +334,14 @@ public class MainLogic {
 			}
 			if (point > 0) {
 				int id = matchCount.get(i).id;
+				taskList.add(mAllTasks.get(id));
 				count++;
-				result = result + mAllTasks.get(id).getDisplay() + getSeparateLine();
 			}
 		}
 		if (count == 0) {
-			result = "Nothing matched! Use 'showall' to show all your tasks! \n";
+			result = AppConst.MESSAGE.NOTHING_MATCHED;
+		} else {
+			result = String.format(AppConst.MESSAGE.FOUND, count);
 		}
 
 		return result;
@@ -366,26 +366,6 @@ public class MainLogic {
 		for (int i=0;i<tasks.size();i++)
 			newTasks.add(tasks.get(i).copy());
 		return newTasks;
-	}
-
-	protected String showAll(ArrayList<Task> tasks) {
-		if (tasks.size() == 0) {
-			return "";
-		}
-		String result = "These are all your tasks!\n" + getSeparateLine();
-		for (int i=0;i<tasks.size();i++){
-			result += tasks.get(i).getDisplay() + getSeparateLine();
-		}
-		return result;
-	}
-
-	private String getSeparateLine() {
-		String result = "";
-		for(int i=0; i<mSeparateLine; i++) {
-			result = result + "=";
-		}
-		result = result + "\n";
-		return result;
 	}
 
 	//supported key up/down to show old command

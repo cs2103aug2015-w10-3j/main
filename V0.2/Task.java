@@ -8,12 +8,13 @@ import java.text.*;
 
 public class Task{
 	private String name;
-	private String priority="normal";
+	private String priority="medium";
 	private String group="";
-	private String done="done";
-	private Date deadline=null;
-	private Date startDate=null;
-	private Date endDate=null;
+	private String status="undone";
+	private String deadline="";
+	private String startDate="";
+	private String endDate="";
+	private String taskInfo;
 	static SimpleDateFormat standardDateFormat = new SimpleDateFormat("dd/MM hh:mm");
 
 	public Task(String newname) {
@@ -44,36 +45,44 @@ public class Task{
 		group = newGroup;
 	}
 
-	public Date getDeadline(){
+	public String getDeadline(){
 		return deadline;
 	}
 
-	public void setDeadline(Date newDeadline){
+	public void setDeadline(String newDeadline){
 		deadline = newDeadline;
 	}
 
-	public Date getStartDate(){
+	public String getStartDate(){
 		return startDate;
 	}
 
-	public void setStartDate(Date newStartDate){
+	public void setStartDate(String newStartDate){
 		startDate = newStartDate;
 	}
 
-	public Date getEndDate(){
+	public String getEndDate(){
 		return startDate;
 	}
 
-	public void setEndDate(Date newEndDate){
+	public void setEndDate(String newEndDate){
 		endDate = newEndDate;
 	}
 
-	public String getDone(){
-		return done;
+	public String getStatus(){
+		return status;
 	}
 
-	public void setDone(String newDone){
-		done=newDone;
+	public void setStatus(String newStatus){
+		status = newStatus;
+	}
+	
+	public String getTaskInfo() {
+		return taskInfo;
+	}
+	
+	public void setTaskInfo(String newTaskInfo) {
+		taskInfo = newTaskInfo;
 	}
 
 	public Task copy(){
@@ -83,30 +92,23 @@ public class Task{
 		newTask.setPriority(priority);
 		newTask.setStartDate(startDate);
 		newTask.setEndDate(endDate);
-		newTask.setDone(done);
+		newTask.setStatus(status);
+		newTask.setTaskInfo(taskInfo);
 
 		return newTask;
-	}
-
-	//helper function to convert from String in dd/MM hh:mm format to Date
-	private static Date stringToDate(String dateString){
-        try {
-            return standardDateFormat.parse(dateString);
-        } catch (Exception e) {
-        	return null;
-        }
 	}
 
 	//the standard date format dd/MM hh:mm is used in storage
 	public String toString(){
 		JSONObject task = new JSONObject();
-		task.put("name",name);
-		task.put("deadline",standardDateFormat.format(deadline));
-		task.put("startDate",standardDateFormat.format(startDate));
-		task.put("endDate",standardDateFormat.format(endDate));
-		task.put("priority",priority);
-		task.put("group",group);
-		task.put("done",done);
+		task.put("name", name);
+		task.put("deadline", deadline);
+		task.put("startDate", startDate);
+		task.put("endDate", endDate);
+		task.put("priority", priority);
+		task.put("group", group);
+		task.put("status", status);
+		task.put("taskInfo", taskInfo);
 		
 		try{
 			StringWriter out = new StringWriter();
@@ -128,13 +130,15 @@ public class Task{
 		    JSONObject jsonObj = (JSONObject)obj;
 		    Task task = new Task((String)jsonObj.get("name"));
 		    
-		    task.setDeadline( stringToDate((String)jsonObj.get("deadline")) );
-		    task.setStartDate( stringToDate((String)jsonObj.get("startDate")) );
-		    task.setEndDate( stringToDate((String)jsonObj.get("endDate")) );
+		    task.setDeadline((String)jsonObj.get("deadline"));
+		    task.setStartDate((String)jsonObj.get("startDate"));
+		    task.setEndDate((String)jsonObj.get("endDate"));
 		    
 		    task.setGroup((String)jsonObj.get("group"));
 		    task.setPriority((String)jsonObj.get("priority"));
-		    task.setDone((String)jsonObj.get("done"));
+		    task.setStatus((String)jsonObj.get("status"));
+		    
+		    task.setTaskInfo((String)jsonObj.get("taskInfo"));
 
 		    return task;
 

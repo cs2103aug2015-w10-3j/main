@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.Scanner;
+import java.util.*;
+import java.lang.*;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -8,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.FlowLayout;
 import java.awt.event.*;
+import javax.swing.table.DefaultTableModel;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
@@ -15,9 +18,7 @@ import javax.swing.text.DefaultCaret;
 public class TaskUIManager {
 
 	private static String ENTER = "Enter";
-    private static String CLEAR = "clear";
     private static String APP_NAME = "To-Do";
-    private static String SHOWALL_COMMAND = "showall";
 	private static String GOOBYE_MESSAGE = "Goodbye!";
 	private static String WELCOME_MESSAGE = "Welcome to To-Do list. ";
     private static String COMMAND_MESSAGE = "$" + APP_NAME + ": ";
@@ -28,8 +29,19 @@ public class TaskUIManager {
     public static JTextField input;
     static JFrame frame;
     static JPanel panel;
-
-	static int windowHigh = 30;
+    static JTable table;
+    
+    // column to display in table
+    static String[] columnNames = new String[] {"Task Name",
+                        "Deadline",
+                        "Start Date",
+                        "End Date",
+                        "Prioriry",
+                        "Group",
+                        "Status"
+                        };
+    static ArrayList<Task> dataTaskList = new ArrayList<Task>();
+	static int windowHigh = 5;
 	static int windowWidth = 70;
     static int userCommandCount = 0;
 
@@ -48,16 +60,28 @@ public class TaskUIManager {
         {
             ex.printStackTrace();
         }
+        String message = mMainLogic.process(AppConst.COMMAND_TYPE.SHOW_ALL, dataTaskList);
         openToDoListWindow();
 
         displayMessage(WELCOME_MESSAGE);
-        String message = mMainLogic.process(SHOWALL_COMMAND);
         assert message != null;
         displayMessage(message);
-        displayMessage(NEW_LINE);
-        displayMessage(COMMAND_MESSAGE);
+	}
+	
+	public static String[] getDataFromTask(Task task) {
+		String[] data = new String[7];
+		data[0] = task.getName();
+		data[1] = task.getDeadline();
+		data[2] = task.getStartDate();
+		data[3] = task.getEndDate();
+		data[4] = task.getPriority();
+		data[5] = task.getGroup();
+		data[6] = task.getStatus();
+		return data;
 	}
 
+	
+	
 	private static void displayMessage(String message) {
 		output.append(message);
 	}
@@ -81,8 +105,25 @@ public class TaskUIManager {
         output.setWrapStyleWord(true);
         output.setEditable(false);
         
-        // Create scroll bar if text area is full
-        JScrollPane scroller = new JScrollPane(output);
+        // Create table to display tasks
+        table = new JTable();
+        DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
+        tableModel.setColumnIdentifiers(columnNames);
+        
+        // Set data for table
+        for(int i=0; i<dataTaskList.size(); i++) {
+            String[] data = getDataFromTask(dataTaskList.get(i));
+            tableModel.addRow(data);
+        }
+        
+		// Create scroll bar if table area is full        
+        JScrollPane scroller = new JScrollPane(table);
+        scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        table.setFillsViewportHeight(true);
+
+		// Create scroll bar if text area is full
+        JScrollPane scroller2 = new JScrollPane(output);
         scroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         
@@ -104,6 +145,7 @@ public class TaskUIManager {
         DefaultCaret caret = (DefaultCaret) output.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         panel.add(scroller);
+        panel.add(scroller2);
         inputpanel.add(input);
         panel.add(inputpanel);
         
@@ -118,6 +160,7 @@ public class TaskUIManager {
         displayMessage(COMMAND_MESSAGE);
     }  
 
+	// Support history user commands by press key UP and DOWN
     private static void panelKeyPressAction(KeyEvent event) {
         if (event.getKeyCode() == KeyEvent.VK_UP || event.getKeyCode() == KeyEvent.VK_DOWN) {
             String userCommand = "";
@@ -152,32 +195,43 @@ public class TaskUIManager {
                 if (ENTER.equals(cmd))
                 {
                 	String userCommand = input.getText();
-                    if (userCommand.equals(CLEAR)) {
+                	output.setText("");
+                	displayMessage(COMMAND_MESSAGE + userCommand + NEW_LINE);
+                	
+                	// Clear text field
+                    if (userCommand.equals(AppConst.COMMAND_TYPE.CLEAR)) {
                         output.setText("");
                         mMainLogic.deleteAllUserCommands();
+                        displayMessage(COMMAND_MESSAGE);
                         userCommandCount = 0;
                     } else {
-                    	String message = mMainLogic.process(userCommand);
-
-                        displayMessage(userCommand);
-                        displayMessage(NEW_LINE);
+                    	
+                    	// Executed user command
+                    	String message = mMainLogic.process(userCommand, dataTaskList);
+                    	
+                    	// Message = null means user want to exit
                     	if (message == null) {
                     		displayMessage(GOOBYE_MESSAGE);
                     		frame.setVisible(false);
                     		frame.dispose();
                     	} else {
+                    		
+                    		// Updated table depends on user command
+                    		DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
+                    		tableModel.setRowCount(0);
+				            for(int i=0; i<dataTaskList.size(); i++) {
+				            	String[] data = getDataFromTask(dataTaskList.get(i));
+				            	tableModel.addRow(data);
+				            }
+                    		tableModel.fireTableDataChanged();
                     		displayMessage(message);
-                            displayMessage(NEW_LINE);
                     	}
                     }
                     userCommandCount = 0;
                 }
-            } else {
-                displayMessage(NEW_LINE);
             }
             input.setText("");
             input.requestFocus();
-            displayMessage(COMMAND_MESSAGE);
         }
     }
 
