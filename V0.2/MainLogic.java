@@ -5,36 +5,63 @@ import java.lang.*;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 
-
 public class MainLogic {
 
-    private String dataFile = "default.txt";
    	private final String PRIORITY_LOW = "low";
 
 	CommandParser mTaskCommandParse = new CommandParser();
+
+	//constants
+	private static final String ENTER = "Enter";
+    private static final String SETTINGS_FILE = "settings.txt";
+    private static final int SEPARATE_LINE = 75;
+	private static final int BIG_NUM = 100000;
+	
+	//standard day format
+	private static SimpleDateFormat standardDayFormat = new SimpleDateFormat("dd/MM");
+	private static SimpleDateFormat standardTimeFormat = new SimpleDateFormat("dd/MM hh:mm");
+	
+	//the parser and the storage objects
+	private CommandParser mCommandParser;
+	private Storage mDataStorage;
+	private Storage mSettingsStorage;
+
+	//global variables for storing internal data
 	private ArrayList<DataState> mHistory;
 	private int mCurrentState;
 	private ArrayList<Task> mAllTasks;
 	private ArrayList<String> mAllUserCommands;
 	private Storage mStorage;
 	
-	private int mBigNum = 100000;
+	private Settings mSettings = new Settings();
 
-	
 	public MainLogic() {
 		//Initialise the variables;
-		mStorage = new Storage();
-		mStorage.setFileURL(dataFile);
+		mCommandParser = new CommandParser();
+		
+		mSettingsStorage = new Storage();
+		mSettingsStorage.setFileURL(SETTINGS_FILE);
+		//mSettings = mSettingsStorage.readSettings();
+		mSettings.setDataFileUrl("data1.txt");
+		mDataStorage = new Storage();
+		mDataStorage.setFileURL(mSettings.getDataFileUrl());
+		
 		mAllUserCommands = new ArrayList<String>();
-
  		initialiseTasks();
 	}
 
+
+	
+	/**
+	 * This function initilises the mAllTasks with data read from mDataStorage.
+	 * It also initialises the mHistory and mCurrentState
+	 * 
+	 * */
 	protected void initialiseTasks(){
 		mAllTasks = new ArrayList<Task>();
 		mHistory = new ArrayList<DataState>();
 		try{
-			mAllTasks = mStorage.readContent();
+			mAllTasks = mDataStorage.readContent();
 			mHistory.add(new DataState(mAllTasks));
 			mCurrentState = 0;
 		} catch (Exception e){
@@ -42,6 +69,11 @@ public class MainLogic {
 		}
 	}
 
+	/**
+	 * This function update the mHistory after each change in mAllTasks.
+	 * So that we could redo/undo changes in mAllTasks
+	 * 
+	 * */
 	protected void updateHistory(){
 		if (mCurrentState < mHistory.size()-1){
 			while (mHistory.size()>mCurrentState+1)
@@ -51,9 +83,11 @@ public class MainLogic {
 		mCurrentState++;
 	}
 
-
+	/**
+	 * These are the comparator classes for comparing Task according to different fields
+	 * 
+	 * */
 	private class TaskPriorityCompare implements Comparator<Task> {
-
 	    @Override
 	    public int compare(Task o1, Task o2) {
 	        // write comparison logic here like below , it's just a sample
@@ -61,12 +95,10 @@ public class MainLogic {
 	        String p2 = o2.getPriority();
 	        if (p1.equals(PRIORITY_LOW)) p1 = "n";
 	        if (p2.equals(PRIORITY_LOW)) p2 = "n";
-	        
 	        return p1.compareTo(p2);
 	    }
 	}
 	private class TaskDeadlineCompare implements Comparator<Task> {
-
 	    @Override
 	    public int compare(Task o1, Task o2) {
 	        // write comparison logic here like below , it's just a sample
@@ -76,219 +108,225 @@ public class MainLogic {
 	    }
 	}
 	private class TaskGroupCompare implements Comparator<Task> {
-
 	    @Override
 	    public int compare(Task o1, Task o2) {
 	        // write comparison logic here like below , it's just a sample
 	       	return o1.getGroup().compareTo(o2.getGroup());
 	    }
 	}
-	protected String process(String userCommand, ArrayList<Task> taskList) {
 
-		taskList = new ArrayList<Task>();
-		addNewUserCommand(userCommand);
+	protected String executeAdd(Command mCommand, ArrayList<Task> feedbackTasks){
+		boolean isExisted = false;
+		Task newTask = mCommand.getNewTask();
 
-		String command = "", taskInfo = "";
-		String[] commandInfo = mTaskCommandParse.getCommandInfo(userCommand);
-		assert commandInfo.length>0;
-		command = commandInfo[0];  String field1 = commandInfo[1];
-		taskInfo = field1;
-		int count;
-		String res;
-		switch (command){
-			case AppConst.COMMAND_TYPE.ADD:
-				Task newTask = new Task(field1);
-				newTask.setDeadline(commandInfo[2]);
-				newTask.setPriority(commandInfo[3]);
-				newTask.setGroup(commandInfo[4]);
-				newTask.setTaskInfo(getTaskInfo(userCommand));
-
-				boolean isExisted = false;
-				for(int i=0; i<mAllTasks.size(); i++) {
-					if (mAllTasks.get(i).getTaskInfo().equals(getTaskInfo(userCommand))) {
-						isExisted = true; 
-						break;
-					}
-				}
-				if (isExisted) {
-					taskList = mAllTasks;
-					return AppConst.MESSAGE.TASK_EXISTS;
-				}
-				mAllTasks.add(newTask);
-				updateHistory();
-				mStorage.rewriteContent(mAllTasks);
-				taskList = mAllTasks;
-				System.out.println(mAllTasks.size());
-				return String.format(AppConst.MESSAGE.TASK_ADDED, newTask.getTaskInfo());
-			case AppConst.COMMAND_TYPE.SHOW_ALL:
-				taskList = mAllTasks;
-				if (mAllTasks.size() > 0) {
-					return AppConst.MESSAGE.TASK_TO_DO;
-				} else {
-					return AppConst.MESSAGE.NO_TASK_FOUND;
-				}
-			case AppConst.COMMAND_TYPE.DELETE:
-				String message = AppConst.MESSAGE.MANY_TASKS_MATCHED;
-				int numberMatched = 0, position = 0;
-				String deleted = "";
-				for (int i=0;i<mAllTasks.size();i++){
-					String taskName = mAllTasks.get(i).getTaskInfo();
-					if (taskName.equals(taskInfo)){
-						mAllTasks.remove(i);
-						updateHistory();
-						mStorage.rewriteContent(mAllTasks);
-						taskList = mAllTasks;
-						return String.format(AppConst.MESSAGE.REMOVED_SUCCESSFUL, taskName);
-					}
-					if (taskName.startsWith(taskInfo)) {
-						numberMatched++;
-						deleted = taskName;
-						position = i;
-					}
-				}
-				if (numberMatched > 0) {
-					if (numberMatched == 1) {
-						mAllTasks.remove(position);
-						updateHistory();
-						mStorage.rewriteContent(mAllTasks);
-						taskList = mAllTasks;
-						return String.format(AppConst.MESSAGE.REMOVED_SUCCESSFUL, deleted);
-					}
-					return message;
-				}
-				taskList = mAllTasks;
-				return  String.format(AppConst.MESSAGE.TASK_NOT_FOUND, taskInfo);
-
-			case AppConst.COMMAND_TYPE.UPDATE:
-				String updated;
-				String [] arguments = taskInfo.split(" ");
-
-				if (arguments.length != 2) {
-					return String.format(AppConst.MESSAGE.COMMAND_ERROR, taskInfo);
-				}
-				for (int i=0;i<mAllTasks.size();i++){
-					if (mAllTasks.get(i).getName().equals(arguments[0])){
-						updated = mAllTasks.get(i).getName();
-						mAllTasks.get(i).setName(arguments[1]);
-
-						updateHistory();
-						mStorage.rewriteContent(mAllTasks);
-						taskList = mAllTasks;
-						return AppConst.MESSAGE.UPDATED_SUCCESSFUL;
-					}
-				}
-				taskList = mAllTasks;
-				return String.format(AppConst.MESSAGE.TASK_NOT_FOUND, arguments[0]);
-			case AppConst.COMMAND_TYPE.SHOW_BY:
-				if (mAllTasks.size() == 0) {
-					return AppConst.MESSAGE.NO_TASK_FOUND;
-				}			
-				switch (field1){
-					case AppConst.TASK_FIELD.DEADLINE:
-						taskList = duplicate(mAllTasks);
-						Collections.sort(taskList,new TaskDeadlineCompare());
-						break;
-					case AppConst.TASK_FIELD.PRIORITY:
-						taskList = duplicate(mAllTasks);
-						Collections.sort(taskList,new TaskPriorityCompare());
-						break;
-					case AppConst.TASK_FIELD.GROUP:
-						taskList = duplicate(mAllTasks);
-						Collections.sort(taskList,new TaskGroupCompare());
-						break;
-					default:
-						taskList = mAllTasks;
-				}
-				return "";
-			case AppConst.COMMAND_TYPE.SHOW_DAY:
-				for (int i=0;i<mAllTasks.size();i++){
-					if (mAllTasks.get(i).getDeadline().equals(field1)){
-						taskList.add(mAllTasks.get(i));
-					}
-				}
-				if (taskList == null || taskList.size()==0) {
-					return AppConst.MESSAGE.NO_TASK_FOUND;
-				}
-				return "";
-
-			case AppConst.COMMAND_TYPE.SHOW_PRIORITY:
-				for (int i=0;i<mAllTasks.size();i++){
-					if (mAllTasks.get(i).getPriority().equals(field1)){
-						taskList.add(mAllTasks.get(i));
-					}
-				}
-				if (taskList == null || taskList.size()==0) {
-					return AppConst.MESSAGE.NO_TASK_FOUND;
-				} 
-				return "";
-			case AppConst.COMMAND_TYPE.SHOW_GROUP:
-				for (int i=0;i<mAllTasks.size();i++){
-					if (mAllTasks.get(i).getGroup().equals(field1)){
-						taskList.add(mAllTasks.get(i));
-					}
-				}
-				if (taskList == null || taskList.size()==0) {
-					return AppConst.MESSAGE.NO_TASK_FOUND;
-				} 
-				return "";
-			case AppConst.COMMAND_TYPE.SET_FILE:
-				mStorage.setFileURL(field1);
-				initialiseTasks();
-				return String.format(AppConst.MESSAGE.CHANGED_SUCCESSFUL, field1);
-			case AppConst.COMMAND_TYPE.UNDO:
-				if (mCurrentState>0) {
-					mCurrentState--;
-					mAllTasks = mHistory.get(mCurrentState).getAllTasks();
-					mStorage.rewriteContent(mAllTasks);
-					taskList = mAllTasks;
-					return AppConst.MESSAGE.UNDID_SUCCESSFUL;
-				}else{
-					taskList = mAllTasks;
-					return AppConst.MESSAGE.NOTHING_UNDONE;
-				}
-			case AppConst.COMMAND_TYPE.REDO:
-				if (mCurrentState < mHistory.size()-1){
-					mCurrentState++;
-					mAllTasks = mHistory.get(mCurrentState).getAllTasks();
-					mStorage.rewriteContent(mAllTasks);
-					taskList = mAllTasks;
-					return AppConst.MESSAGE.REDID_SUCCESSFUL;
-				} else {
-					taskList = mAllTasks;
-					return AppConst.MESSAGE.NOTHING_REDONE;
-				}
-			case AppConst.COMMAND_TYPE.SEARCH:
-				return searchForKey(field1, taskList);
-			case AppConst.COMMAND_TYPE.EXIT:
-				return null;
-			default:
-				taskList = mAllTasks;
-				return String.format(AppConst.MESSAGE.COMMAND_ERROR, command);
+		for(int i=0; i<mAllTasks.size(); i++) {
+			if (mAllTasks.get(i).getName().equals(newTask.getName()) ) {
+				isExisted = true; 
+				break;
+			}
 		}
+
+		if (isExisted) {
+			feedbackTasks = mAllTasks;
+			return AppConst.MESSAGE.TASK_EXISTS;
+		}
+
+		Date date = new Date();
+		String currentTime = standardTimeFormat.format(date);
+		String newTaskDeadline = newTask.getDeadline();
+		if (!newTaskDeadline.equals("") && newTaskDeadline!=null) {
+			if (currentTime.compareTo(newTaskDeadline)>0) {
+				return AppConst.MESSAGE.INVALID_DEADLINE;
+			}
+		}
+
+		mAllTasks.add(newTask);
+		updateHistory();
+		mDataStorage.rewriteContent(mAllTasks);
 		
+		return String.format(AppConst.MESSAGE.TASK_ADDED, newTask.getTaskInfo());
 	}
 
-	private String getTaskInfo(String userCommand) {
-		String[] splits = userCommand.split(" ");
-		String result = "";
-		for(int i = 1; i < splits.length; i++) {
-			if (i > 1) {
-				result += " ";
+	protected String executeDelete(Command mCommand, ArrayList<Task> feedbackTasks){
+		int numberMatched = 0, position = 0;
+		String deletedTask = "";
+		String taskToBeDeleted = mCommand.getCommandArgument();
+		ArrayList<Task> possibleMatches = new ArrayList<Task>();
+
+		for (int i=0;i<mAllTasks.size();i++){
+			String taskName = mAllTasks.get(i).getName();
+			if (taskName.equals(taskToBeDeleted)){
+				mAllTasks.remove(i);
+				updateHistory();
+				mDataStorage.rewriteContent(mAllTasks);
+				return String.format(AppConst.MESSAGE.REMOVED_SUCCESSFUL, taskName);
 			}
-			result += splits[i];
+			if (taskName.startsWith(taskToBeDeleted)) {
+				numberMatched++;
+				deletedTask = taskName;
+				position = i;
+				possibleMatches.add(mAllTasks.get(i));
+			}
 		}
-		return result;
+
+		if (numberMatched > 0) {
+			if (numberMatched == 1) {
+				mAllTasks.remove(position);
+				updateHistory();
+				mDataStorage.rewriteContent(mAllTasks);
+				return String.format(AppConst.MESSAGE.REMOVED_SUCCESSFUL, deletedTask);
+			}
+			feedbackTasks = possibleMatches;
+			return AppConst.MESSAGE.MANY_TASKS_MATCHED;
+		}
+		return String.format(AppConst.MESSAGE.TASK_NOT_FOUND, taskToBeDeleted);
+	}
+
+	protected String executeUpdate(Command mCommand, ArrayList<Task> feedbackTasks){
+		Task updatedInfo = mCommand.getUpdatedTask();
+		String taskToBeUpdated = mCommand.getCommandArgument();
+
+		for (int i=0;i<mAllTasks.size();i++){
+			if ( mAllTasks.get(i).getName().equals(taskToBeUpdated) ){
+				
+				Task mTask = mAllTasks.get(i);
+
+				if ( !updatedInfo.getName().equals("") ){
+					mTask.setName(updatedInfo.getName());					
+				}
+				
+				if ( !updatedInfo.getGroup().equals("") ){
+					mTask.setGroup(updatedInfo.getGroup());					
+				}
+
+				if ( !updatedInfo.getPriority().equals("") ){
+					mTask.setPriority(updatedInfo.getPriority());					
+				}
+
+				if ( updatedInfo.getStartDate() != null ){
+					mTask.setStartDate(updatedInfo.getStartDate());					
+				}
+
+				if ( updatedInfo.getEndDate() != null ){
+					mTask.setEndDate(updatedInfo.getEndDate());					
+				}
+
+				if ( updatedInfo.getDeadline() != null ){
+					mTask.setDeadline(updatedInfo.getDeadline());					
+				}
+
+				updateHistory();
+				mDataStorage.rewriteContent(mAllTasks);
+
+				return String.format(AppConst.MESSAGE.UPDATED_SUCCESSFUL, taskToBeUpdated);
+			}
+		}
+
+		return String.format(AppConst.MESSAGE.TASK_NOT_FOUND, taskToBeUpdated);
+	}
+
+	protected String executeShowby(Command mCommand, ArrayList<Task> feedbackTasks){
+		if (mAllTasks.size() == 0) {
+			return AppConst.MESSAGE.NO_TASK_FOUND;
+		}
+
+		feedbackTasks = duplicate(mAllTasks);
+
+		switch (mCommand.getCommandArgument()){
+			case AppConst.TASK_FIELD.DEADLINE:
+				Collections.sort(feedbackTasks,new TaskDeadlineCompare());
+				return AppConst.MESSAGE.DISPLAY_BY_DEADLINE;
+
+			case AppConst.TASK_FIELD.PRIORITY:
+				Collections.sort(feedbackTasks,new TaskPriorityCompare());
+				return AppConst.MESSAGE.DISPLAY_BY_PRIORITY;
+
+			case AppConst.TASK_FIELD.GROUP:
+				Collections.sort(feedbackTasks,new TaskGroupCompare());
+				return AppConst.MESSAGE.DISPLAY_BY_GROUP;
+
+			default:
+				return AppConst.MESSAGE.NOT_RECOGNIZED_SYNTAX;
+				
+		}
+	}
+
+	protected String executeShow(Command mCommand, ArrayList<Task> feedbackTasks){
+		feedbackTasks = new ArrayList<Task>();
+		String argument = mCommand.getCommandArgument();
+
+		for (int i=0;i<mAllTasks.size();i++){
+			switch (mCommand.getCommandType()){
+				case AppConst.COMMAND_TYPE.SHOW_DAY:
+					String deadline = mAllTasks.get(i).getDeadline();
+
+					if (deadline.equals(argument) ){
+						feedbackTasks.add(mAllTasks.get(i));
+					}
+					break;
+
+				case AppConst.COMMAND_TYPE.SHOW_PRIORITY:
+					if (mAllTasks.get(i).getPriority().equals(argument)){
+						feedbackTasks.add(mAllTasks.get(i));	
+					}
+					break;
+
+				case AppConst.COMMAND_TYPE.SHOW_GROUP:
+					if (mAllTasks.get(i).getGroup().equals(argument)){
+						feedbackTasks.add(mAllTasks.get(i));	
+					}
+					break;
+
+				default: break;
+			}
+		}
+
+		if (feedbackTasks.size()==0){
+			feedbackTasks = mAllTasks;
+			return String.format(AppConst.MESSAGE.NOTHING_TO_SHOW, argument);
+		}
+		return String.format(AppConst.MESSAGE.SHOWING_TASK, mCommand.getCommandType().substring(4), argument);
+	}
+
+	protected String executeSetFile(Command mCommand, ArrayList<Task> feedbackTasks){
+		//update the internal settings object and save it to the setting file.
+		mSettings.setDataFileUrl(mCommand.getCommandArgument());
+		mSettingsStorage.writeSettings(mSettings);
+
+		//Set the new file URL for the dataStorage and reload tasks;
+		mDataStorage.setFileURL(mCommand.getCommandArgument());
+		initialiseTasks();
+
+		return String.format(AppConst.MESSAGE.CHANGED_SUCCESSFUL, mCommand.getCommandArgument());
 	}
 	
-	//supported simple search API
-	private class MatchCount {
-		int id, count;
+	protected String executeUndo(Command mCommand, ArrayList<Task> feedbackTasks){
+		if (mCurrentState>0) {
+			mCurrentState--;
+			mAllTasks = mHistory.get(mCurrentState).getAllTasks();
+			mDataStorage.rewriteContent(mAllTasks);
+			feedbackTasks = mAllTasks;
+			return AppConst.MESSAGE.UNDID_SUCCESSFUL;
+		}
+		return AppConst.MESSAGE.NOTHING_UNDONE;
 	}
 
-	private String searchForKey(String arg, ArrayList<Task> taskList) {
-		String[] arguments = arg.split(" ");
+	protected String executeRedo(Command mCommand, ArrayList<Task> feedbackTasks){
+		if (mCurrentState < mHistory.size()-1){
+			mCurrentState++;
+			mAllTasks = mHistory.get(mCurrentState).getAllTasks();
+			mDataStorage.rewriteContent(mAllTasks);
+			feedbackTasks = mAllTasks;
+			return AppConst.MESSAGE.REDID_SUCCESSFUL;
+		}
+		return AppConst.MESSAGE.NOTHING_REDONE;
+	}
+
+	protected String executeSearch(Command mCommand, ArrayList<Task> feedbackTasks) {
+		String[] arguments = mCommand.getCommandArgument().split(" ");
 
 		ArrayList<MatchCount> matchCount = new ArrayList<MatchCount>();
+		
 		for(int i=0; i<mAllTasks.size(); i++) {
 			matchCount.add(i, new MatchCount());
 			matchCount.get(i).id = i;
@@ -300,8 +338,8 @@ public class MainLogic {
 			}
 			task = task.toLowerCase();
 
-			if (task.contains(arg)) {
-				matchCount.get(i).count = mBigNum;
+			if (task.contains(mCommand.getCommandArgument())) {
+				matchCount.get(i).count = BIG_NUM;
 				continue;
 			}
 			for(int j=0; j<arguments.length; j++) {
@@ -313,39 +351,114 @@ public class MainLogic {
 					}
 				}
 			}
-
 		}
+
 		Collections.sort(matchCount, new TaskSearchMatchCountCompare());
 		String result = "";
-		int count = 0;
+
+		feedbackTasks = new ArrayList<Task>();
+
 		boolean isMatched = false;
 		for(int i=0; i<Math.min(matchCount.size(), 10); i++) {
 			if (i == 0 && matchCount.get(i).count == 0) {
 				//Nothing matched!
-				result = "";
 				break;
 			}
 			int point = matchCount.get(i).count;
-			if (point >= mBigNum) {
+			if (point >= BIG_NUM) {
 				isMatched = true;
 			}
-			if (point < mBigNum && isMatched) {
+			if (point < BIG_NUM && isMatched) {
 				break;
 			}
 			if (point > 0) {
 				int id = matchCount.get(i).id;
-				taskList.add(mAllTasks.get(id));
-				count++;
+				feedbackTasks.add(mAllTasks.get(id));
 			}
 		}
-		if (count == 0) {
-			result = AppConst.MESSAGE.NOTHING_MATCHED;
-		} else {
-			result = String.format(AppConst.MESSAGE.FOUND, count);
+
+		if (feedbackTasks.size()==0) {
+			feedbackTasks = mAllTasks;
+			return AppConst.MESSAGE.NOTHING_MATCHED;
 		}
 
-		return result;
+		return String.format(AppConst.MESSAGE.SHOWING_RESULT, mCommand.getCommandArgument());
 
+	}
+
+	/**
+	 * the main function for the UI to call to execute a command
+	 * returns a feedback String and an ArrayList of Task in feedbackTasks
+	 * 
+	 * */
+	protected String process(String userCommand, ArrayList<Task> feedbackTasks) {
+
+		addNewUserCommand(userCommand);
+		Command mCommand = mCommandParser.parse(userCommand);
+
+		//For most of the times the tasks to be displayed after each command is all the tasks.
+		//if it is otherwise, later codes will modify this pointer
+		feedbackTasks = mAllTasks;
+
+		switch (mCommand.getCommandType()){
+			case AppConst.COMMAND_TYPE.ADD:
+				return executeAdd(mCommand,feedbackTasks);
+				
+			case AppConst.COMMAND_TYPE.SHOW_ALL:
+				return AppConst.MESSAGE.TASK_TO_DO;
+
+			case AppConst.COMMAND_TYPE.DELETE:
+				return executeDelete(mCommand,feedbackTasks);
+
+			case AppConst.COMMAND_TYPE.UPDATE:
+				return executeUpdate(mCommand,feedbackTasks);
+				
+			case AppConst.COMMAND_TYPE.SHOW_BY:
+				return executeShowby(mCommand,feedbackTasks);
+			
+			case AppConst.COMMAND_TYPE.SHOW_DAY:
+			case AppConst.COMMAND_TYPE.SHOW_PRIORITY:
+			case AppConst.COMMAND_TYPE.SHOW_GROUP:
+				return executeShow(mCommand,feedbackTasks);
+
+			case AppConst.COMMAND_TYPE.SET_FILE:
+				return executeSetFile(mCommand,feedbackTasks);
+
+			case AppConst.COMMAND_TYPE.UNDO:
+				return executeUndo(mCommand,feedbackTasks);
+
+			case AppConst.COMMAND_TYPE.REDO:
+				return executeRedo(mCommand,feedbackTasks);
+			
+			case AppConst.COMMAND_TYPE.SHOW:
+			case AppConst.COMMAND_TYPE.SEARCH:
+				return executeSearch(mCommand,feedbackTasks);
+
+			case AppConst.COMMAND_TYPE.EXIT:
+				return null;
+
+			default:
+				return String.format(AppConst.MESSAGE.SYNTAX_ERROR, mCommand.getCommandType());
+		}
+		
+	}
+
+	private String getTaskInfo(String userCommand) {
+		String[] splits = userCommand.split(" ");
+	 	String result = "";
+	 	for(int i = 1; i < splits.length; i++) {
+	 		if (i > 1) {
+	 			result += " ";
+	 		}
+	 		result += splits[i];
+	 	}
+	 	return result;
+	}
+	
+	//supported simple search API
+
+	private class MatchCount {
+		int id, count;
 	}
 
 	private class TaskSearchMatchCountCompare implements Comparator<MatchCount> {
@@ -367,7 +480,7 @@ public class MainLogic {
 			newTasks.add(tasks.get(i).copy());
 		return newTasks;
 	}
-
+	
 	//supported key up/down to show old command
 	private void addNewUserCommand(String userCommand) {
 		mAllUserCommands.add(userCommand);

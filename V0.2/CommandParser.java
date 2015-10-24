@@ -8,6 +8,37 @@ public class CommandParser {
 	public CommandParser() {
 		
 	}
+	
+	protected Command parse(String userCommand) {
+		
+		mPosition = 0;
+		Command command = new Command();
+		String commandType = getCommandType(userCommand);
+		command.setCommandType(commandType);
+		command.setCommandArgument(getCommandSecondArgument(userCommand));
+		command.setNewTask(null);
+		command.setUpdatedTask(null);
+		
+		switch (commandType) {
+			case AppConst.COMMAND_TYPE.ADD:
+			case AppConst.COMMAND_TYPE.UPDATE:
+			case AppConst.COMMAND_TYPE.DELETE:
+				Task task = new Task("");
+				task.setDeadline(getDeadlineForTask(userCommand));
+				task.setPriority(getPriorityForTask(userCommand));
+				task.setGroup(getGroupForTask(userCommand));
+				task.setTaskInfo(getCommandArgument(userCommand));
+				task.setName(getTaskInfo(userCommand));
+		
+				command.setNewTask(task);
+				command.setUpdatedTask(task);
+				break;
+			default:
+				command.setCommandArgument(getCommandArgument(userCommand));
+				
+		}
+		return command;
+	}
 
 	protected String[] getCommandInfo(String userCommand) {
         String[] result = new String[10];
@@ -95,24 +126,31 @@ public class CommandParser {
 
 	private String getCommandType(String userCommand) {
         
-        String command = "";
-        for(int i=0; i<userCommand.length(); i++) {
-            if (userCommand.charAt(i) == ' ') {
-                break;
-            } else {
-                command += userCommand.charAt(i);
-            }
+        String[] splits = userCommand.split(" ");
+        return splits[0];
+    }
+    
+    
+    
+    private String getCommandSecondArgument(String userCommand) {
+        
+        String[] splits = userCommand.split(" ");
+        if (splits.length > 1) {
+        	return splits[1];
         }
-        return command;   
+        return "";  
     }
 
     private String getCommandArgument(String userCommand) {
-    	String commandArgument = "";
-        String command = getCommandType(userCommand);
-        for(int i=command.length()+1; i<userCommand.length(); i++) {
-            commandArgument = commandArgument + userCommand.charAt(i);
-        }
-        return commandArgument;
+    	String[] splits = userCommand.split(" ");
+        String result = "";
+        for(int i=1; i<splits.length; i++) {
+        	result += splits[i];
+        	if (i != splits.length-1) {
+        		result += " ";
+        	}
+       	}
+       	return result;
     }
 
 }

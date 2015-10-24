@@ -6,7 +6,7 @@ import org.json.simple.parser.JSONParser;
 import java.io.*;
 import java.text.*;
 
-public class Task{
+public class Task {
 	private String name;
 	private String priority="medium";
 	private String group="";
@@ -15,7 +15,6 @@ public class Task{
 	private String startDate="";
 	private String endDate="";
 	private String taskInfo;
-	static SimpleDateFormat standardDateFormat = new SimpleDateFormat("dd/MM hh:mm");
 
 	public Task(String newname) {
 		name = newname;
@@ -96,57 +95,6 @@ public class Task{
 		newTask.setTaskInfo(taskInfo);
 
 		return newTask;
-	}
-
-	//the standard date format dd/MM hh:mm is used in storage
-	public String toString(){
-		JSONObject task = new JSONObject();
-		task.put("name", name);
-		task.put("deadline", deadline);
-		task.put("startDate", startDate);
-		task.put("endDate", endDate);
-		task.put("priority", priority);
-		task.put("group", group);
-		task.put("status", status);
-		task.put("taskInfo", taskInfo);
-		
-		try{
-			StringWriter out = new StringWriter();
-	      	task.writeJSONString(out);
-	      
-	      	return out.toString();
-	    }
-	    catch (Exception e){
-	    	e.printStackTrace();
-	    	return null;
-	    }
-
-	}
-
-	public static Task stringToTask(String str){
-		JSONParser parser = new JSONParser();
-		try{
-		    Object obj = parser.parse(str);
-		    JSONObject jsonObj = (JSONObject)obj;
-		    Task task = new Task((String)jsonObj.get("name"));
-		    
-		    task.setDeadline((String)jsonObj.get("deadline"));
-		    task.setStartDate((String)jsonObj.get("startDate"));
-		    task.setEndDate((String)jsonObj.get("endDate"));
-		    
-		    task.setGroup((String)jsonObj.get("group"));
-		    task.setPriority((String)jsonObj.get("priority"));
-		    task.setStatus((String)jsonObj.get("status"));
-		    
-		    task.setTaskInfo((String)jsonObj.get("taskInfo"));
-
-		    return task;
-
-      	}catch(ParseException pe){
-         	System.out.println("position: " + pe.getPosition());
-         	System.out.println(pe);
-         	return null;
-      	}
 	}
 }
 

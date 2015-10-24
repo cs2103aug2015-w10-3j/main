@@ -10,7 +10,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.FlowLayout;
 import java.awt.event.*;
+import java.awt.Component;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
@@ -41,8 +43,8 @@ public class TaskUIManager {
                         "Status"
                         };
     static ArrayList<Task> dataTaskList = new ArrayList<Task>();
-	static int windowHigh = 5;
-	static int windowWidth = 70;
+	static int windowHeight = 5;
+	static int windowWidth = 80;
     static int userCommandCount = 0;
 
 	public TaskUIManager() {
@@ -61,6 +63,15 @@ public class TaskUIManager {
             ex.printStackTrace();
         }
         String message = mMainLogic.process(AppConst.COMMAND_TYPE.SHOW_ALL, dataTaskList);
+        
+        
+        Storage storage = new Storage();
+        storage.setFileURL("data1.txt");
+        try {
+        	dataTaskList = storage.readContent();
+        } catch (IOException e) {
+        }
+        
         openToDoListWindow();
 
         displayMessage(WELCOME_MESSAGE);
@@ -98,7 +109,7 @@ public class TaskUIManager {
         
         // Create text area to display message to users
         ButtonListener buttonListener = new ButtonListener();
-        output = new JTextArea(windowHigh, windowWidth);
+        output = new JTextArea(windowHeight, windowWidth);
         output.setBackground(Color.white);
         output.setForeground(Color.black);
         output.setLineWrap(true);
@@ -106,7 +117,24 @@ public class TaskUIManager {
         output.setEditable(false);
         
         // Create table to display tasks
-        table = new JTable();
+        table = new JTable() {
+		    @Override
+			public Component prepareRenderer(TableCellRenderer renderer, int row, int col) {
+				Component comp = super.prepareRenderer(renderer, row, col);
+				Object value = getModel().getValueAt(row, col);
+				comp.setBackground(Color.white);
+				if (col == 4) {
+					if (value.equals("high")) {
+						comp.setBackground(Color.red);
+					} else if (value.equals("medium")) {
+						comp.setBackground(Color.yellow);
+					} else if (value.equals("low")) {
+						comp.setBackground(Color.green);
+					}
+				}
+				return comp;
+    		}
+        };
         DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
         tableModel.setColumnIdentifiers(columnNames);
         
@@ -208,6 +236,13 @@ public class TaskUIManager {
                     	
                     	// Executed user command
                     	String message = mMainLogic.process(userCommand, dataTaskList);
+                    	
+                    	Storage storage = new Storage();
+        storage.setFileURL("data1.txt");
+        try {
+        	dataTaskList = storage.readContent();
+        } catch (IOException e) {
+        }
                     	
                     	// Message = null means user want to exit
                     	if (message == null) {
