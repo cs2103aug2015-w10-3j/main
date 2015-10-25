@@ -47,7 +47,7 @@ public interface AppConst {
 		// Add new task
 		String TASK_EXISTS = "Can not add new task. This task already existed! Look at table above.\n";
 		String TASK_ADDED = "Successful added '%s' \n";
-		String INVALID_DEADLINE = "Can not add new task with invalid deadline!\n";
+		String INVALID_DEADLINE = "Can not add new task with invalid deadline! Current date and time is %s\n";
 		
 		// Show
 		String TASK_TO_DO = "These are your tasks to do!";

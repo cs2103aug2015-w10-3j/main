@@ -1,9 +1,15 @@
-import java.util.ArrayList;
+
 import java.io.*;
+import java.util.*;
+import java.lang.*;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 
 public class CommandParser {
 	
     private int mPosition = 0;
+    
+    private static SimpleDateFormat standardTimeFormat = new SimpleDateFormat("dd/MM hh:mm");
 
 	public CommandParser() {
 		
@@ -22,9 +28,10 @@ public class CommandParser {
 		switch (commandType) {
 			case AppConst.COMMAND_TYPE.ADD:
 			case AppConst.COMMAND_TYPE.UPDATE:
-			case AppConst.COMMAND_TYPE.DELETE:
 				Task task = new Task("");
 				task.setDeadline(getDeadlineForTask(userCommand));
+				task.setStartDate(getStartDateForTask(userCommand));
+				task.setEndDate(getEndDateForTask(userCommand));
 				task.setPriority(getPriorityForTask(userCommand));
 				task.setGroup(getGroupForTask(userCommand));
 				task.setTaskInfo(getCommandArgument(userCommand));
@@ -44,7 +51,7 @@ public class CommandParser {
         String[] result = new String[10];
         mPosition = 0;
         result[0] = getCommandType(userCommand);
-        if (result[0].equals("add")) {
+        if (result[0].equals(AppConst.COMMAND_TYPE.ADD)) {
             result[2] = getDeadlineForTask(userCommand);
             result[3] = getPriorityForTask(userCommand);
             result[4] = getGroupForTask(userCommand);
@@ -57,12 +64,17 @@ public class CommandParser {
 
     private String getDeadlineForTask(String userCommand) {
         String[] splits = userCommand.split(" ");
+        String time = "";
         for(int i = splits.length - 1; i >= 0; i--) {
             if (splits[i].equals("by") || splits[i].equals("before")) {
                 String result = "";
-                mPosition = i;
+                if (mPosition == 0) {
+   					mPosition = i;
+   				} else {
+   					mPosition = Math.min(mPosition, i);
+   				}
                 for(int j = i+1; j < splits.length; j++) {
-                    if (splits[j].equals("grp") || splits[j].equals("group") || splits[j].equals("priority")) {
+                    if (splits[j].equals("grp") || splits[j].equals("group") || splits[j].equals("priority") || splits[j].equals("from") || splits[j].equals("to")) {
                         break;
                     } else {
                         if (j != i+1) {
@@ -72,6 +84,9 @@ public class CommandParser {
                     }
                 }
                 System.out.println(result);
+                if (!result.equals("")) {
+                	result = getStandardDateTimeFormatFromString(result, 2);
+                }
                 return result;
             }
         }
@@ -86,6 +101,8 @@ public class CommandParser {
                     System.out.println(splits[i+1]);
                     if (mPosition == 0) {
                         mPosition = i;
+                    } else {
+                    	mPosition = Math.min(mPosition, i);
                     }
                     return splits[i+1];
                 }
@@ -94,6 +111,95 @@ public class CommandParser {
         //default is medium
         return "medium";
     }
+    
+    private String getStartDateForTask(String userCommand) {
+   		String[] splits = userCommand.split(" ");
+   		Date date = new Date();
+   		String result = standardTimeFormat.format(date);
+   		String time = "";
+   		for(int i=splits.length-1; i>=0; i--) {
+   			if (splits[i].equals("from")) {
+   				if (mPosition == 0) {
+   					mPosition = i;
+   				} else {
+   					mPosition = Math.min(mPosition, i);
+   				}
+   				for(int j=i+1; j<splits.length; j++) {
+   					if (splits[j].equals("to") || splits[j].equals("priority") || splits[j].equals("group") || splits[j].equals("grp")) {
+   						break;
+   					} else {
+   						if (j>i+1) {
+   							time += " ";
+   						}
+   						time += splits[j];
+   					}
+   				}
+	   			if (!time.equals("")) {
+					time = getStandardDateTimeFormatFromString(time, 1);
+				}
+				break;
+   			}
+   		}
+   		if (!time.equals("")) {
+   			if (result.compareTo(time) < 0) {
+   				result = time;
+   			}
+   		}
+   		return result;
+    }
+    
+    private String getEndDateForTask(String userCommand) {
+   		String[] splits = userCommand.split(" ");
+   		String time = "";
+   		for(int i=splits.length-1; i>=0; i--) {
+   			if (splits[i].equals("to")) {
+   				if (mPosition == 0) {
+   					mPosition = i;
+   				} else {
+   					mPosition = Math.min(mPosition, i);
+   				}
+   				for(int j=i+1; j<splits.length; j++) {
+   					if (splits[j].equals("priority") || splits[j].equals("group") || splits[j].equals("grp")) {
+   						break;
+   					} else {
+   						if (j>i+1) {
+   							time += " ";
+   						}
+   						time += splits[j];
+   					}
+   				}
+   				if (!time.equals("")) {
+					time = getStandardDateTimeFormatFromString(time, 2);
+				}
+				break;
+   			}
+   		}
+   		System.out.println("End date: " + time);
+   		return time;
+    }
+    
+    
+    private String getStandardDateTimeFormatFromString(String dateTime, int flag) {
+    	// Do something crazy here
+    	// Flag = 1, if not specify time, time will be 00:00
+    	// Flag = 2, if not specify time, time will be 23:59
+    	
+    	return dateTime;
+    }
+    
+    private String getDateFromString(String dateTime) {
+    	
+    	// Do something crazy
+    	String date = dateTime;
+    	return date;
+    }
+    
+    private String getTimeFromString(String dateTime) {
+    
+    	// Do something crazy
+    	String time = dateTime;
+    	return time;
+    }
 
     private String getGroupForTask(String userCommand) {
         String[] splits = userCommand.split(" ");
@@ -101,9 +207,21 @@ public class CommandParser {
             if (splits[i].equals("grp") || splits[i].equals("group")) {
                 System.out.println(splits[i+1]);
                 if (mPosition == 0) {
-                    mPosition = i;
+   					mPosition = i;
+   				} else {
+   					mPosition = Math.min(mPosition, i);
+   				}
+                String result = "";
+                for(int j=i+1; j<splits.length; j++) {
+                	if (splits[j].equals("priority") || splits[j].equals("by") || splits[j].equals("before") || splits[j].equals("from") || splits[j].equals("to")) {
+                		break;
+                	}
+                	if (j > i + 1) {
+                		result += " ";
+                	}
+                	result += splits[j];
                 }
-                return splits[i+1];
+                return result;
             }
         }
         return "";
