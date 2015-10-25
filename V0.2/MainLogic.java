@@ -245,6 +245,32 @@ public class MainLogic {
 					}
 				}
 				break;
+			case AppConst.TASK_FIELD.DEADLINE:
+				String day = "";
+				for(int i=1; i<field.length; i++) {
+					if (i > 1) {
+						day += " ";
+					}
+					day += field[i];
+				}
+				taskFieldArg = day;
+				String date =  mDateTimeHelper.getDateMonthFromString(day);
+				if (date == null || date.equals("")) {
+					feedbackTasks.setPointer(new ArrayList<Task>());
+					
+					return AppConst.MESSAGE.INVALID_DAY;
+				}
+				for(int i=0; i<mAllTasks.size(); i++) {
+					String deadline = mAllTasks.get(i).getDeadline();
+					if (!deadline.equals("")) {
+						if (!deadline.substring(0, 5).equals(date)) {
+							remainTaskList.add(mAllTasks.get(i));
+						}
+					} else {
+						remainTaskList.add(mAllTasks.get(i));
+					} 
+				}
+				break;
 			default:
 				return String.format(AppConst.MESSAGE.SYNTAX_ERROR, userCommand);
 		}
@@ -333,13 +359,23 @@ public class MainLogic {
 		feedbackTasks.setPointer(mTasks);
 
 		String argument = mCommand.getCommandArgument();
+		// handle for show day
+		String dateTimeArgument = "";
+		if (mCommand.getCommandType().equals(AppConst.COMMAND_TYPE.SHOW_DAY)) {
+			dateTimeArgument = mDateTimeHelper.getDateMonthFromString(argument);
+			
+			if (dateTimeArgument == null || dateTimeArgument.equals("")) {
+				return AppConst.MESSAGE.INVALID_DAY;
+			}
+		}
 
 		for (int i=0;i<mAllTasks.size();i++){
 			switch (mCommand.getCommandType()){
 				case AppConst.COMMAND_TYPE.SHOW_DAY:
 					String deadline = mAllTasks.get(i).getDeadline();
 
-					if (deadline.equals(argument) ){
+					System.out.println(deadline.substring(0,4));
+					if (deadline.substring(0, 5).equals(dateTimeArgument) ){
 						mTasks.add(mAllTasks.get(i));
 					}
 					break;

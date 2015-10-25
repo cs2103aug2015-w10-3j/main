@@ -28,6 +28,7 @@ public class CommandParser {
 			case AppConst.COMMAND_TYPE.UPDATE:
 				Task task = new Task("");
 				String deadline = getDeadlineForTask(userCommand);
+				String startDate = getStartDateForTask(userCommand);
 				String endDate = getEndDateForTask(userCommand);
 				if (deadline != null && deadline.equals("")) {
 					deadline = endDate;
@@ -35,8 +36,23 @@ public class CommandParser {
 				if (endDate != null && endDate.equals("")) {
 					endDate = deadline;
 				}
+				
+				// handle for from DateTime to DateTime of Month case
+				// get Month from endDate, put to startDate
+				if (startDate == null && endDate != null && !endDate.equals("")) {
+					startDate = getStringDateForStartDate(userCommand);
+					String month = mDateTimeHelper.getMonthStringForDateTime(endDate);
+					startDate = mDateTimeHelper.getStringDateFromString(month + " " + startDate, 1);
+					if (startDate != null && !startDate.equals("")) {
+						String currentDate = mDateTimeHelper.getCurrentTimeString();
+						if (mDateTimeHelper.compareStringDates(startDate, currentDate)<0) {
+							startDate = currentDate;
+						}
+					}
+				}
+				
 				task.setDeadline(deadline);
-				task.setStartDate(getStartDateForTask(userCommand));
+				task.setStartDate(startDate);
 				task.setEndDate(endDate);
 				task.setPriority(getPriorityForTask(userCommand));
 				task.setGroup(getGroupForTask(userCommand));
@@ -103,12 +119,11 @@ public class CommandParser {
         return "medium";
     }
     
-    private String getStartDateForTask(String userCommand) {
-   		String[] splits = userCommand.split(" ");
-   		String result = mDateTimeHelper.getCurrentTimeString();
-   		String time = "";
-   		for(int i=splits.length-1; i>=0; i--) {
-   			if (splits[i].equals("from")) {
+    private String getStringDateForStartDate(String userCommand) {
+    	String[] splits = userCommand.split(" ");
+    	String result = "";
+    	for(int i=0; i<splits.length - 1; i++) {
+    		if (splits[i].equals("from")) {
    				if (mPosition == 0) {
    					mPosition = i;
    				} else {
@@ -119,17 +134,24 @@ public class CommandParser {
    						break;
    					} else {
    						if (j>i+1) {
-   							time += " ";
+   							result += " ";
    						}
-   						time += splits[j];
+   						result += splits[j];
    					}
    				}
-	   			if (!time.equals("")) {
-					time = mDateTimeHelper.getStringDateFromString(time, 1);
-				}
-				break;
+				return result;
    			}
-   		}
+    	}
+    	return "";
+    }
+    
+    private String getStartDateForTask(String userCommand) {
+   		String[] splits = userCommand.split(" ");
+   		String result = mDateTimeHelper.getCurrentTimeString();
+   		String time = getStringDateForStartDate(userCommand);
+	   	if (!time.equals("")) {
+			time = mDateTimeHelper.getStringDateFromString(time, 1);
+		}
    		if (time == null) {
    			return null;
    		}

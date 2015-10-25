@@ -37,6 +37,7 @@ public interface AppConst {
 	
 		String TASK_NAME = "taskName";
 		String DEADLINE = "deadline";
+		String DAY = "day";
 		
 		// Priority field and values
 		String PRIORITY = "priority";
@@ -71,6 +72,7 @@ public interface AppConst {
 		String NOT_RECOGNIZED_SYNTAX = "Syntax not recognized. Use 'showby deadline' or 'showby priority' or 'showby group'";
 		String SHOWING_TASK = "These are your tasks for %s '%s'";
 		String NOTHING_TO_SHOW = "You don't have any tasks to show for '%s'!\n";
+		String INVALID_DAY = "Invalid day format!\n";
 		
 		// Delete
 		String MANY_TASKS_MATCHED = "Look at the table above. Do you mean one of the above ? Please be more specific.";

@@ -304,7 +304,9 @@ public class DateTimeHelper {
 		
 	}
 	
-	private String getDateMonthFromString(String dateTime) {
+	protected String getDateMonthFromString(String dateTime) {
+	
+		dateTime = dateTime.toLowerCase();
 
 		String month = getMonthFromString(dateTime);
 		String date = "";
@@ -368,6 +370,14 @@ public class DateTimeHelper {
 		}
 		
 		return date + " " + time;
+	}
+
+	// have a date time with format: dd/MM HH:mm
+	// get MM from this string
+	protected String getMonthStringForDateTime(String dateTime) {
+		String month = String.valueOf(dateTime.charAt(3)) + String.valueOf(dateTime.charAt(4));
+		int x = Integer.parseInt(month);
+		return months[x-1];
 	}
 
 }
