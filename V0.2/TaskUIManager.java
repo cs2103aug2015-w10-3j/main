@@ -62,15 +62,18 @@ public class TaskUIManager {
         {
             ex.printStackTrace();
         }
-        String message = mMainLogic.process(AppConst.COMMAND_TYPE.SHOW_ALL, dataTaskList);
+
+        ArrayListPointer dataTaskListPointer = new ArrayListPointer();   
+        String message = mMainLogic.process(AppConst.COMMAND_TYPE.SHOW_ALL, dataTaskListPointer);
+        dataTaskList = dataTaskListPointer.getPointer();
+        System.out.println("size of dataTaskList:"+dataTaskList.size());
         
-        
-        Storage storage = new Storage();
-        storage.setFileURL("data1.txt");
-        try {
-        	dataTaskList = storage.readContent();
-        } catch (IOException e) {
-        }
+        // Storage storage = new Storage();
+        // storage.setFileURL("data1.txt");
+        // try {
+        // 	dataTaskList = storage.readContent();
+        // } catch (IOException e) {
+        // }
         
         openToDoListWindow();
 
@@ -235,14 +238,17 @@ public class TaskUIManager {
                     } else {
                     	
                     	// Executed user command
-                    	String message = mMainLogic.process(userCommand, dataTaskList);
+                        ArrayListPointer dataTaskListPointer = new ArrayListPointer();   
+                    	String message = mMainLogic.process(userCommand, dataTaskListPointer);
+                        dataTaskList = dataTaskListPointer.getPointer();
+                        System.out.println("size of dataTaskList:"+dataTaskList.size());
                     	
-                    	Storage storage = new Storage();
-        storage.setFileURL("data1.txt");
-        try {
-        	dataTaskList = storage.readContent();
-        } catch (IOException e) {
-        }
+        //             	Storage storage = new Storage();
+        // storage.setFileURL("data1.txt");
+        // try {
+        // 	dataTaskList = storage.readContent();
+        // } catch (IOException e) {
+        // }
                     	
                     	// Message = null means user want to exit
                     	if (message == null) {

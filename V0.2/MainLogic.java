@@ -115,7 +115,7 @@ public class MainLogic {
 	    }
 	}
 
-	protected String executeAdd(Command mCommand, ArrayList<Task> feedbackTasks){
+	protected String executeAdd(Command mCommand,  ArrayListPointer feedbackTasks){
 		boolean isExisted = false;
 		Task newTask = mCommand.getNewTask();
 
@@ -127,7 +127,6 @@ public class MainLogic {
 		}
 
 		if (isExisted) {
-			feedbackTasks = mAllTasks;
 			return AppConst.MESSAGE.TASK_EXISTS;
 		}
 
@@ -147,7 +146,7 @@ public class MainLogic {
 		return String.format(AppConst.MESSAGE.TASK_ADDED, newTask.getTaskInfo());
 	}
 
-	protected String executeDelete(Command mCommand, ArrayList<Task> feedbackTasks){
+	protected String executeDelete(Command mCommand,  ArrayListPointer feedbackTasks){
 		int numberMatched = 0, position = 0;
 		String deletedTask = "";
 		String taskToBeDeleted = mCommand.getCommandArgument();
@@ -176,13 +175,13 @@ public class MainLogic {
 				mDataStorage.rewriteContent(mAllTasks);
 				return String.format(AppConst.MESSAGE.REMOVED_SUCCESSFUL, deletedTask);
 			}
-			feedbackTasks = possibleMatches;
+			feedbackTasks.setPointer(possibleMatches);
 			return AppConst.MESSAGE.MANY_TASKS_MATCHED;
 		}
 		return String.format(AppConst.MESSAGE.TASK_NOT_FOUND, taskToBeDeleted);
 	}
 
-	protected String executeUpdate(Command mCommand, ArrayList<Task> feedbackTasks){
+	protected String executeUpdate(Command mCommand,  ArrayListPointer feedbackTasks){
 		Task updatedInfo = mCommand.getUpdatedTask();
 		String taskToBeUpdated = mCommand.getCommandArgument();
 
@@ -225,24 +224,25 @@ public class MainLogic {
 		return String.format(AppConst.MESSAGE.TASK_NOT_FOUND, taskToBeUpdated);
 	}
 
-	protected String executeShowby(Command mCommand, ArrayList<Task> feedbackTasks){
+	protected String executeShowby(Command mCommand,  ArrayListPointer feedbackTasks){
 		if (mAllTasks.size() == 0) {
 			return AppConst.MESSAGE.NO_TASK_FOUND;
 		}
 
-		feedbackTasks = duplicate(mAllTasks);
+		ArrayList<Task> mTasks = duplicate(mAllTasks);
+		feedbackTasks.setPointer(mTasks);
 
 		switch (mCommand.getCommandArgument()){
 			case AppConst.TASK_FIELD.DEADLINE:
-				Collections.sort(feedbackTasks,new TaskDeadlineCompare());
+				Collections.sort(mTasks,new TaskDeadlineCompare());
 				return AppConst.MESSAGE.DISPLAY_BY_DEADLINE;
 
 			case AppConst.TASK_FIELD.PRIORITY:
-				Collections.sort(feedbackTasks,new TaskPriorityCompare());
+				Collections.sort(mTasks,new TaskPriorityCompare());
 				return AppConst.MESSAGE.DISPLAY_BY_PRIORITY;
 
 			case AppConst.TASK_FIELD.GROUP:
-				Collections.sort(feedbackTasks,new TaskGroupCompare());
+				Collections.sort(mTasks,new TaskGroupCompare());
 				return AppConst.MESSAGE.DISPLAY_BY_GROUP;
 
 			default:
@@ -251,8 +251,10 @@ public class MainLogic {
 		}
 	}
 
-	protected String executeShow(Command mCommand, ArrayList<Task> feedbackTasks){
-		feedbackTasks = new ArrayList<Task>();
+	protected String executeShow(Command mCommand,  ArrayListPointer feedbackTasks){
+		ArrayList<Task> mTasks = new ArrayList<Task>();
+		feedbackTasks.setPointer(mTasks);
+
 		String argument = mCommand.getCommandArgument();
 
 		for (int i=0;i<mAllTasks.size();i++){
@@ -261,19 +263,19 @@ public class MainLogic {
 					String deadline = mAllTasks.get(i).getDeadline();
 
 					if (deadline.equals(argument) ){
-						feedbackTasks.add(mAllTasks.get(i));
+						mTasks.add(mAllTasks.get(i));
 					}
 					break;
 
 				case AppConst.COMMAND_TYPE.SHOW_PRIORITY:
 					if (mAllTasks.get(i).getPriority().equals(argument)){
-						feedbackTasks.add(mAllTasks.get(i));	
+						mTasks.add(mAllTasks.get(i));	
 					}
 					break;
 
 				case AppConst.COMMAND_TYPE.SHOW_GROUP:
 					if (mAllTasks.get(i).getGroup().equals(argument)){
-						feedbackTasks.add(mAllTasks.get(i));	
+						mTasks.add(mAllTasks.get(i));	
 					}
 					break;
 
@@ -281,14 +283,14 @@ public class MainLogic {
 			}
 		}
 
-		if (feedbackTasks.size()==0){
-			feedbackTasks = mAllTasks;
+		if (mTasks.size()==0){
+			feedbackTasks.setPointer(mAllTasks);
 			return String.format(AppConst.MESSAGE.NOTHING_TO_SHOW, argument);
 		}
 		return String.format(AppConst.MESSAGE.SHOWING_TASK, mCommand.getCommandType().substring(4), argument);
 	}
 
-	protected String executeSetFile(Command mCommand, ArrayList<Task> feedbackTasks){
+	protected String executeSetFile(Command mCommand,  ArrayListPointer feedbackTasks){
 		//update the internal settings object and save it to the setting file.
 		mSettings.setDataFileUrl(mCommand.getCommandArgument());
 		mSettingsStorage.writeSettings(mSettings);
@@ -300,29 +302,29 @@ public class MainLogic {
 		return String.format(AppConst.MESSAGE.CHANGED_SUCCESSFUL, mCommand.getCommandArgument());
 	}
 	
-	protected String executeUndo(Command mCommand, ArrayList<Task> feedbackTasks){
+	protected String executeUndo(Command mCommand, ArrayListPointer feedbackTasks){
 		if (mCurrentState>0) {
 			mCurrentState--;
 			mAllTasks = mHistory.get(mCurrentState).getAllTasks();
 			mDataStorage.rewriteContent(mAllTasks);
-			feedbackTasks = mAllTasks;
+			feedbackTasks.setPointer(mAllTasks);
 			return AppConst.MESSAGE.UNDID_SUCCESSFUL;
 		}
 		return AppConst.MESSAGE.NOTHING_UNDONE;
 	}
 
-	protected String executeRedo(Command mCommand, ArrayList<Task> feedbackTasks){
+	protected String executeRedo(Command mCommand,  ArrayListPointer feedbackTasks){
 		if (mCurrentState < mHistory.size()-1){
 			mCurrentState++;
 			mAllTasks = mHistory.get(mCurrentState).getAllTasks();
 			mDataStorage.rewriteContent(mAllTasks);
-			feedbackTasks = mAllTasks;
+			feedbackTasks.setPointer(mAllTasks);
 			return AppConst.MESSAGE.REDID_SUCCESSFUL;
 		}
 		return AppConst.MESSAGE.NOTHING_REDONE;
 	}
 
-	protected String executeSearch(Command mCommand, ArrayList<Task> feedbackTasks) {
+	protected String executeSearch(Command mCommand, ArrayListPointer feedbackTasks) {
 		String[] arguments = mCommand.getCommandArgument().split(" ");
 
 		ArrayList<MatchCount> matchCount = new ArrayList<MatchCount>();
@@ -356,7 +358,8 @@ public class MainLogic {
 		Collections.sort(matchCount, new TaskSearchMatchCountCompare());
 		String result = "";
 
-		feedbackTasks = new ArrayList<Task>();
+		ArrayList<Task> mTasks = new ArrayList<Task>();
+		feedbackTasks.setPointer(mTasks);
 
 		boolean isMatched = false;
 		for(int i=0; i<Math.min(matchCount.size(), 10); i++) {
@@ -373,12 +376,12 @@ public class MainLogic {
 			}
 			if (point > 0) {
 				int id = matchCount.get(i).id;
-				feedbackTasks.add(mAllTasks.get(id));
+				mTasks.add(mAllTasks.get(id));
 			}
 		}
 
-		if (feedbackTasks.size()==0) {
-			feedbackTasks = mAllTasks;
+		if (mTasks.size()==0) {
+			feedbackTasks.setPointer(mAllTasks);
 			return AppConst.MESSAGE.NOTHING_MATCHED;
 		}
 
@@ -391,14 +394,14 @@ public class MainLogic {
 	 * returns a feedback String and an ArrayList of Task in feedbackTasks
 	 * 
 	 * */
-	protected String process(String userCommand, ArrayList<Task> feedbackTasks) {
+	protected String process(String userCommand, ArrayListPointer feedbackTasks) {
 
 		addNewUserCommand(userCommand);
 		Command mCommand = mCommandParser.parse(userCommand);
 
 		//For most of the times the tasks to be displayed after each command is all the tasks.
 		//if it is otherwise, later codes will modify this pointer
-		feedbackTasks = mAllTasks;
+		feedbackTasks.setPointer(mAllTasks);
 
 		switch (mCommand.getCommandType()){
 			case AppConst.COMMAND_TYPE.ADD:
