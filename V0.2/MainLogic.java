@@ -2,8 +2,6 @@
 import java.io.*;
 import java.util.*;
 import java.lang.*;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
 
 public class MainLogic {
 
@@ -17,10 +15,6 @@ public class MainLogic {
     private static final int SEPARATE_LINE = 75;
 	private static final int BIG_NUM = 100000;
 	
-	//standard day format
-	private static SimpleDateFormat standardDayFormat = new SimpleDateFormat("dd/MM");
-	private static SimpleDateFormat standardTimeFormat = new SimpleDateFormat("dd/MM hh:mm");
-	
 	//the parser and the storage objects
 	private CommandParser mCommandParser;
 	private Storage mDataStorage;
@@ -32,10 +26,14 @@ public class MainLogic {
 	private ArrayList<Task> mAllTasks;
 	private ArrayList<String> mAllUserCommands;
 	private Storage mStorage;
+	private DateTimeHelper mDateTimeHelper;
 	
 	private Settings mSettings = new Settings();
 
 	public MainLogic() {
+		
+		mDateTimeHelper = new DateTimeHelper();
+		
 		//Initialise the variables;
 		mCommandParser = new CommandParser();
 		
@@ -102,9 +100,7 @@ public class MainLogic {
 	    @Override
 	    public int compare(Task o1, Task o2) {
 	        // write comparison logic here like below , it's just a sample
-	        if (o1.getDeadline().equals("")) return 1;
-	        if (o2.getDeadline().equals("")) return -1;
-	        return o1.getDeadline().compareTo(o2.getDeadline());
+	        return mDateTimeHelper.compareStringDates(o1.getDeadline(), o2.getDeadline());
 	    }
 	}
 	private class TaskGroupCompare implements Comparator<Task> {
@@ -118,6 +114,10 @@ public class MainLogic {
 	protected String executeAdd(Command mCommand,  ArrayListPointer feedbackTasks){
 		boolean isExisted = false;
 		Task newTask = mCommand.getNewTask();
+		
+		if (newTask.getDeadline() == null || newTask.getStartDate() == null || newTask.getEndDate() == null) {
+			return AppConst.MESSAGE.INVALID_DATE_TIME_FORMAT;
+		}
 
 		for(int i=0; i<mAllTasks.size(); i++) {
 			if (mAllTasks.get(i).getName().equals(newTask.getName()) ) {
@@ -132,14 +132,11 @@ public class MainLogic {
 
 		// Check for valid deadline or end date
 		
-		String newTaskStartDateTime = newTask.getStartDate();
-		String newTaskEndDateTime = newTask.getDeadline();
-		if (newTaskEndDateTime.equals("") || newTaskEndDateTime==null) {
-			newTaskEndDateTime = newTask.getEndDate();
-		}
-		if (!newTaskEndDateTime.equals("") && newTaskEndDateTime!=null) {
-			if (newTaskStartDateTime.compareTo(newTaskEndDateTime)>0) {
-				return String.format(AppConst.MESSAGE.INVALID_DEADLINE, standardTimeFormat.format(new Date()));
+		String deadline = newTask.getDeadline();
+		
+		if (!deadline.equals("") && deadline!=null) {
+			if (mDateTimeHelper.compareStringDates(newTask.getStartDate(), newTask.getDeadline())>0) {
+				return String.format(AppConst.MESSAGE.INVALID_DEADLINE, mDateTimeHelper.getCurrentTimeString());
 			}
 		}
 
@@ -158,7 +155,7 @@ public class MainLogic {
 		ArrayList<Task> possibleMatches = new ArrayList<Task>();
 
 		for (int i=0;i<mAllTasks.size();i++){
-			String taskName = mAllTasks.get(i).getTaskInfo();
+			String taskName = mAllTasks.get(i).getName();
 			if (taskName.equals(taskToBeDeleted)){
 				mAllTasks.remove(i);
 				updateHistory();
@@ -184,6 +181,81 @@ public class MainLogic {
 			return AppConst.MESSAGE.MANY_TASKS_MATCHED;
 		}
 		return String.format(AppConst.MESSAGE.TASK_NOT_FOUND, taskToBeDeleted);
+	}
+	
+	protected String executeDeleteAll(Command mCommand, ArrayListPointer feedbackTasks) {
+		if (mAllTasks.size() == 0) {
+			feedbackTasks.setPointer(mAllTasks);
+			return AppConst.MESSAGE.NO_TASK_TO_DELETE;
+		}
+		mAllTasks = new ArrayList<Task>();
+		updateHistory();
+		mDataStorage.rewriteContent(mAllTasks);
+		feedbackTasks.setPointer(mAllTasks);
+		return AppConst.MESSAGE.DELETED_ALL;
+	}
+	
+	protected String executeDeleteBy(Command mCommand, ArrayListPointer feedbackTasks) {
+		String fieldToDelete = mCommand.getCommandArgument();
+		String[] field = fieldToDelete.split(" ");
+		String userCommand = mCommand.getCommandType() + " " + fieldToDelete;
+		feedbackTasks.setPointer(mAllTasks);
+		if (field.length < 2) {
+			return String.format(AppConst.MESSAGE.SYNTAX_ERROR, userCommand);
+		}
+		String message = String.format(AppConst.MESSAGE.DELETED_FIELD, field[0], field[1]);
+		ArrayList<Task> remainTaskList = new ArrayList<Task>();
+		
+		String taskField = field[0];
+		String taskFieldArg = field[1];
+		
+		switch (field[0]) {
+			case AppConst.TASK_FIELD.STATUS:
+				if (!field[1].equals(AppConst.TASK_FIELD.DONE) && !field[1].equals(AppConst.TASK_FIELD.UNDONE) || field.length!=2) {
+					return String.format(AppConst.MESSAGE.SYNTAX_ERROR, userCommand);
+				}
+				for(int i=0; i<mAllTasks.size(); i++) {
+					if (!mAllTasks.get(i).getStatus().equals(field[1])) {
+						remainTaskList.add(mAllTasks.get(i));	
+					}
+				}
+				break;
+			case AppConst.TASK_FIELD.PRIORITY:
+				if (!field[1].equals(AppConst.TASK_FIELD.HIGH) && !field[1].equals(AppConst.TASK_FIELD.MEDIUM) && !field[1].equals(AppConst.TASK_FIELD.LOW) || field.length!=2) {
+					return String.format(AppConst.MESSAGE.SYNTAX_ERROR, userCommand);
+				}
+				for(int i=0; i<mAllTasks.size(); i++) {
+					if (!mAllTasks.get(i).getPriority().equals(field[1])) {
+						remainTaskList.add(mAllTasks.get(i));	
+					}
+				}
+				break;
+			case AppConst.TASK_FIELD.GROUP:
+				String groupName = "";
+				for(int i=1; i<field.length; i++) {
+					if (i>1) {
+						groupName += " ";
+					}
+					groupName += field[i];
+				}
+				taskFieldArg = groupName;
+				for(int i=0; i<mAllTasks.size(); i++) {
+					if (!mAllTasks.get(i).getGroup().equals(groupName)) {
+						remainTaskList.add(mAllTasks.get(i));	
+					}
+				}
+				break;
+			default:
+				return String.format(AppConst.MESSAGE.SYNTAX_ERROR, userCommand);
+		}
+		if (mAllTasks.size() == remainTaskList.size()) {
+			message = String.format(AppConst.MESSAGE.DELETED_NO_TASK, taskField, taskFieldArg);
+		}
+		mAllTasks = remainTaskList;
+		updateHistory();
+		mDataStorage.rewriteContent(mAllTasks);
+		feedbackTasks.setPointer(mAllTasks);
+		return message;
 	}
 
 	protected String executeUpdate(Command mCommand,  ArrayListPointer feedbackTasks){
@@ -410,43 +482,49 @@ public class MainLogic {
 
 		switch (mCommand.getCommandType()){
 			case AppConst.COMMAND_TYPE.ADD:
-				return executeAdd(mCommand,feedbackTasks);
+				return executeAdd(mCommand, feedbackTasks);
 				
 			case AppConst.COMMAND_TYPE.SHOW_ALL:
 				return AppConst.MESSAGE.TASK_TO_DO;
 
 			case AppConst.COMMAND_TYPE.DELETE:
-				return executeDelete(mCommand,feedbackTasks);
-
+				return executeDelete(mCommand, feedbackTasks);
+			
+			case AppConst.COMMAND_TYPE.DELETE_ALL:
+				return executeDeleteAll(mCommand, feedbackTasks);
+				
+			case AppConst.COMMAND_TYPE.DELETE_BY:
+				return executeDeleteBy(mCommand, feedbackTasks);
+			
 			case AppConst.COMMAND_TYPE.UPDATE:
-				return executeUpdate(mCommand,feedbackTasks);
+				return executeUpdate(mCommand, feedbackTasks);
 				
 			case AppConst.COMMAND_TYPE.SHOW_BY:
-				return executeShowby(mCommand,feedbackTasks);
+				return executeShowby(mCommand, feedbackTasks);
 			
 			case AppConst.COMMAND_TYPE.SHOW_DAY:
 			case AppConst.COMMAND_TYPE.SHOW_PRIORITY:
 			case AppConst.COMMAND_TYPE.SHOW_GROUP:
-				return executeShow(mCommand,feedbackTasks);
+				return executeShow(mCommand, feedbackTasks);
 
 			case AppConst.COMMAND_TYPE.SET_FILE:
-				return executeSetFile(mCommand,feedbackTasks);
+				return executeSetFile(mCommand, feedbackTasks);
 
 			case AppConst.COMMAND_TYPE.UNDO:
-				return executeUndo(mCommand,feedbackTasks);
+				return executeUndo(mCommand, feedbackTasks);
 
 			case AppConst.COMMAND_TYPE.REDO:
-				return executeRedo(mCommand,feedbackTasks);
+				return executeRedo(mCommand, feedbackTasks);
 			
 			case AppConst.COMMAND_TYPE.SHOW:
 			case AppConst.COMMAND_TYPE.SEARCH:
-				return executeSearch(mCommand,feedbackTasks);
+				return executeSearch(mCommand, feedbackTasks);
 
 			case AppConst.COMMAND_TYPE.EXIT:
 				return null;
 
 			default:
-				return String.format(AppConst.MESSAGE.SYNTAX_ERROR, mCommand.getCommandType());
+				return String.format(AppConst.MESSAGE.SYNTAX_ERROR, userCommand);
 		}
 		
 	}

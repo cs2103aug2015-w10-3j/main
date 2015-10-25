@@ -2,14 +2,12 @@
 import java.io.*;
 import java.util.*;
 import java.lang.*;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
 
 public class CommandParser {
 	
     private int mPosition = 0;
-    
-    private static SimpleDateFormat standardTimeFormat = new SimpleDateFormat("dd/MM hh:mm");
+	
+	private DateTimeHelper mDateTimeHelper = new DateTimeHelper();
 
 	public CommandParser() {
 		
@@ -29,9 +27,17 @@ public class CommandParser {
 			case AppConst.COMMAND_TYPE.ADD:
 			case AppConst.COMMAND_TYPE.UPDATE:
 				Task task = new Task("");
-				task.setDeadline(getDeadlineForTask(userCommand));
+				String deadline = getDeadlineForTask(userCommand);
+				String endDate = getEndDateForTask(userCommand);
+				if (deadline != null && deadline.equals("")) {
+					deadline = endDate;
+				}
+				if (endDate != null && endDate.equals("")) {
+					endDate = deadline;
+				}
+				task.setDeadline(deadline);
 				task.setStartDate(getStartDateForTask(userCommand));
-				task.setEndDate(getEndDateForTask(userCommand));
+				task.setEndDate(endDate);
 				task.setPriority(getPriorityForTask(userCommand));
 				task.setGroup(getGroupForTask(userCommand));
 				task.setTaskInfo(getCommandArgument(userCommand));
@@ -45,21 +51,6 @@ public class CommandParser {
 				
 		}
 		return command;
-	}
-
-	protected String[] getCommandInfo(String userCommand) {
-        String[] result = new String[10];
-        mPosition = 0;
-        result[0] = getCommandType(userCommand);
-        if (result[0].equals(AppConst.COMMAND_TYPE.ADD)) {
-            result[2] = getDeadlineForTask(userCommand);
-            result[3] = getPriorityForTask(userCommand);
-            result[4] = getGroupForTask(userCommand);
-            result[1] = getTaskInfo(userCommand);
-        } else {
-            result[1] = getCommandArgument(userCommand);
-        }
-        return result;
 	}
 
     private String getDeadlineForTask(String userCommand) {
@@ -85,7 +76,7 @@ public class CommandParser {
                 }
                 System.out.println(result);
                 if (!result.equals("")) {
-                	result = getStandardDateTimeFormatFromString(result, 2);
+                	result = mDateTimeHelper.getStringDateFromString(result, 2);
                 }
                 return result;
             }
@@ -114,8 +105,7 @@ public class CommandParser {
     
     private String getStartDateForTask(String userCommand) {
    		String[] splits = userCommand.split(" ");
-   		Date date = new Date();
-   		String result = standardTimeFormat.format(date);
+   		String result = mDateTimeHelper.getCurrentTimeString();
    		String time = "";
    		for(int i=splits.length-1; i>=0; i--) {
    			if (splits[i].equals("from")) {
@@ -125,7 +115,7 @@ public class CommandParser {
    					mPosition = Math.min(mPosition, i);
    				}
    				for(int j=i+1; j<splits.length; j++) {
-   					if (splits[j].equals("to") || splits[j].equals("priority") || splits[j].equals("group") || splits[j].equals("grp")) {
+   					if (splits[j].equals("to") || splits[j].equals("priority") || splits[j].equals("group") || splits[j].equals("grp") || splits[j].equals("by") || splits[j].equals("before")) {
    						break;
    					} else {
    						if (j>i+1) {
@@ -135,13 +125,16 @@ public class CommandParser {
    					}
    				}
 	   			if (!time.equals("")) {
-					time = getStandardDateTimeFormatFromString(time, 1);
+					time = mDateTimeHelper.getStringDateFromString(time, 1);
 				}
 				break;
    			}
    		}
+   		if (time == null) {
+   			return null;
+   		}
    		if (!time.equals("")) {
-   			if (result.compareTo(time) < 0) {
+   			if (mDateTimeHelper.compareStringDates(result, time) < 0) {
    				result = time;
    			}
    		}
@@ -159,7 +152,7 @@ public class CommandParser {
    					mPosition = Math.min(mPosition, i);
    				}
    				for(int j=i+1; j<splits.length; j++) {
-   					if (splits[j].equals("priority") || splits[j].equals("group") || splits[j].equals("grp")) {
+   					if (splits[j].equals("priority") || splits[j].equals("group") || splits[j].equals("grp") || splits[j].equals("by") || splits[j].equals("before") || splits[j].equals("from")) {
    						break;
    					} else {
    						if (j>i+1) {
@@ -169,36 +162,13 @@ public class CommandParser {
    					}
    				}
    				if (!time.equals("")) {
-					time = getStandardDateTimeFormatFromString(time, 2);
+					time = mDateTimeHelper.getStringDateFromString(time, 2);
 				}
 				break;
    			}
    		}
    		System.out.println("End date: " + time);
    		return time;
-    }
-    
-    
-    private String getStandardDateTimeFormatFromString(String dateTime, int flag) {
-    	// Do something crazy here
-    	// Flag = 1, if not specify time, time will be 00:00
-    	// Flag = 2, if not specify time, time will be 23:59
-    	
-    	return dateTime;
-    }
-    
-    private String getDateFromString(String dateTime) {
-    	
-    	// Do something crazy
-    	String date = dateTime;
-    	return date;
-    }
-    
-    private String getTimeFromString(String dateTime) {
-    
-    	// Do something crazy
-    	String time = dateTime;
-    	return time;
     }
 
     private String getGroupForTask(String userCommand) {

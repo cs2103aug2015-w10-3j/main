@@ -9,6 +9,8 @@ public interface AppConst {
 		String CLEAR = "clear";
 		
 		String DELETE = "delete";
+		String DELETE_ALL = "deleteall";
+		String DELETE_BY = "deleteby";
 		
 		String EXIT = "exit";
 		
@@ -35,11 +37,21 @@ public interface AppConst {
 	
 		String TASK_NAME = "taskName";
 		String DEADLINE = "deadline";
+		
+		// Priority field and values
 		String PRIORITY = "priority";
+		String HIGH = "high";
+		String MEDIUM = "medium";
+		String LOW = "low";
+		
 		String GROUP = "group";
 		String START_DATE = "startDate";
 		String END_DATE = "endDate";
+		
+		// Status field and values
 		String STATUS = "status";
+		String DONE = "done";
+		String UNDONE = "undone";
 	}
 	
 	interface MESSAGE {
@@ -48,6 +60,7 @@ public interface AppConst {
 		String TASK_EXISTS = "Can not add new task. This task already existed! Look at table above.\n";
 		String TASK_ADDED = "Successful added '%s' \n";
 		String INVALID_DEADLINE = "Can not add new task with invalid deadline! Current date and time is %s\n";
+		String INVALID_DATE_TIME_FORMAT = "Can not add new task. Invalid date time format!\n";
 		
 		// Show
 		String TASK_TO_DO = "These are your tasks to do!";
@@ -62,6 +75,10 @@ public interface AppConst {
 		// Delete
 		String MANY_TASKS_MATCHED = "Look at the table above. Do you mean one of the above ? Please be more specific.";
 		String REMOVED_SUCCESSFUL = "'%s' was removed successfully!\n";
+		String DELETED_ALL = "All tasks were removed successfully!\n";
+		String DELETED_FIELD = "Removed all tasks with %s '%s' successfully!\n";
+		String DELETED_NO_TASK = "No more tasks with %s '%s' to delete!\n";
+		String NO_TASK_TO_DELETE = "No more tasks to delete!\n";
 		
 		// Update
 		String UPDATED_SUCCESSFUL = "'%s' was updated successfully!\n";

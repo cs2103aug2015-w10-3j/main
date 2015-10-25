@@ -68,13 +68,6 @@ public class TaskUIManager {
         dataTaskList = dataTaskListPointer.getPointer();
         System.out.println("size of dataTaskList:"+dataTaskList.size());
         
-        // Storage storage = new Storage();
-        // storage.setFileURL("data1.txt");
-        // try {
-        // 	dataTaskList = storage.readContent();
-        // } catch (IOException e) {
-        // }
-        
         openToDoListWindow();
 
         displayMessage(WELCOME_MESSAGE);
@@ -243,14 +236,7 @@ public class TaskUIManager {
                         dataTaskList = dataTaskListPointer.getPointer();
                         System.out.println("size of dataTaskList:"+dataTaskList.size());
                     	
-        //             	Storage storage = new Storage();
-        // storage.setFileURL("data1.txt");
-        // try {
-        // 	dataTaskList = storage.readContent();
-        // } catch (IOException e) {
-        // }
-                    	
-                    	// Message = null means user want to exit
+        			   	// Message = null means user want to exit
                     	if (message == null) {
                     		displayMessage(GOOBYE_MESSAGE);
                     		frame.setVisible(false);
