@@ -131,12 +131,16 @@ public class MainLogic {
 			return AppConst.MESSAGE.TASK_EXISTS;
 		}
 
-		Date date = new Date();
-		String currentTime = standardTimeFormat.format(date);
-		String newTaskDeadline = newTask.getDeadline();
-		if (!newTaskDeadline.equals("") && newTaskDeadline!=null) {
-			if (currentTime.compareTo(newTaskDeadline)>0) {
-				return AppConst.MESSAGE.INVALID_DEADLINE;
+		// Check for valid deadline or end date
+		
+		String newTaskStartDateTime = newTask.getStartDate();
+		String newTaskEndDateTime = newTask.getDeadline();
+		if (newTaskEndDateTime.equals("") || newTaskEndDateTime==null) {
+			newTaskEndDateTime = newTask.getEndDate();
+		}
+		if (!newTaskEndDateTime.equals("") && newTaskEndDateTime!=null) {
+			if (newTaskStartDateTime.compareTo(newTaskEndDateTime)>0) {
+				return String.format(AppConst.MESSAGE.INVALID_DEADLINE, standardTimeFormat.format(new Date()));
 			}
 		}
 
@@ -151,10 +155,11 @@ public class MainLogic {
 		int numberMatched = 0, position = 0;
 		String deletedTask = "";
 		String taskToBeDeleted = mCommand.getCommandArgument();
+		System.out.println(taskToBeDeleted);
 		ArrayList<Task> possibleMatches = new ArrayList<Task>();
 
 		for (int i=0;i<mAllTasks.size();i++){
-			String taskName = mAllTasks.get(i).getName();
+			String taskName = mAllTasks.get(i).getTaskInfo();
 			if (taskName.equals(taskToBeDeleted)){
 				mAllTasks.remove(i);
 				updateHistory();

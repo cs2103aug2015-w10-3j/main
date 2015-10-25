@@ -61,7 +61,7 @@ public class Task {
 	}
 
 	public String getEndDate(){
-		return startDate;
+		return endDate;
 	}
 
 	public void setEndDate(String newEndDate){
