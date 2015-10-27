@@ -36,7 +36,7 @@ public class Command{
 	}
 
 	public Task getUpdatedTask(){
-		return newTask;
+		return updatedTask;
 	}
 
 	public void setUpdatedTask(Task newUpdatedTask){

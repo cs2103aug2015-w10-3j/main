@@ -51,6 +51,27 @@ public class Task {
 	public void setDeadline(String newDeadline){
 		deadline = newDeadline;
 	}
+	
+	public String getDisplay() {
+		String result = name;
+		if (!deadline.equals("")) {
+			result += " by" + deadline;
+		}
+		if (!startDate.equals("")) {
+			result += " from" + startDate;	
+		}	
+		if (!endDate.equals("")) {
+			result += " to" + endDate;
+		}
+		if (!priority.equals("")) {
+			result += " priority" + priority;
+		}
+		if (!group.equals("")) {
+			result += " group" + group;
+		}
+		return result;
+		
+	}
 
 	public String getStartDate(){
 		return startDate;

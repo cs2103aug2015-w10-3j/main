@@ -112,31 +112,45 @@ public class MainLogic {
 	}
 
 	protected String executeAdd(Command mCommand,  ArrayListPointer feedbackTasks){
-		boolean isExisted = false;
 		Task newTask = mCommand.getNewTask();
 		
 		if (newTask.getDeadline() == null || newTask.getStartDate() == null || newTask.getEndDate() == null) {
 			return AppConst.MESSAGE.INVALID_DATE_TIME_FORMAT;
 		}
+		
+		if (newTask.getPriority() == null) {
+			return AppConst.MESSAGE.INVALID_PRIORITY;
+		}
+
+		if (newTask.getName() == null || newTask.getName().equals("")) {
+			return AppConst.MESSAGE.INVALID_TASK_NAME;
+		}
 
 		for(int i=0; i<mAllTasks.size(); i++) {
-			if (mAllTasks.get(i).getName().equals(newTask.getName()) ) {
-				isExisted = true; 
-				break;
+			if (isTasksMatched(newTask, mAllTasks.get(i)) == 1) {
+				return AppConst.MESSAGE.TASK_EXISTS;
 			}
 		}
 
-		if (isExisted) {
-			return AppConst.MESSAGE.TASK_EXISTS;
-		}
-
-		// Check for valid deadline or end date
-		
+		// Check for valid deadline, end date and start date
 		String deadline = newTask.getDeadline();
+		String startDate = newTask.getStartDate();
+		String endDate = newTask.getEndDate();
+		String currentTime = mDateTimeHelper.getCurrentTimeString();
 		
-		if (!deadline.equals("") && deadline!=null) {
-			if (mDateTimeHelper.compareStringDates(newTask.getStartDate(), newTask.getDeadline())>0) {
-				return String.format(AppConst.MESSAGE.INVALID_DEADLINE, mDateTimeHelper.getCurrentTimeString());
+		if (mDateTimeHelper.compareStringDates(currentTime, startDate)>0) {
+			return String.format(AppConst.MESSAGE.INVALID_START_DATE, currentTime);		
+		}
+		
+		if (!deadline.equals("")) {
+			if (mDateTimeHelper.compareStringDates(startDate, deadline)>0) {
+				return String.format(AppConst.MESSAGE.INVALID_DEADLINE, currentTime);
+			}
+		}
+		
+		if (!endDate.equals("")) {
+			if (mDateTimeHelper.compareStringDates(startDate, endDate)>0) {
+				return String.format(AppConst.MESSAGE.INVALID_DEADLINE, currentTime);
 			}
 		}
 
@@ -148,39 +162,46 @@ public class MainLogic {
 	}
 
 	protected String executeDelete(Command mCommand,  ArrayListPointer feedbackTasks){
-		int numberMatched = 0, position = 0;
-		String deletedTask = "";
-		String taskToBeDeleted = mCommand.getCommandArgument();
-		System.out.println(taskToBeDeleted);
-		ArrayList<Task> possibleMatches = new ArrayList<Task>();
-
-		for (int i=0;i<mAllTasks.size();i++){
-			String taskName = mAllTasks.get(i).getName();
-			if (taskName.equals(taskToBeDeleted)){
+	
+		int position = 0;
+		feedbackTasks.setPointer(mAllTasks);
+		Task taskToDelete = mCommand.getNewTask();
+		if (taskToDelete == null) {
+			return "";
+		}
+		if (taskToDelete.getDeadline() == null || taskToDelete.getStartDate() == null || taskToDelete.getEndDate() == null) {
+			return AppConst.MESSAGE.INVALID_DATE_TIME_FORMAT;
+		}
+		
+		if (taskToDelete.getPriority() == null) {
+			return AppConst.MESSAGE.INVALID_PRIORITY;
+		}
+		ArrayList<Task> possibleTasks = new ArrayList<Task>();
+		for(int i=0; i<mAllTasks.size(); i++) {
+			int x = isTasksMatched(taskToDelete, mAllTasks.get(i));
+			if (x == 1) {
 				mAllTasks.remove(i);
 				updateHistory();
 				mDataStorage.rewriteContent(mAllTasks);
-				return String.format(AppConst.MESSAGE.REMOVED_SUCCESSFUL, taskName);
-			}
-			if (taskName.startsWith(taskToBeDeleted)) {
-				numberMatched++;
-				deletedTask = taskName;
+				feedbackTasks.setPointer(mAllTasks);
+				return String.format(AppConst.MESSAGE.REMOVED_SUCCESSFUL, taskToDelete.getTaskInfo());
+			} else if (x == 0) {
 				position = i;
-				possibleMatches.add(mAllTasks.get(i));
+				possibleTasks.add(mAllTasks.get(i));
 			}
 		}
-
-		if (numberMatched > 0) {
-			if (numberMatched == 1) {
-				mAllTasks.remove(position);
-				updateHistory();
-				mDataStorage.rewriteContent(mAllTasks);
-				return String.format(AppConst.MESSAGE.REMOVED_SUCCESSFUL, deletedTask);
-			}
-			feedbackTasks.setPointer(possibleMatches);
-			return AppConst.MESSAGE.MANY_TASKS_MATCHED;
+		if (possibleTasks.size() == 0) {
+			return AppConst.MESSAGE.NOTHING_MATCHED;
+		} else if (possibleTasks.size() == 1) {
+			mAllTasks.remove(position);
+			updateHistory();
+			mDataStorage.rewriteContent(mAllTasks);
+			feedbackTasks.setPointer(mAllTasks);
+			return String.format(AppConst.MESSAGE.REMOVED_SUCCESSFUL, taskToDelete.getTaskInfo());
 		}
-		return String.format(AppConst.MESSAGE.TASK_NOT_FOUND, taskToBeDeleted);
+		feedbackTasks.setPointer(possibleTasks);
+		return AppConst.MESSAGE.MANY_TASKS_MATCHED;
+		
 	}
 	
 	protected String executeDeleteAll(Command mCommand, ArrayListPointer feedbackTasks) {
@@ -286,45 +307,123 @@ public class MainLogic {
 
 	protected String executeUpdate(Command mCommand,  ArrayListPointer feedbackTasks){
 		Task updatedInfo = mCommand.getUpdatedTask();
-		String taskToBeUpdated = mCommand.getCommandArgument();
-
-		for (int i=0;i<mAllTasks.size();i++){
-			if ( mAllTasks.get(i).getName().equals(taskToBeUpdated) ){
-				
-				Task mTask = mAllTasks.get(i);
-
-				if ( !updatedInfo.getName().equals("") ){
-					mTask.setName(updatedInfo.getName());					
-				}
-				
-				if ( !updatedInfo.getGroup().equals("") ){
-					mTask.setGroup(updatedInfo.getGroup());					
-				}
-
-				if ( !updatedInfo.getPriority().equals("") ){
-					mTask.setPriority(updatedInfo.getPriority());					
-				}
-
-				if ( updatedInfo.getStartDate() != null ){
-					mTask.setStartDate(updatedInfo.getStartDate());					
-				}
-
-				if ( updatedInfo.getEndDate() != null ){
-					mTask.setEndDate(updatedInfo.getEndDate());					
-				}
-
-				if ( updatedInfo.getDeadline() != null ){
-					mTask.setDeadline(updatedInfo.getDeadline());					
-				}
-
-				updateHistory();
-				mDataStorage.rewriteContent(mAllTasks);
-
-				return String.format(AppConst.MESSAGE.UPDATED_SUCCESSFUL, taskToBeUpdated);
+		Task taskToBeUpdated = mCommand.getNewTask();
+		feedbackTasks.setPointer(mAllTasks);
+		if (updatedInfo == null || taskToBeUpdated == null) {
+			return AppConst.MESSAGE.INVALID_UPDATE_FORMAT;
+		}
+		
+		if (updatedInfo.getDeadline() == null || updatedInfo.getStartDate() == null || updatedInfo.getEndDate() == null) {
+			return AppConst.MESSAGE.INVALID_DATE_TIME_FORMAT;
+		}
+		
+		if (updatedInfo.getPriority() == null) {
+			return AppConst.MESSAGE.INVALID_PRIORITY;		
+		}
+		
+		if (taskToBeUpdated.getDeadline() == null || taskToBeUpdated.getStartDate() == null || taskToBeUpdated.getEndDate() == null) {
+			return AppConst.MESSAGE.INVALID_DATE_TIME_FORMAT;
+		}
+		
+		if (taskToBeUpdated.getPriority() == null) {
+			return AppConst.MESSAGE.INVALID_PRIORITY;		
+		}
+		
+		
+		// Check deadline, start/end date for new version
+		String deadline = updatedInfo.getDeadline();
+		String startDate = updatedInfo.getStartDate();
+		String endDate = updatedInfo.getEndDate();
+		String currentTime = mDateTimeHelper.getCurrentTimeString();
+		
+		if (!startDate.equals("") && mDateTimeHelper.compareStringDates(currentTime, startDate)>0) {
+			return String.format(AppConst.MESSAGE.INVALID_START_DATE, currentTime);		
+		}
+		
+		if (!deadline.equals("") && !startDate.equals("")) {
+			if (mDateTimeHelper.compareStringDates(startDate, deadline)>0) {
+				return String.format(AppConst.MESSAGE.INVALID_DEADLINE, currentTime);
 			}
 		}
+		
+		if (!endDate.equals("") && !startDate.equals("")) {
+			if (mDateTimeHelper.compareStringDates(startDate, endDate)>0) {
+				return String.format(AppConst.MESSAGE.INVALID_DEADLINE, currentTime);
+			}
+		}
+		
+		int position = 0;
+		ArrayList<Task> possibleTasks = new ArrayList<Task>();
+		for(int i=0; i<mAllTasks.size(); i++) {
+			int x = isTasksMatched(taskToBeUpdated, mAllTasks.get(i));
+			if (x == 1) {
+				position = i;
+				possibleTasks = new ArrayList<Task>();
+				possibleTasks.add(mAllTasks.get(i));
+				break;
+			} else if (x == 0) {
+				position = i;
+				possibleTasks.add(mAllTasks.get(i));
+			}
+		}
+		
+		if (possibleTasks.size() == 0) {
+			return String.format(AppConst.MESSAGE.TASK_NOT_FOUND, taskToBeUpdated.getTaskInfo());
+		} else if (possibleTasks.size() == 1) {
+		
+			Task mTask = mAllTasks.get(position);
 
-		return String.format(AppConst.MESSAGE.TASK_NOT_FOUND, taskToBeUpdated);
+			if ( updatedInfo.getName().equals("") ){
+				updatedInfo.setName(mTask.getName());					
+			}
+				
+			String taskInfo = " " + updatedInfo.getTaskInfo() + " ";
+			
+			if ( updatedInfo.getGroup().equals("") && !taskInfo.contains(" group ") && !taskInfo.contains(" grp ")) {
+				updatedInfo.setGroup(mTask.getGroup());					
+			}
+
+			if ( updatedInfo.getPriority().equals("")){
+				updatedInfo.setPriority(mTask.getPriority());					
+			}
+
+			if ( updatedInfo.getStartDate().equals("") && !taskInfo.contains(" from ")){
+				updatedInfo.setStartDate(mTask.getStartDate());					
+			}
+
+			if ( updatedInfo.getEndDate().equals("") && !taskInfo.contains(" to ")){
+				updatedInfo.setEndDate(mTask.getEndDate());					
+			}
+
+			if ( updatedInfo.getDeadline().equals("") && !taskInfo.contains(" by ") && !taskInfo.contains(" before ")) {
+				updatedInfo.setDeadline(mTask.getDeadline());					
+			}
+			
+			updatedInfo.setStatus(mTask.getStatus());
+			
+			for(int i=0; i<mAllTasks.size(); i++) {
+				if (isTasksMatched(updatedInfo, mAllTasks.get(i)) == 1) {
+					return AppConst.MESSAGE.TASK_UPDATED_EXIST;
+				}
+			}
+			
+			mTask.setName(updatedInfo.getName());
+			mTask.setDeadline(updatedInfo.getDeadline());
+			mTask.setStartDate(updatedInfo.getStartDate());
+			mTask.setEndDate(updatedInfo.getEndDate());
+			mTask.setPriority(updatedInfo.getPriority());
+			mTask.setGroup(updatedInfo.getGroup());
+			mTask.setTaskInfo(updatedInfo.getDisplay());
+
+			
+			updateHistory();
+			mDataStorage.rewriteContent(mAllTasks);
+			feedbackTasks.setPointer(mAllTasks);
+			return String.format(AppConst.MESSAGE.UPDATED_SUCCESSFUL);
+		}
+		feedbackTasks.setPointer(possibleTasks);
+		return AppConst.MESSAGE.MANY_TASKS_MATCHED;
+		
 	}
 
 	protected String executeShowby(Command mCommand,  ArrayListPointer feedbackTasks){
@@ -501,12 +600,151 @@ public class MainLogic {
 		return String.format(AppConst.MESSAGE.SHOWING_RESULT, mCommand.getCommandArgument());
 
 	}
+	
+	
+	protected String executeClose(Command mCommand, ArrayListPointer feedbackTasks) {
+		int position = 0;
+		feedbackTasks.setPointer(mAllTasks);
+		Task taskToClose = mCommand.getNewTask();
+		if (taskToClose == null) {
+			return "";
+		}
+		if (taskToClose.getDeadline() == null || taskToClose.getStartDate() == null || taskToClose.getEndDate() == null) {
+			return AppConst.MESSAGE.INVALID_DATE_TIME_FORMAT;
+		}
+		
+		if (taskToClose.getPriority() == null) {
+			return AppConst.MESSAGE.INVALID_PRIORITY;
+		}
+		ArrayList<Task> possibleTasks = new ArrayList<Task>();
+		for(int i=0; i<mAllTasks.size(); i++) {
+			int x = isTasksMatched(taskToClose, mAllTasks.get(i));
+			if (x == 1) {
+				if (mAllTasks.get(i).getStatus().equals(AppConst.TASK_FIELD.DONE)) {
+					return AppConst.MESSAGE.TASK_CLOSED;
+				} else {
+					mAllTasks.get(i).setStatus(AppConst.TASK_FIELD.DONE);
+					updateHistory();
+					mDataStorage.rewriteContent(mAllTasks);
+					feedbackTasks.setPointer(mAllTasks);
+					return AppConst.MESSAGE.MARKED_DONE_SUCCESSFUL;
+				}
+			} else if (x == 0) {
+				position = i;
+				possibleTasks.add(mAllTasks.get(i));
+			}
+		}
+		if (possibleTasks.size() == 0) {
+			return AppConst.MESSAGE.NOTHING_MATCHED;
+		} else if (possibleTasks.size() == 1) {
+			if (mAllTasks.get(position).getStatus().equals(AppConst.TASK_FIELD.DONE)) {
+				return AppConst.MESSAGE.TASK_CLOSED;
+			} else {
+				mAllTasks.get(position).setStatus(AppConst.TASK_FIELD.DONE);
+				updateHistory();
+				mDataStorage.rewriteContent(mAllTasks);
+				feedbackTasks.setPointer(mAllTasks);
+				return AppConst.MESSAGE.MARKED_DONE_SUCCESSFUL;
+			}
+				
+		}
+		feedbackTasks.setPointer(possibleTasks);
+		return AppConst.MESSAGE.MANY_TASKS_MATCHED;
+	}
+	
+	protected String executeOpen(Command mCommand, ArrayListPointer feedbackTasks) {
+		int position = 0;
+		feedbackTasks.setPointer(mAllTasks);
+		Task taskToOpen = mCommand.getNewTask();
+		if (taskToOpen == null) {
+			return "";
+		}
+		if (taskToOpen.getDeadline() == null || taskToOpen.getStartDate() == null || taskToOpen.getEndDate() == null) {
+			return AppConst.MESSAGE.INVALID_DATE_TIME_FORMAT;
+		}
+		
+		if (taskToOpen.getPriority() == null) {
+			return AppConst.MESSAGE.INVALID_PRIORITY;
+		}
+		ArrayList<Task> possibleTasks = new ArrayList<Task>();
+		for(int i=0; i<mAllTasks.size(); i++) {
+			int x = isTasksMatched(taskToOpen, mAllTasks.get(i));
+			if (x == 1) {
+				if (mAllTasks.get(i).getStatus().equals(AppConst.TASK_FIELD.UNDONE)) {
+					return AppConst.MESSAGE.TASK_OPENED;
+				} else {
+					mAllTasks.get(i).setStatus(AppConst.TASK_FIELD.UNDONE);
+					updateHistory();
+					mDataStorage.rewriteContent(mAllTasks);
+					feedbackTasks.setPointer(mAllTasks);
+					return AppConst.MESSAGE.MARKED_UNDONE_SUCCESSFUL;
+				}
+			} else if (x == 0) {
+				position = i;
+				possibleTasks.add(mAllTasks.get(i));
+			}
+		}
+		if (possibleTasks.size() == 0) {
+			return AppConst.MESSAGE.NOTHING_MATCHED;
+		} else if (possibleTasks.size() == 1) {
+			if (mAllTasks.get(position).getStatus().equals(AppConst.TASK_FIELD.UNDONE)) {
+				return AppConst.MESSAGE.TASK_OPENED;
+			} else {
+				mAllTasks.get(position).setStatus(AppConst.TASK_FIELD.UNDONE);
+				updateHistory();
+				mDataStorage.rewriteContent(mAllTasks);
+				feedbackTasks.setPointer(mAllTasks);
+				return AppConst.MESSAGE.MARKED_UNDONE_SUCCESSFUL;
+			}
+		}
+		feedbackTasks.setPointer(possibleTasks);
+		return AppConst.MESSAGE.MANY_TASKS_MATCHED;
+	}
+
+	
+	// -1 is different
+	// 1 is the same
+	// 0 is almost the same
+	private int isTasksMatched(Task task1, Task task2) {
+		boolean isTheSame = true;
+		if (!task1.getPriority().equals("") && !task1.getPriority().equals(task2.getPriority())) {
+			return -1;
+		} else if (task1.getPriority().equals("") && !task2.getPriority().equals("")) {
+			isTheSame = false;
+		}
+		if (!task1.getDeadline().equals("") && !task1.getDeadline().equals(task2.getDeadline())) {
+			return -1; 
+		} else if (task1.getDeadline().equals("") && !task2.getDeadline().equals("")) {
+			isTheSame = false;
+		}
+		
+		if (!task1.getEndDate().equals("") && !task1.getEndDate().equals(task2.getEndDate())) {
+			return -1;
+		} else if (task1.getEndDate().equals("") && !task2.getEndDate().equals("")) {
+			isTheSame = false;
+		}
+		
+		if (!task1.getGroup().equals("") && !task1.getGroup().equals(task2.getGroup())) {
+			return -1;
+		} else if (task1.getGroup().equals("") && !task2.getGroup().equals("")) {
+			isTheSame = false;
+		}
+		if (!task2.getName().startsWith(task1.getName())) {
+			return -1;
+		} else if (!task1.getName().equals(task2.getName())) {
+			isTheSame = false;
+		}
+		if (isTheSame) {
+			return 1;
+		}
+		return 0;
+	}
 
 	/**
 	 * the main function for the UI to call to execute a command
 	 * returns a feedback String and an ArrayList of Task in feedbackTasks
 	 * 
-	 * */
+	 **/
 	protected String process(String userCommand, ArrayListPointer feedbackTasks) {
 
 		addNewUserCommand(userCommand);
@@ -556,6 +794,10 @@ public class MainLogic {
 			case AppConst.COMMAND_TYPE.SEARCH:
 				return executeSearch(mCommand, feedbackTasks);
 
+			case AppConst.COMMAND_TYPE.CLOSE:
+				return executeClose(mCommand, feedbackTasks);
+			case AppConst.COMMAND_TYPE.OPEN:
+				return executeOpen(mCommand, feedbackTasks);
 			case AppConst.COMMAND_TYPE.EXIT:
 				return null;
 

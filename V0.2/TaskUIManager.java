@@ -13,6 +13,8 @@ import java.awt.event.*;
 import java.awt.Component;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
@@ -21,8 +23,6 @@ public class TaskUIManager {
 
 	private static String ENTER = "Enter";
     private static String APP_NAME = "To-Do";
-	private static String GOOBYE_MESSAGE = "Goodbye!";
-	private static String WELCOME_MESSAGE = "Welcome to To-Do list. ";
     private static String COMMAND_MESSAGE = "$" + APP_NAME + ": ";
     private static String NEW_LINE = "\n";
 
@@ -34,7 +34,7 @@ public class TaskUIManager {
     static JTable table;
     
     // column to display in table
-    static String[] columnNames = new String[] {"Task Name",
+    static String[] columnNames = new String[] {"#", "Task Name",
                         "Deadline",
                         "Start Date",
                         "End Date",
@@ -42,9 +42,20 @@ public class TaskUIManager {
                         "Group",
                         "Status"
                         };
+    static int[] columnWidth = new int[] {	40,
+    										0,
+    										100,
+    										100,
+    										100,
+    										80,
+    										150,
+    										80
+    	
+    };
     static ArrayList<Task> dataTaskList = new ArrayList<Task>();
 	static int windowHeight = 5;
 	static int windowWidth = 80;
+	static int rowHeightDefault = 25;
     static int userCommandCount = 0;
 
 	public TaskUIManager() {
@@ -66,24 +77,24 @@ public class TaskUIManager {
         ArrayListPointer dataTaskListPointer = new ArrayListPointer();   
         String message = mMainLogic.process(AppConst.COMMAND_TYPE.SHOW_ALL, dataTaskListPointer);
         dataTaskList = dataTaskListPointer.getPointer();
-        System.out.println("size of dataTaskList:"+dataTaskList.size());
-        
+                
         openToDoListWindow();
 
-        displayMessage(WELCOME_MESSAGE);
+        displayMessage(AppConst.MESSAGE.WELCOME);
         assert message != null;
         displayMessage(message);
 	}
 	
-	public static String[] getDataFromTask(Task task) {
-		String[] data = new String[7];
-		data[0] = task.getName();
-		data[1] = task.getDeadline();
-		data[2] = task.getStartDate();
-		data[3] = task.getEndDate();
-		data[4] = task.getPriority();
-		data[5] = task.getGroup();
-		data[6] = task.getStatus();
+	public static String[] getDataFromTask(Task task, int i) {
+		String[] data = new String[8];
+		data[0] = String.valueOf(i);
+		data[1] = task.getName();
+		data[2] = task.getDeadline();
+		data[3] = task.getStartDate();
+		data[4] = task.getEndDate();
+		data[5] = task.getPriority();
+		data[6] = task.getGroup();
+		data[7] = task.getStatus();
 		return data;
 	}
 
@@ -119,26 +130,46 @@ public class TaskUIManager {
 				Component comp = super.prepareRenderer(renderer, row, col);
 				Object value = getModel().getValueAt(row, col);
 				comp.setBackground(Color.white);
-				if (col == 4) {
-					if (value.equals("high")) {
+				if (col == 5) {
+					if (value.equals(AppConst.TASK_FIELD.HIGH)) {
 						comp.setBackground(Color.red);
-					} else if (value.equals("medium")) {
+					} else if (value.equals(AppConst.TASK_FIELD.MEDIUM)) {
 						comp.setBackground(Color.yellow);
-					} else if (value.equals("low")) {
+					} else if (value.equals(AppConst.TASK_FIELD.LOW)) {
 						comp.setBackground(Color.green);
 					}
 				}
 				return comp;
     		}
         };
+       
+        table.setRowHeight(rowHeightDefault);
+        
         DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
         tableModel.setColumnIdentifiers(columnNames);
         
+        for(int i=0; i<=7; i++) {
+        	if (i != 1) {
+        		table.getColumnModel().getColumn(i).setPreferredWidth(columnWidth[i]);
+        		table.getColumnModel().getColumn(i).setMaxWidth(columnWidth[i]);
+        	}
+        }
+        
         // Set data for table
         for(int i=0; i<dataTaskList.size(); i++) {
-            String[] data = getDataFromTask(dataTaskList.get(i));
+            String[] data = getDataFromTask(dataTaskList.get(i), i);
             tableModel.addRow(data);
         }
+        
+        DefaultTableCellRenderer centerRender = new DefaultTableCellRenderer();
+		centerRender.setHorizontalAlignment(SwingConstants.CENTER);
+		for(int i=0; i<=7; i++) {
+			if (i != 6 && i != 1 ) {
+				table.getColumnModel().getColumn(i).setCellRenderer(centerRender);
+        	}
+        }
+       
+        ((DefaultTableCellRenderer)table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
         
 		// Create scroll bar if table area is full        
         JScrollPane scroller = new JScrollPane(table);
@@ -234,11 +265,10 @@ public class TaskUIManager {
                         ArrayListPointer dataTaskListPointer = new ArrayListPointer();   
                     	String message = mMainLogic.process(userCommand, dataTaskListPointer);
                         dataTaskList = dataTaskListPointer.getPointer();
-                        System.out.println("size of dataTaskList:"+dataTaskList.size());
                     	
         			   	// Message = null means user want to exit
                     	if (message == null) {
-                    		displayMessage(GOOBYE_MESSAGE);
+                    		displayMessage(AppConst.MESSAGE.GOODBYE);
                     		frame.setVisible(false);
                     		frame.dispose();
                     	} else {
@@ -247,7 +277,7 @@ public class TaskUIManager {
                     		DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
                     		tableModel.setRowCount(0);
 				            for(int i=0; i<dataTaskList.size(); i++) {
-				            	String[] data = getDataFromTask(dataTaskList.get(i));
+				            	String[] data = getDataFromTask(dataTaskList.get(i), i);
 				            	tableModel.addRow(data);
 				            }
                     		tableModel.fireTableDataChanged();

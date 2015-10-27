@@ -27,10 +27,16 @@ public interface AppConst {
 		String REDO = "redo";
 		String UNDO = "undo";
 		
-		// Search
+		// Search tasks for some keywords
 		String SEARCH = "search";
 		
 		String UPDATE = "update";
+		
+		// Close to mark a task is done
+		String CLOSE = "close";
+		
+		// Open a task that is marked 'done'
+		String OPEN = "open";
 	}
 	
 	interface TASK_FIELD {
@@ -56,12 +62,19 @@ public interface AppConst {
 	}
 	
 	interface MESSAGE {
+	
+		
+		String GOODBYE = "Goodbye!";
+		String WELCOME = "Welcome to To-Do list. ";
 		
 		// Add new task
 		String TASK_EXISTS = "Can not add new task. This task already existed! Look at table above.\n";
 		String TASK_ADDED = "Successful added '%s' \n";
-		String INVALID_DEADLINE = "Can not add new task with invalid deadline! Current date and time is %s\n";
-		String INVALID_DATE_TIME_FORMAT = "Can not add new task. Invalid date time format!\n";
+		String INVALID_DEADLINE = "Invalid deadline or end date! Current date and time is %s\n";
+		String INVALID_START_DATE = "Invalid start date! Current date and time is %s\n";
+		String INVALID_DATE_TIME_FORMAT = "Invalid date time format!\n";
+		String INVALID_PRIORITY = "Invalid priority format!\n";
+		String INVALID_TASK_NAME = "Invalid task name! Task name can not be null, empty or space only!\n";
 		
 		// Show
 		String TASK_TO_DO = "These are your tasks to do!";
@@ -83,7 +96,9 @@ public interface AppConst {
 		String NO_TASK_TO_DELETE = "No more tasks to delete!\n";
 		
 		// Update
-		String UPDATED_SUCCESSFUL = "'%s' was updated successfully!\n";
+		String UPDATED_SUCCESSFUL = "Updated successfully!\n";
+		String INVALID_UPDATE_FORMAT = "Invalid update format, use 'update <oldTask> TO <newTask>' oldTask and newTask can not be null, empty or space only!\n";
+		String TASK_UPDATED_EXIST = "Can not update, this new task was already exist!\n";
 		
 		// Change file name
 		String CHANGED_SUCCESSFUL = "Successful changed data file to '%s'!\n";
@@ -99,6 +114,12 @@ public interface AppConst {
 		// Search
 		String NOTHING_MATCHED = "Nothing matched! Use 'showall' to show all your tasks!\n";
 		String SHOWING_RESULT = "Showing results for '%s'";
+		
+		// Mark done/undone, use open and close commands
+		String MARKED_DONE_SUCCESSFUL = "Task is marked 'done' successfully!\n";
+		String MARKED_UNDONE_SUCCESSFUL = "Task is marked 'undone' successfully. You can update the new deadline for this task by using 'update' command!\n";
+		String TASK_CLOSED = "Task is already closed!\n";
+		String TASK_OPENED = "Task is already opened!\n";
 		
 		String TASK_NOT_FOUND = "Error: '%s' not found!\n";
 		String SYNTAX_ERROR = "Syntax error: command(%s) not found.\n";	
