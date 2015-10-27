@@ -40,7 +40,7 @@ public class MainLogic {
 		mSettingsStorage = new Storage();
 		mSettingsStorage.setFileURL(SETTINGS_FILE);
 		//mSettings = mSettingsStorage.readSettings();
-		mSettings.setDataFileUrl("data1.txt");
+		mSettings.setDataFileUrl("test.txt");
 		mDataStorage = new Storage();
 		mDataStorage.setFileURL(mSettings.getDataFileUrl());
 		
