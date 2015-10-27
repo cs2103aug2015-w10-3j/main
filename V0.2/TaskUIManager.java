@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.FlowLayout;
 import java.awt.event.*;
 import java.awt.Component;
+import java.awt.Rectangle;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -25,6 +26,7 @@ public class TaskUIManager {
     private static String APP_NAME = "To-Do";
     private static String COMMAND_MESSAGE = "$" + APP_NAME + ": ";
     private static String NEW_LINE = "\n";
+    private static int MAX_NUMBER_ROWS = 16;
 
     static JButton enterButton;
     public static JTextArea output;
@@ -53,10 +55,12 @@ public class TaskUIManager {
     	
     };
     static ArrayList<Task> dataTaskList = new ArrayList<Task>();
+    static ArrayList<Task> mSaveDataList = new ArrayList<Task>();
 	static int windowHeight = 5;
 	static int windowWidth = 80;
 	static int rowHeightDefault = 25;
     static int userCommandCount = 0;
+    static int userScrollCount = 0;
 
 	public TaskUIManager() {
 
@@ -77,6 +81,7 @@ public class TaskUIManager {
         ArrayListPointer dataTaskListPointer = new ArrayListPointer();   
         String message = mMainLogic.process(AppConst.COMMAND_TYPE.SHOW_ALL, dataTaskListPointer);
         dataTaskList = dataTaskListPointer.getPointer();
+        mSaveDataList = dataTaskList;
                 
         openToDoListWindow();
 
@@ -237,6 +242,41 @@ public class TaskUIManager {
             input.setText(userCommand);
             input.setCaretPosition(userCommand.length());
         }
+        
+        if (event.getKeyCode() == KeyEvent.VK_PAGE_DOWN) {
+        	userScrollCount++;
+        	if (userScrollCount + MAX_NUMBER_ROWS > dataTaskList.size()) {
+        		userScrollCount--;
+        	}
+        	
+        	table.scrollRectToVisible(new Rectangle(0, 
+        											userScrollCount * table.getRowHeight(), 
+        											table.getWidth(), 
+        											MAX_NUMBER_ROWS * table.getRowHeight()));
+        	
+        }
+        if (event.getKeyCode() == KeyEvent.VK_PAGE_UP) {
+        	userScrollCount--;
+        	if (userScrollCount < 0) {
+        		userScrollCount++;
+        	}
+        	
+        	table.scrollRectToVisible(new Rectangle(0, 
+        											userScrollCount * table.getRowHeight(), 
+        											table.getWidth(), 
+        											MAX_NUMBER_ROWS * table.getRowHeight()));
+        }
+    }
+    
+    public static void updateTable() {
+    
+    	DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
+        tableModel.setRowCount(0);
+        for(int i=userScrollCount; i<dataTaskList.size(); i++) {
+        	String[] data = getDataFromTask(dataTaskList.get(i), i);
+			tableModel.addRow(data);
+		}
+        tableModel.fireTableDataChanged();
     }
 
     public static class ButtonListener implements ActionListener
@@ -265,6 +305,7 @@ public class TaskUIManager {
                         ArrayListPointer dataTaskListPointer = new ArrayListPointer();   
                     	String message = mMainLogic.process(userCommand, dataTaskListPointer);
                         dataTaskList = dataTaskListPointer.getPointer();
+                        mSaveDataList = dataTaskList;
                     	
         			   	// Message = null means user want to exit
                     	if (message == null) {
@@ -272,15 +313,8 @@ public class TaskUIManager {
                     		frame.setVisible(false);
                     		frame.dispose();
                     	} else {
-                    		
-                    		// Updated table depends on user command
-                    		DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
-                    		tableModel.setRowCount(0);
-				            for(int i=0; i<dataTaskList.size(); i++) {
-				            	String[] data = getDataFromTask(dataTaskList.get(i), i);
-				            	tableModel.addRow(data);
-				            }
-                    		tableModel.fireTableDataChanged();
+                    		userScrollCount = 0;
+                    		updateTable();
                     		displayMessage(message);
                     	}
                     }
