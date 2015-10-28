@@ -5,8 +5,6 @@ import java.lang.*;
 
 public class MainLogic {
 
-   	private final String PRIORITY_LOW = "low";
-
 	CommandParser mTaskCommandParse = new CommandParser();
 
 	//constants
@@ -91,8 +89,8 @@ public class MainLogic {
 	        // write comparison logic here like below , it's just a sample
 	        String p1 = o1.getPriority();
 	        String p2 = o2.getPriority();
-	        if (p1.equals(PRIORITY_LOW)) p1 = "n";
-	        if (p2.equals(PRIORITY_LOW)) p2 = "n";
+	        if (p1.equals(AppConst.TASK_FIELD.LOW)) p1 = "n";
+	        if (p2.equals(AppConst.TASK_FIELD.LOW)) p2 = "n";
 	        return p1.compareTo(p2);
 	    }
 	}
@@ -100,9 +98,46 @@ public class MainLogic {
 	    @Override
 	    public int compare(Task o1, Task o2) {
 	        // write comparison logic here like below , it's just a sample
+	        if (o1.getDeadline().equals("")) {
+	        	return 1;
+	        }
+	        if (o2.getDeadline().equals("")) {
+	        	return -1;
+	        }
 	        return mDateTimeHelper.compareStringDates(o1.getDeadline(), o2.getDeadline());
 	    }
 	}
+	
+	private class TaskStartDateCompare implements Comparator<Task> {
+	    @Override
+	    public int compare(Task o1, Task o2) {
+	        // write comparison logic here like below , it's just a sample
+	        if (o1.getStartDate().equals("")) {
+	        	return 1;
+	        }
+	        if (o2.getStartDate().equals("")) {
+	        	return -1;
+	        }
+	        return mDateTimeHelper.compareStringDates(o1.getStartDate(), o2.getStartDate());
+	    }
+	}
+	
+	
+	private class TaskEndDateCompare implements Comparator<Task> {
+	    @Override
+	    public int compare(Task o1, Task o2) {
+	        // write comparison logic here like below , it's just a sample
+	        if (o1.getEndDate().equals("")) {
+	        	return 1;
+	        }
+	        if (o2.getEndDate().equals("")) {
+	        	return -1;
+	        }
+	        return mDateTimeHelper.compareStringDates(o1.getEndDate(), o2.getEndDate());
+	    }
+	}
+	
+	
 	private class TaskGroupCompare implements Comparator<Task> {
 	    @Override
 	    public int compare(Task o1, Task o2) {
@@ -138,17 +173,17 @@ public class MainLogic {
 		String endDate = newTask.getEndDate();
 		String currentTime = mDateTimeHelper.getCurrentTimeString();
 		
-		if (mDateTimeHelper.compareStringDates(currentTime, startDate)>0) {
-			return String.format(AppConst.MESSAGE.INVALID_START_DATE, currentTime);		
-		}
+		//if (!startDate.equals("") && mDateTimeHelper.compareStringDates(currentTime, startDate)>0) {
+		//	return String.format(AppConst.MESSAGE.INVALID_START_DATE, currentTime);		
+		//}
 		
-		if (!deadline.equals("")) {
+		if (!deadline.equals("") && !startDate.equals("")) {
 			if (mDateTimeHelper.compareStringDates(startDate, deadline)>0) {
 				return String.format(AppConst.MESSAGE.INVALID_DEADLINE, currentTime);
 			}
 		}
 		
-		if (!endDate.equals("")) {
+		if (!endDate.equals("") && !startDate.equals("")) {
 			if (mDateTimeHelper.compareStringDates(startDate, endDate)>0) {
 				return String.format(AppConst.MESSAGE.INVALID_DEADLINE, currentTime);
 			}
@@ -336,9 +371,9 @@ public class MainLogic {
 		String endDate = updatedInfo.getEndDate();
 		String currentTime = mDateTimeHelper.getCurrentTimeString();
 		
-		if (!startDate.equals("") && mDateTimeHelper.compareStringDates(currentTime, startDate)>0) {
-			return String.format(AppConst.MESSAGE.INVALID_START_DATE, currentTime);		
-		}
+		//if (!startDate.equals("") && mDateTimeHelper.compareStringDates(currentTime, startDate)>0) {
+		//	return String.format(AppConst.MESSAGE.INVALID_START_DATE, currentTime);		
+		//}
 		
 		if (!deadline.equals("") && !startDate.equals("")) {
 			if (mDateTimeHelper.compareStringDates(startDate, deadline)>0) {
@@ -438,6 +473,15 @@ public class MainLogic {
 			case AppConst.TASK_FIELD.DEADLINE:
 				Collections.sort(mTasks,new TaskDeadlineCompare());
 				return AppConst.MESSAGE.DISPLAY_BY_DEADLINE;
+				
+			case AppConst.TASK_FIELD.START_DATE:
+				Collections.sort(mTasks,new TaskStartDateCompare());
+				return AppConst.MESSAGE.DISPLAY_BY_START_DATE;
+				
+			case AppConst.TASK_FIELD.END_DATE:
+				Collections.sort(mTasks,new TaskEndDateCompare());
+				return AppConst.MESSAGE.DISPLAY_BY_END_DATE;
+				
 
 			case AppConst.TASK_FIELD.PRIORITY:
 				Collections.sort(mTasks,new TaskPriorityCompare());
@@ -446,7 +490,7 @@ public class MainLogic {
 			case AppConst.TASK_FIELD.GROUP:
 				Collections.sort(mTasks,new TaskGroupCompare());
 				return AppConst.MESSAGE.DISPLAY_BY_GROUP;
-
+		
 			default:
 				return AppConst.MESSAGE.NOT_RECOGNIZED_SYNTAX;
 				
@@ -712,6 +756,13 @@ public class MainLogic {
 		} else if (task1.getPriority().equals("") && !task2.getPriority().equals("")) {
 			isTheSame = false;
 		}
+		
+		if (!task1.getStartDate().equals("") && !task1.getStartDate().equals(task2.getStartDate())) {
+			return -1;
+		} else if (task1.getStartDate().equals("") && !task2.getStartDate().equals("")) {
+			isTheSame = false;
+		}
+		
 		if (!task1.getDeadline().equals("") && !task1.getDeadline().equals(task2.getDeadline())) {
 			return -1; 
 		} else if (task1.getDeadline().equals("") && !task2.getDeadline().equals("")) {

@@ -6,6 +6,7 @@ import java.text.ParseException;
 public class DateTimeHelper {
 	
 	private static SimpleDateFormat standardTimeFormat = new SimpleDateFormat("dd/MM HH:mm");
+	private static SimpleDateFormat displayDateTimeFormat = new SimpleDateFormat("dd MMM HH:mm");
 	private static final String startDateTime = " 00:00";
 	private static final String endDateTime = " 23:59";
 	private static final String AM = "am";
@@ -35,6 +36,17 @@ public class DateTimeHelper {
 	
 	public DateTimeHelper() {
 	
+	}
+	
+	protected String convertToDisplayFormat(String dateTime) {
+		if (dateTime == null || dateTime.equals("")) {
+			return dateTime;
+		}
+		Date date = convertStringToDate(dateTime);
+		if (date == null) {
+			return dateTime;
+		}
+		return displayDateTimeFormat.format(date);			 
 	}
 	
 	protected String getCurrentTimeString() {

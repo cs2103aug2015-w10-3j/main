@@ -92,12 +92,6 @@ public class CommandParser {
 		String deadline = getDeadlineForTask(userCommand);
 		String startDate = getStartDateForTask(userCommand);
 		String endDate = getEndDateForTask(userCommand);
-		if (deadline != null && deadline.equals("")) {
-			deadline = endDate;
-		}
-		if (endDate != null && endDate.equals("")) {
-			endDate = deadline;
-		}
 				
 		// handle for from DateTime to DateTime of Month case
 		// get Month from endDate, put to startDate
@@ -105,25 +99,13 @@ public class CommandParser {
 			startDate = getStringDateForStartDate(userCommand);
 			String month = mDateTimeHelper.getMonthStringForDateTime(endDate);
 			startDate = mDateTimeHelper.getStringDateFromString(month + " " + startDate, 1);
-			if (startDate != null && !startDate.equals("")) {
-				String currentDate = mDateTimeHelper.getCurrentTimeString();
-				if (mDateTimeHelper.compareStringDates(startDate, currentDate)<0) {
-					startDate = currentDate;
-				}
-			}
 		}
 				
 		String priority = getPriorityForTask(userCommand);
 				
-		if (commandType.equals(AppConst.COMMAND_TYPE.ADD)) {
-			if (startDate!=null && startDate.equals("")) {
-				startDate = mDateTimeHelper.getCurrentTimeString();
-			}
-					
-			if (priority!=null && priority.equals("")) {
-				// Default medium
-				priority = AppConst.TASK_FIELD.MEDIUM;
-			}
+		if (priority!=null && priority.equals("")) {
+			// Default medium
+			priority = AppConst.TASK_FIELD.MEDIUM;
 		}
 				
 		task.setDeadline(deadline);

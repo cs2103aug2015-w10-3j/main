@@ -27,7 +27,8 @@ public class TaskUIManager {
     private static String COMMAND_MESSAGE = "$" + APP_NAME + ": ";
     private static String NEW_LINE = "\n";
     private static int MAX_NUMBER_ROWS = 16;
-
+	private static DateTimeHelper mDateTimeHelper = new DateTimeHelper();
+	
     static JButton enterButton;
     public static JTextArea output;
     public static JTextField input;
@@ -44,6 +45,8 @@ public class TaskUIManager {
                         "Group",
                         "Status"
                         };
+                        
+    static String[] timeTableColumnNames = new String[] {"8-9", "9-10", "10-11", "11-12", "12-13", "13-14", "14-16", "16-17", "17-18", "18-19", "19-20"};
     static int[] columnWidth = new int[] {	40,
     										0,
     										100,
@@ -94,9 +97,9 @@ public class TaskUIManager {
 		String[] data = new String[8];
 		data[0] = String.valueOf(i);
 		data[1] = task.getName();
-		data[2] = task.getDeadline();
-		data[3] = task.getStartDate();
-		data[4] = task.getEndDate();
+		data[2] = mDateTimeHelper.convertToDisplayFormat(task.getDeadline());
+		data[3] = mDateTimeHelper.convertToDisplayFormat(task.getStartDate());
+		data[4] = mDateTimeHelper.convertToDisplayFormat(task.getEndDate());
 		data[5] = task.getPriority();
 		data[6] = task.getGroup();
 		data[7] = task.getStatus();
@@ -256,6 +259,7 @@ public class TaskUIManager {
         	
         }
         if (event.getKeyCode() == KeyEvent.VK_PAGE_UP) {
+        	
         	userScrollCount--;
         	if (userScrollCount < 0) {
         		userScrollCount++;

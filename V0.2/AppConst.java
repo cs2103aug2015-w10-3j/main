@@ -52,8 +52,8 @@ public interface AppConst {
 		String LOW = "low";
 		
 		String GROUP = "group";
-		String START_DATE = "startDate";
-		String END_DATE = "endDate";
+		String START_DATE = "start date";
+		String END_DATE = "end date";
 		
 		// Status field and values
 		String STATUS = "status";
@@ -80,6 +80,8 @@ public interface AppConst {
 		String TASK_TO_DO = "These are your tasks to do!";
 		String NO_TASK_FOUND = "You don't have any tasks! Use 'add' to add a new task!\n";
 		String DISPLAY_BY_DEADLINE = "Displaying tasks in the order of their deadlines.";
+		String DISPLAY_BY_START_DATE = "Displaying tasks in the order of their start dates.";
+		String DISPLAY_BY_END_DATE = "Displaying tasks in the order of their end dates.";
 		String DISPLAY_BY_PRIORITY = "Displaying tasks in the order of their priorities.";
 		String DISPLAY_BY_GROUP = "Displaying tasks in the order of their groups.";
 		String NOT_RECOGNIZED_SYNTAX = "Syntax not recognized. Use 'showby deadline' or 'showby priority' or 'showby group'";
