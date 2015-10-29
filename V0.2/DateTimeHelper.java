@@ -5,6 +5,12 @@ import java.text.ParseException;
 
 public class DateTimeHelper {
 	
+	private static final String TODAY = "Today";
+	private static final String TOMORROW = "Tomorrow";
+	private static final String YESTERDAY = "Yesterday";
+	private static final String YTD = "ytd";
+	private static final String TMR = "tmr";
+	private static final String NOW = "now";
 	private static SimpleDateFormat standardTimeFormat = new SimpleDateFormat("dd/MM HH:mm");
 	private static SimpleDateFormat displayDateTimeFormat = new SimpleDateFormat("dd MMM HH:mm");
 	private static final String startDateTime = " 00:00";
@@ -12,7 +18,17 @@ public class DateTimeHelper {
 	private static final String AM = "am";
 	private static final String PM = "pm";
 	private static final String NEXT = "next";
+	private static final String NXT = "nxt";
+	private static final String LAST = "last";
 	private static final String WEEKS = "weeks";
+	private static final String WEEK = "week";
+	private static final String LATER = "later";
+	private static final String DAY = "day";
+	private static final String DAYS = "days";
+	private static final String THIS = "this";
+	
+	private static int[] daysInMonth = new int[] {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	
 	private static final String[] months = new String[] {"january", 
 														 "february", 
 														 "march", 
@@ -38,6 +54,117 @@ public class DateTimeHelper {
 	
 	}
 	
+	
+	protected boolean isCorrectDate(String dateTime) {
+		if (dateTime == null || dateTime.equals("")) {
+			return true;
+		}
+		
+		int day = getDayFromStringDate(dateTime);
+		int month = getMonthFromStringDate(dateTime);
+		if (day <= 0 || month <= 0 || month > 12) {
+			return false;
+		}
+		if (day > daysInMonth[month-1]) {
+			return false;
+		}
+		return true;
+	}
+	
+	private int getDayFromStringDate(String date) {
+		String day = String.valueOf(date.charAt(0)) + String.valueOf(date.charAt(1));
+		return Integer.parseInt(day);
+	}
+	
+	private int getMonthFromStringDate(String date) {
+		String month = String.valueOf(date.charAt(3)) + String.valueOf(date.charAt(4));
+		return Integer.parseInt(month);
+	}
+	
+	protected boolean isToday(String dateTime) {
+		int day = getDayFromStringDate(dateTime);
+		int month = getMonthFromStringDate(dateTime);
+		String date = getCurrentTimeString();
+		int currentDay = getDayFromStringDate(date);
+		int currentMonth = getMonthFromStringDate(date);
+		if (day == currentDay && month == currentMonth) {
+			return true;
+		}
+		return false;
+	}
+	
+	protected boolean isYesterday(String dateTime) {
+		int day = getDayFromStringDate(dateTime);
+		int month = getMonthFromStringDate(dateTime);
+		String date = getCurrentTimeString();
+		int yesterdayDay = getDayFromStringDate(getYesterday());
+		int yesterdayMonth = getMonthFromStringDate(getYesterday());
+		if (day == yesterdayDay && month == yesterdayMonth) {
+			return true;
+		}
+		return false;
+	}
+	
+	protected boolean isTomorrow(String dateTime) {
+		int day = getDayFromStringDate(dateTime);
+		int month = getMonthFromStringDate(dateTime);
+		int tomorrowDay = getDayFromStringDate(getTomorrow());
+		int tomorrowMonth = getMonthFromStringDate(getTomorrow());
+		if (day == tomorrowDay && month == tomorrowMonth) {
+			return true;
+		}
+		return false;
+	}
+	
+	protected String getYesterday() {
+		String dateTime = getCurrentTimeString();
+		int day = getDayFromStringDate(dateTime);
+		int month = getMonthFromStringDate(dateTime);
+		day--;
+		if (day == 0 && month != 1) {
+			month--;  day = daysInMonth[month-1];		
+		}
+		if (month > 0 && month < 13 && day > 0 && day <= daysInMonth[month-1]) {
+			String dayString = String.valueOf(day);
+			String monthString = String.valueOf(month);
+			if (dayString.length() < 2) {
+				dayString = "0" + dayString;
+			}
+			if (monthString.length() < 2) {
+				monthString = "0" + monthString;
+			}
+			return dayString + "/" + monthString;
+		}
+		return "";
+	}
+	
+	protected String getToday() {
+		String dateTime = getCurrentTimeString();
+		return String.valueOf(getDayFromStringDate(dateTime)) + "/" + String.valueOf(getMonthFromStringDate(dateTime));
+	}
+	
+	protected String getTomorrow() {
+		String dateTime = getCurrentTimeString();
+		int day = getDayFromStringDate(dateTime);
+		int month = getMonthFromStringDate(dateTime);
+		day++;
+		if (day > daysInMonth[month-1]) {
+			day = 1; month++;
+		}
+		if (month > 0 && month < 13 && day > 0 && day <= daysInMonth[month-1]) {
+			String dayString = String.valueOf(day);
+			String monthString = String.valueOf(month);
+			if (dayString.length() < 2) {
+				dayString = "0" + dayString;
+			}
+			if (monthString.length() < 2) {
+				monthString = "0" + monthString;
+			}
+			return dayString + "/" + monthString;
+		}
+		return "";
+	}
+	
 	protected String convertToDisplayFormat(String dateTime) {
 		if (dateTime == null || dateTime.equals("")) {
 			return dateTime;
@@ -46,6 +173,21 @@ public class DateTimeHelper {
 		if (date == null) {
 			return dateTime;
 		}
+		System.out.println("Date Time: " + dateTime);
+		SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+		String time = " " + timeFormat.format(date);
+		
+		if (isYesterday(dateTime)) {
+			return YESTERDAY + time;
+		}
+		
+		if (isToday(dateTime)) {
+			return TODAY + time;
+		}
+		if (isTomorrow(dateTime)) {
+			return TOMORROW + time;
+		}
+		
 		return displayDateTimeFormat.format(date);			 
 	}
 	
@@ -155,7 +297,7 @@ public class DateTimeHelper {
 		return hour;
 	}
 	
-	private boolean isNumber(String st) {
+	protected boolean isNumber(String st) {
 		for(int i=0; i<st.length(); i++) {
 			if (st.charAt(i)<'0' || st.charAt(i)>'9') {
 				return false;
@@ -164,7 +306,7 @@ public class DateTimeHelper {
 		return true;
 	}
 
-	private String getTimeFromString(String dateTime, int flag) {
+	protected String getTimeFromString(String dateTime, int flag) {
 		String time = "";
 		if (flag == 1) {
 			time = startDateTime;
@@ -226,6 +368,9 @@ public class DateTimeHelper {
 		for(int i=0; i<months.length; i++) {
 			int j = 0, k = 0;
 			String st1 = months[i];
+			if (st1.charAt(0) != st.charAt(0)) {
+				continue;
+			}
 			while (j<st.length() && k<st1.length()) {
 				while (k<st1.length() && st1.charAt(k)!=st.charAt(j)) {
 					k++;
@@ -298,6 +443,9 @@ public class DateTimeHelper {
 		String date = "";
 		for(int i=0; i<st.length(); i++) {
 			if (st.charAt(i)<'0'||st.charAt(i)>'9') {
+				if (i < st.length()-3) {
+					return null;
+				}
 				break;
 			}
 			date += st.charAt(i);
@@ -306,7 +454,7 @@ public class DateTimeHelper {
 			return null;
 		}
 		int x = Integer.parseInt(date);
-		if (x>31) {
+		if (x>31 || x <= 0) {
 			return null;
 		}
 		if (date.length() < 2) {
@@ -316,7 +464,131 @@ public class DateTimeHelper {
 		
 	}
 	
-	protected String getDateMonthFromString(String dateTime) {
+	
+	protected int getMatchedDayInWeek(String day) {
+		if (day == null || day.length()<2) {
+			return -1;
+		}
+		for(int i=0; i<7; i++) {
+			if (days[i].startsWith(day)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	
+	// 1/1/2015 is Thursday
+	protected int getDayInWeekForDate(String date) {
+		int day = getDayFromStringDate(date);
+		int month = getMonthFromStringDate(date);
+		int number = 0;
+		for(int i=1; i<month; i++) {
+			number += daysInMonth[i];
+		}
+		number += day;
+		number += 3;
+		// 1/1/2015 is Thursday, we go back to Monday is 29/12/2014
+		number = number % 7;
+		if (number == 0) {
+			number = 7;
+		}
+		return number-1;
+		
+	}
+	
+	protected String getDateAfterSomeDaysFromNow(int number) {
+		String currentDateTime = getCurrentTimeString();
+		int day = getDayFromStringDate(currentDateTime);
+		int month = getMonthFromStringDate(currentDateTime);
+		day += number;
+		while (month < 12 && day > daysInMonth[month-1]) {
+			day -= daysInMonth[month-1];
+			month++;
+		}
+		
+		if (day > 0 && day < 32 && month > 0 && month < 13) {
+		
+			String dayString = String.valueOf(day);
+			if (dayString.length() < 2) {
+				dayString = "0" + dayString;
+			}
+			String monthString = String.valueOf(month);
+			if (monthString.length() < 2) {
+				monthString = "0" + monthString;
+			}
+			return dayString + "/" + monthString;
+		}
+		return null;
+	}
+	
+	protected String getDateBeforeSomeDaysFromNow(int number) {
+		String currentDateTime = getCurrentTimeString();
+		int day = getDayFromStringDate(currentDateTime);
+		int month = getMonthFromStringDate(currentDateTime);
+		day -= number;
+		while (month > 1 && day <= 0) {
+			month--;
+			day += daysInMonth[month-1];
+		}
+		if (day > 0 && day < 32 && month > 0 && month < 13) {
+			String dayString = String.valueOf(day);
+			if (dayString.length() < 2) {
+				dayString = "0" + dayString;
+			}
+			String monthString = String.valueOf(month);
+			if (monthString.length() < 2) {
+				monthString = "0" + monthString;
+			
+			}
+			return day + "/" + month;
+		}	
+		return null;
+	}
+	
+	protected String getDateFromDayInCurrentWeek(String day_) {
+		int dayInWeek = getMatchedDayInWeek(day_);
+		if (dayInWeek == -1) {
+			return null;
+		}
+		
+		String currentDateTime = getCurrentTimeString();
+
+		int currentDayInWeek = getDayInWeekForDate(currentDateTime);
+		int day = getDayFromStringDate(currentDateTime);
+		int month = getMonthFromStringDate(currentDateTime);
+		
+		if (dayInWeek > currentDayInWeek) { 			
+			day += dayInWeek - currentDayInWeek;
+			if (day > daysInMonth[month-1]) {
+				day -= daysInMonth[month-1];
+				month++;
+			}
+		} else {
+			day += dayInWeek - currentDayInWeek;
+			if (day <= 0 && month > 1) {
+				month--;
+				day += daysInMonth[month-1];
+			}
+		}
+		
+		if (day > 0 && day < 32 && month > 0 && month < 13) {
+			String dayString = String.valueOf(day);
+			if (dayString.length() < 2) {
+				dayString = "0" + dayString;
+			}
+			String monthString = String.valueOf(month);
+			if (monthString.length() < 2) {
+				monthString = "0" + monthString;
+			
+			}
+			return dayString + "/" + monthString;
+		}
+		
+		return null;
+	}
+	
+	protected String getDateMonthFromString(String dateTime, int flag) {
 	
 		dateTime = dateTime.toLowerCase();
 
@@ -329,6 +601,8 @@ public class DateTimeHelper {
 		String[] splits = dateTime.split(" ");
 		
 		int count = 0;
+		String result = null;
+		int numberResult = 0;
 		
 		if (!month.equals("")) {
 			for(int i=0; i<splits.length; i++) {
@@ -344,8 +618,19 @@ public class DateTimeHelper {
 			if (count>1 || count==0) {
 				return null;
 			}
-			return date + "/" + month;
+			if (date.length() < 2) {
+				date = "0" + date;
+			}
+			
+			if (month.length() < 2) {
+				month = "0" + month;
+			}
+			result = date + "/" + month;
+			numberResult = 1;
+			
 		}
+		
+		count = 0;
 		
 		for(int i=0; i<splits.length; i++) {
 			String st = splits[i];
@@ -360,23 +645,250 @@ public class DateTimeHelper {
 		if (count > 1) {
 			return null;
 		} else if (count == 1){
-			return date + "/" + month;
+			if (numberResult > 0) {
+				return null;
+			}
+			numberResult = 1;
+			
+			if (date.length() < 2) {
+				date = "0" + date;
+			}
+			
+			if (month.length() < 2) {
+				month = "0" + month;
+			}
+			result = date + "/" + month;
 		}
 		
-		return "";
+		for(int i=0; i<splits.length; i++) {
+			if (splits[i].equals(YESTERDAY.toLowerCase()) || splits[i].equals(YTD)) {
+				if (numberResult > 0) {
+					return null;
+				}
+				numberResult = 1;
+				result = getYesterday();
+			}
+			
+			if (splits[i].equals(TODAY.toLowerCase())) {
+				if (numberResult > 0) {
+					return null;
+				}
+				numberResult = 1;
+				result = getToday();
+			}
+			
+			if (splits[i].equals(TOMORROW.toLowerCase()) || splits[i].equals(TMR)) {
+				if (numberResult > 0) {
+					return null;
+				}
+				numberResult = 1;
+				result = getTomorrow();
+			}
+		}
+		
+		int dayInWeek = -1;
+		count = 0;
+		for(int i=0; i<splits.length; i++) {
+			int x = getMatchedDayInWeek(splits[i]);
+			if (x > 0) {
+				count++;  dayInWeek = x;
+			}
+		}
+		if (count > 1) {
+			return null;
+		}
+		
+		count = 0;
+		
+		int daysFromNow = 0;
+		int weeksFromNow = 0;	
+		
+		for(int i=0; i<splits.length; i++) {
+			if (splits[i].equals(THIS) || splits[i].equals(NEXT) || splits[i].equals(NXT) || splits[i].equals(LAST)) {
+				count++;
+			}
+		}
+		if (count > 1) {
+			return null;
+		}
+		
+		count = 0;
+		
+		for(int i=0; i<splits.length; i++) {
+			if (splits[i].equals(NEXT) || splits[i].equals(NXT)) {
+				if (i >= splits.length - 1) {
+					break;
+				}
+				if (isNumber(splits[i+1])) {
+					if (i >= splits.length - 2) {
+						continue;
+					}
+					String st = splits[i+2];
+					if (st.equals(DAY) || st.equals(DAYS)) {
+						daysFromNow = Integer.parseInt(splits[i+1]);
+						count++;
+						continue;
+					}
+					if (st.equals(WEEK) || st.equals(WEEKS)) {
+						weeksFromNow = Integer.parseInt(splits[i+1]);
+						count++;
+						continue;
+					}
+				} else if (splits[i+1].equals(DAY) || splits[i+1].equals(DAYS)) {
+					daysFromNow = 1;
+					count++;
+					continue;
+				} else if (splits[i+1].equals(WEEK) || splits[i+1].equals(WEEKS)) {
+					weeksFromNow = 1;
+					count++;
+					continue;
+				} else if (getMatchedDayInWeek(splits[i+1])>=0) {
+					weeksFromNow = 1;
+					continue;
+				}
+			}
+			
+			if (splits[i].equals(LAST)) {
+				if (i >= splits.length - 1) {
+					break;
+				}
+				if (isNumber(splits[i+1])) {
+					if (i >= splits.length - 2) {
+						continue;
+					}
+					String st = splits[i+2];
+					if (st.equals(DAY) || st.equals(DAYS)) {
+						daysFromNow = -Integer.parseInt(splits[i+1]);
+						count++;
+						continue;
+					}
+					if (st.equals(WEEK) || st.equals(WEEKS)) {
+						weeksFromNow = -Integer.parseInt(splits[i+1]);
+						count++;
+						continue;
+					}
+				} else if (splits[i+1].equals(DAY) || splits[i+1].equals(DAYS)) {
+					daysFromNow = -1;
+					count++;
+					continue;
+				} else if (splits[i+1].equals(WEEK) || splits[i+1].equals(WEEKS)) {
+					weeksFromNow = -1;
+					count++;
+					continue;
+				} else if (getMatchedDayInWeek(splits[i+1])>=0) {
+					weeksFromNow = -1;
+					continue;
+				}
+			}			
+		}
+		
+		if (count > 1) {
+			return null;
+		}
+		if (count == 1 && numberResult > 0) {
+			return null;
+		}
+		
+		for(int i=0; i<splits.length; i++) {
+			if (splits[i].equals(THIS)) {
+				if (i == splits.length - 1) {
+					break;
+				}
+				if (getMatchedDayInWeek(splits[i+1])>=0) {
+					count++;
+					continue;
+				}
+				if (splits[i+1].equals(WEEK) || splits[i+1].equals(WEEKS)) {
+					count++;
+					continue;
+				}
+			}
+		}
+		
+		if (count > 1) {
+			return null;
+		}
+		
+		if (count == 0 && dayInWeek!=-1) {
+			count++;
+		} else {
+			if (dayInWeek == -1 && daysFromNow == 0) {
+				if (flag == 1) {
+					dayInWeek = 0;
+				} else {
+					dayInWeek = 6;
+				}
+			}
+		}
+		
+		if (count == 1 && numberResult > 0) {
+			return null;
+		}
+		
+		if (count == 0) {
+			return result;
+		}
+		
+		if (daysFromNow != 0) {
+			if (daysFromNow > 0) {
+				return getDateAfterSomeDaysFromNow(daysFromNow);
+			} else {
+				return getDateBeforeSomeDaysFromNow(daysFromNow);
+			}
+		}
+		
+		// get the date for dayInWeek for this current week
+		String dateForDayInWeek = getDateFromDayInCurrentWeek(days[dayInWeek]);
+		int day_ = getDayFromStringDate(dateForDayInWeek);
+		int month_ = getMonthFromStringDate(dateForDayInWeek);
+		int numberOfDays = weeksFromNow * 7;
+		if (numberOfDays > 0) {
+			day_ += numberOfDays;
+			while (month_ <= 12 && day_ > daysInMonth[month_-1]) {
+				day_ -= daysInMonth[month_-1];
+				month_++;
+			}
+		} else if (numberOfDays > 0) {
+			day_ -= numberOfDays;
+			while (day_ <= 0 && month_ > 1) {
+				month_--;
+				day_ += daysInMonth[month_-1];
+			}
+		}
+		
+		if (month_ > 0 && month_ < 13 && day_ > 0 && day_ <= daysInMonth[month_-1]) {
+			
+			String dayString = String.valueOf(day_);
+			if (dayString.length() < 2) {
+				dayString = "0" + dayString;
+			}
+			String monthString = String.valueOf(month_);
+			if (monthString.length() < 2) {
+				monthString = "0" + monthString;
+			}
+			
+			return dayString + "/" + monthString;
+		}
+		
+		return null;
 	}
 
 	protected String getStringDateFromString(String dateTime, int flag) {
 		
 		dateTime = dateTime.toLowerCase();
 		
+		if (dateTime.equals(NOW)) {
+			return getCurrentTimeString();
+		}
+		
 		String time = getTimeFromString(dateTime, flag);
-		String date = getDateMonthFromString(dateTime);
-		System.out.println(time);
-		System.out.println(date);
+		String date = getDateMonthFromString(dateTime, flag);
 		if (time == null || date == null) {
 			return null;
 		}
+		
+		System.out.println(date + " " + time);
+		
 		if (date.equals("")) {
 			return null;
 		}
