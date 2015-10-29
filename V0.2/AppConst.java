@@ -2,6 +2,21 @@ import java.util.*;
 
 public interface AppConst {
 
+	interface KEY_WORD {
+	
+		String[] keywords = new String[] {
+				"from",
+				"to",
+				"by",
+				"before",
+				"repeat",
+				"group",
+				"grp",
+				"priority",
+				"TO"
+				};
+	}
+
 	interface COMMAND_TYPE {
 	
 		String ADD = "add";
