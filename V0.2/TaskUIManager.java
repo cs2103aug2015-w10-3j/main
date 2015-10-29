@@ -26,6 +26,7 @@ public class TaskUIManager {
     private static String APP_NAME = "To-Do";
     private static String COMMAND_MESSAGE = "$" + APP_NAME + ": ";
     private static String NEW_LINE = "\n";
+    private static String SLASH = "\\";
     private static int MAX_NUMBER_ROWS = 16;
 	private static DateTimeHelper mDateTimeHelper = new DateTimeHelper();
 	
@@ -46,12 +47,22 @@ public class TaskUIManager {
                         "Status"
                         };
                         
-    static String[] timeTableColumnNames = new String[] {"8-9", "9-10", "10-11", "11-12", "12-13", "13-14", "14-16", "16-17", "17-18", "18-19", "19-20"};
+    static String[] timeTableColumnNames = new String[] { 	"8-9", 
+    														"9-10", 
+    														"10-11", 
+    														"11-12", 
+    														"12-13", 
+    														"13-14", 
+    														"14-16", 
+    														"16-17", 
+    														"17-18", 
+    														"18-19", 
+    														"19-20"};
     static int[] columnWidth = new int[] {	40,
     										0,
-    										100,
-    										100,
-    										100,
+    										150,
+    										150,
+    										150,
     										80,
     										150,
     										80
@@ -60,7 +71,7 @@ public class TaskUIManager {
     static ArrayList<Task> dataTaskList = new ArrayList<Task>();
     static ArrayList<Task> mSaveDataList = new ArrayList<Task>();
 	static int windowHeight = 5;
-	static int windowWidth = 80;
+	static int windowWidth = 90;
 	static int rowHeightDefault = 25;
     static int userCommandCount = 0;
     static int userScrollCount = 0;
@@ -96,14 +107,53 @@ public class TaskUIManager {
 	public static String[] getDataFromTask(Task task, int i) {
 		String[] data = new String[8];
 		data[0] = String.valueOf(i);
-		data[1] = task.getName();
+		data[1] = removeSlash(task.getName());
 		data[2] = mDateTimeHelper.convertToDisplayFormat(task.getDeadline());
 		data[3] = mDateTimeHelper.convertToDisplayFormat(task.getStartDate());
 		data[4] = mDateTimeHelper.convertToDisplayFormat(task.getEndDate());
 		data[5] = task.getPriority();
-		data[6] = task.getGroup();
+		data[6] = removeSlash(task.getGroup());
 		data[7] = task.getStatus();
 		return data;
+	}
+	
+	private static String removeSlash(String st) {
+		if (st == null || st.equals("")) {
+			return st;
+		}
+		
+		String splits[] = st.split(" ");
+		if (st.length() == 0) {
+			return st;
+		}
+		
+		String[] keys = AppConst.KEY_WORD.keywords;
+		
+		for(int i=0; i<splits.length; i++) {
+			if (splits[i].startsWith(SLASH) && splits[i].length()>1) {
+				String s = splits[i].substring(1, splits[i].length());
+				boolean isKeyword = false;
+				for(int j=0; j<keys.length; j++) {
+					if (keys[j].equals(s)) {
+						isKeyword = true;
+						break;
+					}
+				}
+				if (isKeyword) {
+					splits[i] = s;
+				}
+			}
+		}
+		
+		String result = "";
+		for(int i=0; i<splits.length; i++) {
+			if (i > 0) {
+				result += " ";
+			}
+			result += splits[i];
+		}
+		return result;
+		
 	}
 
 	

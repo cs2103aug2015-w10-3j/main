@@ -177,6 +177,10 @@ public class MainLogic {
 		//	return String.format(AppConst.MESSAGE.INVALID_START_DATE, currentTime);		
 		//}
 		
+		if (mDateTimeHelper.compareStringDates(currentTime, startDate)>0) {
+			startDate = currentTime;	
+		}	
+		
 		if (!deadline.equals("") && !startDate.equals("")) {
 			if (mDateTimeHelper.compareStringDates(startDate, deadline)>0) {
 				return String.format(AppConst.MESSAGE.INVALID_DEADLINE, currentTime);
@@ -310,7 +314,7 @@ public class MainLogic {
 					day += field[i];
 				}
 				taskFieldArg = day;
-				String date =  mDateTimeHelper.getDateMonthFromString(day);
+				String date =  mDateTimeHelper.getDateMonthFromString(day, 2);
 				if (date == null || date.equals("")) {
 					feedbackTasks.setPointer(new ArrayList<Task>());
 					
@@ -505,7 +509,7 @@ public class MainLogic {
 		// handle for show day
 		String dateTimeArgument = "";
 		if (mCommand.getCommandType().equals(AppConst.COMMAND_TYPE.SHOW_DAY)) {
-			dateTimeArgument = mDateTimeHelper.getDateMonthFromString(argument);
+			dateTimeArgument = mDateTimeHelper.getDateMonthFromString(argument, 1);
 			
 			if (dateTimeArgument == null || dateTimeArgument.equals("")) {
 				return AppConst.MESSAGE.INVALID_DAY;
@@ -516,10 +520,11 @@ public class MainLogic {
 			switch (mCommand.getCommandType()){
 				case AppConst.COMMAND_TYPE.SHOW_DAY:
 					String deadline = mAllTasks.get(i).getDeadline();
-
-					System.out.println(deadline.substring(0,4));
-					if (deadline.substring(0, 5).equals(dateTimeArgument) ){
-						mTasks.add(mAllTasks.get(i));
+					
+					if (!deadline.equals("")) {
+						if (deadline.substring(0, 5).equals(dateTimeArgument) ){
+							mTasks.add(mAllTasks.get(i));
+						}
 					}
 					break;
 

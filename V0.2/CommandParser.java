@@ -97,15 +97,34 @@ public class CommandParser {
 		// get Month from endDate, put to startDate
 		if (startDate == null && endDate != null && !endDate.equals("")) {
 			startDate = getStringDateForStartDate(userCommand);
-			String month = mDateTimeHelper.getMonthStringForDateTime(endDate);
-			startDate = mDateTimeHelper.getStringDateFromString(month + " " + startDate, 1);
+			if (mDateTimeHelper.isNumber(startDate) && startDate.length()<=2 && startDate.length()>0) {
+				String month = mDateTimeHelper.getMonthStringForDateTime(endDate);
+				startDate = mDateTimeHelper.getStringDateFromString(month + " " + startDate, 1);
+			} else {
+				startDate = mDateTimeHelper.getTimeFromString(startDate, 1);
+				if (startDate != null) {
+					startDate = mDateTimeHelper.getDateMonthFromString(endDate, 1) + " " + startDate;
+				}
+			}
 		}
 				
 		String priority = getPriorityForTask(userCommand);
 				
 		if (priority!=null && priority.equals("")) {
 			// Default medium
-			priority = AppConst.TASK_FIELD.MEDIUM;
+			if (commandType.equals(AppConst.COMMAND_TYPE.ADD)) {
+				priority = AppConst.TASK_FIELD.MEDIUM;
+			}
+		}
+		
+		if (!mDateTimeHelper.isCorrectDate(startDate)) {
+			startDate = null;
+		}
+		if (!mDateTimeHelper.isCorrectDate(endDate)) {
+			endDate = null;
+		}
+		if (!mDateTimeHelper.isCorrectDate(deadline)) {
+			deadline = null;
 		}
 				
 		task.setDeadline(deadline);
@@ -242,7 +261,6 @@ public class CommandParser {
 				break;
    			}
    		}
-   		System.out.println("End date: " + time);
    		return time;
     }
 

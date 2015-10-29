@@ -55,19 +55,19 @@ public class Task {
 	public String getDisplay() {
 		String result = name;
 		if (!deadline.equals("")) {
-			result += " by" + deadline;
+			result += " by " + deadline;
 		}
 		if (!startDate.equals("")) {
-			result += " from" + startDate;	
+			result += " from " + startDate;	
 		}	
 		if (!endDate.equals("")) {
-			result += " to" + endDate;
+			result += " to " + endDate;
 		}
 		if (!priority.equals("")) {
-			result += " priority" + priority;
+			result += " priority " + priority;
 		}
 		if (!group.equals("")) {
-			result += " group" + group;
+			result += " group " + group;
 		}
 		return result;
 		
