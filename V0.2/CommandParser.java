@@ -5,6 +5,10 @@ import java.lang.*;
 
 public class CommandParser {
 	
+	private final String EVERY = "every";
+	private final String EVERYDAY = "everyday";
+	private final String DAY = "day";
+	
     private int mPosition = -1;
 	
 	private DateTimeHelper mDateTimeHelper = new DateTimeHelper();
@@ -87,6 +91,12 @@ public class CommandParser {
 	}
 
 	private Task getTaskFromString(String commandType, String userCommand) {
+		String[] splits = userCommand.split(" ");
+		for(int i=0; i<splits.length; i++) {
+			if (splits[i].equals("repeat")) {
+				return getTaskRepeatFromString(commandType, userCommand);
+			}
+		}
 		mPosition = -1;
 		Task task = new Task("");
 		String deadline = getDeadlineForTask(userCommand);
@@ -97,17 +107,17 @@ public class CommandParser {
 		// get Month from endDate, put to startDate
 		if (startDate == null && endDate != null && !endDate.equals("")) {
 			startDate = getStringDateForStartDate(userCommand);
-			if (mDateTimeHelper.isNumber(startDate) && startDate.length()<=2 && startDate.length()>0) {
-				String month = mDateTimeHelper.getMonthStringForDateTime(endDate);
-				startDate = mDateTimeHelper.getStringDateFromString(month + " " + startDate, 1);
-			} else {
+			String month = mDateTimeHelper.getMonthStringForDateTime(endDate);
+			startDate = mDateTimeHelper.getStringDateFromString(month + " " + startDate, 1);
+			if (startDate == null || startDate.equals("")) {
+				startDate = getStringDateForStartDate(userCommand);
 				startDate = mDateTimeHelper.getTimeFromString(startDate, 1);
-				if (startDate != null) {
+				if (startDate != null && !startDate.equals("")) {
 					startDate = mDateTimeHelper.getDateMonthFromString(endDate, 1) + " " + startDate;
 				}
 			}
-		}
-				
+		}	
+						
 		String priority = getPriorityForTask(userCommand);
 				
 		if (priority!=null && priority.equals("")) {
@@ -131,11 +141,240 @@ public class CommandParser {
 		task.setStartDate(startDate);
 		task.setEndDate(endDate);
 		task.setPriority(priority);
+		task.setRepeatedType(0);
+		task.setPeriod("");
 		task.setGroup(getGroupForTask(userCommand));
 		task.setTaskInfo(getCommandArgument(userCommand));
 		task.setName(getTaskInfo(userCommand));
 		return task;
 	}
+	
+	private Task getTaskRepeatFromString(String commandType, String userCommand) {
+		
+		mPosition = -1;
+		Task task = new Task("");
+		
+		String priority = getPriorityForTask(userCommand);
+				
+		if (priority!=null && priority.equals("")) {
+			// Default medium
+			if (commandType.equals(AppConst.COMMAND_TYPE.ADD)) {
+				priority = AppConst.TASK_FIELD.MEDIUM;
+			}
+		}
+		
+		String deadline = getDeadlineForTask(userCommand);
+		if (deadline != null && !deadline.equals("")) {
+			deadline = null;
+		}
+		
+		int repeatedType = 1;
+		String periodTime = getPeriodForTask(userCommand);
+		System.out.println("Period: " + periodTime);
+		
+		String splits[] = userCommand.split(" ");
+		int position = 0;
+		for(int i=0; i<splits.length; i++) {
+			if (splits[i].equals("repeat")) {
+				position = i;
+				break;
+			}	
+		}
+		String startDate = null;
+		String endDate = null;
+		if (position < splits.length-1) {
+			if (splits[position+1].equals("from")) {
+				startDate = getStartDateForPeriod(userCommand);
+				endDate = getEndDateForPeriod(userCommand);
+				if (startDate != null) {
+					if (endDate == null) {
+						endDate = "31/12 23:59";
+					}
+				}
+				repeatedType = 1;
+			} else if (splits[position+1].equals(EVERYDAY) || (splits[position+1].equals(EVERY) && position+2<splits.length && splits[position+2].equals(DAY)))  {
+				repeatedType = 3;
+				startDate = mDateTimeHelper.getCurrentTimeString();
+				endDate = "31/12 23:59";
+			} else {
+				repeatedType = 2;
+				String day = "";
+				if (splits[position+1].equals(EVERY)) {
+					if (position+2<splits.length) {
+						day = mDateTimeHelper.getDateFromDayInCurrentWeek(splits[position+2]);
+					}
+				} else {
+					day = mDateTimeHelper.getDateFromDayInCurrentWeek(splits[position+1]);
+				}
+				if (day != null) {
+					startDate = day + " 00:00";
+					endDate = day + " 23:59";
+				}
+			}
+		}
+		
+		if (periodTime == null) {
+			startDate = null;
+			endDate = null;
+		}
+		
+		task.setDeadline(deadline);
+		task.setStartDate(startDate);
+		task.setEndDate(endDate);
+		task.setPeriod(periodTime);
+		task.setRepeatedType(repeatedType);
+		task.setPriority(priority);
+		task.setGroup(getGroupForTask(userCommand));
+		task.setTaskInfo(getCommandArgument(userCommand));
+		task.setName(getTaskInfo(userCommand));
+		
+		return task;
+	}
+
+	private String getPeriodForTask(String userCommand) {
+		String[] splits = userCommand.split(" ");
+		int position = 0;
+		for(int i=0; i<splits.length; i++) {
+			if (splits[i].equals("repeat")) {
+				position = i;
+				if (mPosition == -1) {
+					mPosition = i;
+				} else {
+					mPosition = Math.min(mPosition, i);
+				}
+				break;
+			}
+		}
+		String startTime = "";
+		for(int i=0; i<position; i++) {
+			if (splits[i].equals("from")) {
+				if (mPosition == -1) {
+					mPosition = i;
+				} else {
+					mPosition = Math.min(mPosition, i);
+				}
+				for(int j=i+1; j<position; j++) {
+					if (splits[j].equals("to")) {
+						break;
+					} else {
+						startTime += splits[j];
+					}
+				}
+			}
+		}
+		
+		
+		String endTime = "";
+		for(int i=0; i<position; i++) {
+			if (splits[i].equals("to")) {
+				if (mPosition == -1) {
+					mPosition = i;
+				} else {
+					mPosition = Math.min(mPosition, i);
+				}
+				for(int j=i+1; j<position; j++) {
+					if (splits[j].equals("repeat")) {
+						break;
+					} else {
+						endTime += splits[j];
+					}
+				}
+			}
+		}
+		
+		startTime = mDateTimeHelper.getTimeFromString(startTime, 1);
+		endTime = mDateTimeHelper.getTimeFromString(endTime, 2);
+		
+		System.out.println("Start time: " + startTime);
+		System.out.println("End time: " + endTime);
+		
+		if (startTime == null || endTime == null || startTime.equals("") || endTime.equals("")) {
+			return null;
+		}
+		if (startTime.compareTo(endTime)>=0) {
+			return null;
+		}
+		return startTime + " " + endTime;
+		
+	}
+	
+	private String getStartDateForPeriod(String userCommand) {
+	
+		String[] splits = userCommand.toLowerCase().split(" ");
+		int position = -1;
+		for(int i=0; i<splits.length; i++) {
+			if (splits[i].equals("repeat")) {
+				position = i;
+				if (mPosition == -1) {
+					mPosition = i;
+				} else {
+					mPosition = Math.min(mPosition, i);
+				}
+				break;
+			}
+		}
+		if (position == -1 || position > splits.length-1) {
+			return null;
+		}
+		if (!splits[position+1].equals("from")) {
+			return null;
+		}
+		String startDate = "";
+		for(int i=position+2; i<splits.length; i++) {
+			if (splits[i].equals("to")) {
+				break;
+			}
+			if (i>position+2) {
+				startDate += " ";
+			}
+			startDate += splits[i];
+		}
+		
+		String result = mDateTimeHelper.getDateMonthFromString(startDate, 1);
+		if (result == null || result.equals("")) {
+			String endDate = getEndDateForPeriod(userCommand);
+			if (endDate == null || endDate.equals("")) {
+				return null;
+			}
+			startDate += mDateTimeHelper.getMonthStringForDateTime(endDate);
+			result = mDateTimeHelper.getDateMonthFromString(startDate, 1);
+		}
+		
+		System.out.println("Start date: " + result);
+		
+		return result + " 00:00";
+	}
+	
+	private String getEndDateForPeriod(String userCommand) {
+	
+		String[] splits = userCommand.toLowerCase().split(" ");
+		int position = 0;
+		for(int i=0; i<splits.length; i++) {
+			if (splits[i].equals("repeat")) {
+				position = i;
+				break;
+			}
+		}
+		String endDate = "";
+		for(int i=position+1; i<splits.length; i++) {
+			if (splits[i].equals("to")) {
+				for(int j=i+1; j<splits.length; j++) {
+					if (splits[j].equals("priority") || splits[j].equals("group") || splits[j].equals("grp") || splits[j].equals("by") || splits[j].equals("before")) {
+						break;
+					}
+					endDate += " " + splits[j];
+				}
+				break;
+			}
+		}
+	
+		if (endDate.equals("")) {
+			return null;
+		}
+		
+		return mDateTimeHelper.getDateMonthFromString(endDate, 2) + " 23:59";
+	}
+	
 
     private String getDeadlineForTask(String userCommand) {
         String[] splits = userCommand.split(" ");
@@ -340,5 +579,81 @@ public class CommandParser {
        	}
        	return result;
     }
+    
+   	protected String getStartDateForTimetable(String userCommand) {
+   	
+   		String st = " " + userCommand + " ";
+   		st = st.toLowerCase();
+   		if (st.contains("from") && !st.contains("to")) {
+   			return null;
+   		}
+   		if (!st.contains("from") && st.contains("to")) {
+   			return null;
+   		}
+   		
+		String[] commands = userCommand.toLowerCase().split(" ");
+		String result = "";
+		boolean isHasFrom = false;
+		for(int i=0; i<commands.length; i++) {
+			if (commands[i].equals("from")) {
+				for(int j=i+1; j<commands.length; j++) {
+				
+					if (commands[j].equals("to")) {
+						break;	
+					}
+					result += " " + commands[j];
+				}
+				isHasFrom = true;
+				break;
+			}
+		}
+		if (!isHasFrom) {
+			for(int i=1; i<commands.length; i++) {
+				result += " " + commands[i];
+			}
+		}
+		if (result.equals("")) {
+			return result;
+		}
+		result = mDateTimeHelper.getDateMonthFromString(result, 1);
+		return result;
+	}
+	
+	protected String getEndDateForTimetable(String userCommand) {
+	
+		String st = " " + userCommand + " ";
+   		st = st.toLowerCase();
+   		if (st.contains("from") && !st.contains("to")) {
+   			return null;
+   		}
+   		if (!st.contains("from") && st.contains("to")) {
+   			return null;
+   		}
+	
+		String[] commands = userCommand.toLowerCase().split(" ");
+		String result = "";
+		boolean isHasTo = false;
+		for(int i=0; i<commands.length; i++) {
+			if (commands[i].equals("to")) {
+				for(int j=i+1; j<commands.length; j++) {
+					result += " " + commands[j];
+				}
+				isHasTo = true;
+				break;
+			}
+		}
+		if (!isHasTo) {
+			for(int i=1; i<commands.length; i++) {
+				result += " " + commands[i];
+			}
+		}
+		
+		if (result.equals("")) {
+			return result;
+		}
+		result = mDateTimeHelper.getDateMonthFromString(result, 2);
+		return result;
+	}
+	
 
 }

@@ -52,6 +52,9 @@ public interface AppConst {
 		
 		// Open a task that is marked 'done'
 		String OPEN = "open";
+		
+		String TIMETABLE = "timetable";
+		
 	}
 	
 	interface TASK_FIELD {
@@ -76,6 +79,22 @@ public interface AppConst {
 		String UNDONE = "undone";
 	}
 	
+	interface REPEATED_TYPE {
+		
+		// no repeat
+		int NONE = 0;
+		
+		// from day to day
+		int FROM_TO = 1;
+		
+		// every a day in week
+		int EVERY_WEEK = 2;
+		
+		// every day
+		int EVERYDAY = 3;
+		
+	}
+	
 	interface MESSAGE {
 	
 		
@@ -91,7 +110,8 @@ public interface AppConst {
 		String INVALID_PRIORITY = "Invalid priority format!\n";
 		String INVALID_TASK_NAME = "Invalid task name! Task name can not be null, empty or space only!\n";
 		
-		// Show
+		String OVERLAP_TIME_PERIOD = "Overlap time period! Please check your timetable before you add of update.\n";
+		
 		String TASK_TO_DO = "These are your tasks to do!";
 		String NO_TASK_FOUND = "You don't have any tasks! Use 'add' to add a new task!\n";
 		String DISPLAY_BY_DEADLINE = "Displaying tasks in the order of their deadlines.";

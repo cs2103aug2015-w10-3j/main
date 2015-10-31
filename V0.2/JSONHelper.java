@@ -67,6 +67,8 @@ public class JSONHelper {
 		parser.put("group", task.getGroup());
 		parser.put("status", task.getStatus());
 		parser.put("taskInfo", task.getTaskInfo());
+		parser.put("repeatedType", String.valueOf(task.getRepeatedType()));
+		parser.put("period", task.getPeriod());
 		
 		try{
 			StringWriter out = new StringWriter();
@@ -97,6 +99,10 @@ public class JSONHelper {
 		    task.setStatus((String)jsonObj.get("status"));
 		    
 		    task.setTaskInfo((String)jsonObj.get("taskInfo"));
+		    
+		    task.setRepeatedType(Integer.parseInt((String)jsonObj.get("repeatedType")));
+		    
+		    task.setPeriod((String)jsonObj.get("period"));
 
 		    return task;
 

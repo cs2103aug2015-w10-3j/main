@@ -38,7 +38,7 @@ public class MainLogic {
 		mSettingsStorage = new Storage();
 		mSettingsStorage.setFileURL(SETTINGS_FILE);
 		//mSettings = mSettingsStorage.readSettings();
-		mSettings.setDataFileUrl("test.txt");
+		mSettings.setDataFileUrl("mike_nusmods.txt");
 		mDataStorage = new Storage();
 		mDataStorage.setFileURL(mSettings.getDataFileUrl());
 		
@@ -176,21 +176,24 @@ public class MainLogic {
 		//if (!startDate.equals("") && mDateTimeHelper.compareStringDates(currentTime, startDate)>0) {
 		//	return String.format(AppConst.MESSAGE.INVALID_START_DATE, currentTime);		
 		//}
+			
+		if (newTask.getRepeatedType() == AppConst.REPEATED_TYPE.NONE || newTask.getRepeatedType() == AppConst.REPEATED_TYPE.FROM_TO) { 
 		
-		if (mDateTimeHelper.compareStringDates(currentTime, startDate)>0) {
-			startDate = currentTime;	
-		}	
-		
-		if (!deadline.equals("") && !startDate.equals("")) {
-			if (mDateTimeHelper.compareStringDates(startDate, deadline)>0) {
-				return String.format(AppConst.MESSAGE.INVALID_DEADLINE, currentTime);
+			if (!deadline.equals("") && !startDate.equals("")) {
+				if (mDateTimeHelper.compareStringDates(startDate, deadline)>0) {
+					return String.format(AppConst.MESSAGE.INVALID_DEADLINE, currentTime);
+				}
 			}
+		
+			if (!endDate.equals("") && !startDate.equals("")) {
+				if (mDateTimeHelper.compareStringDates(startDate, endDate)>0) {
+					return String.format(AppConst.MESSAGE.INVALID_DEADLINE, currentTime);
+				}
+			}
+		
 		}
-		
-		if (!endDate.equals("") && !startDate.equals("")) {
-			if (mDateTimeHelper.compareStringDates(startDate, endDate)>0) {
-				return String.format(AppConst.MESSAGE.INVALID_DEADLINE, currentTime);
-			}
+		if (isCheckOverlap(newTask)) {
+			return AppConst.MESSAGE.OVERLAP_TIME_PERIOD;
 		}
 
 		mAllTasks.add(newTask);
@@ -379,15 +382,18 @@ public class MainLogic {
 		//	return String.format(AppConst.MESSAGE.INVALID_START_DATE, currentTime);		
 		//}
 		
-		if (!deadline.equals("") && !startDate.equals("")) {
-			if (mDateTimeHelper.compareStringDates(startDate, deadline)>0) {
-				return String.format(AppConst.MESSAGE.INVALID_DEADLINE, currentTime);
-			}
-		}
+		if (updatedInfo.getRepeatedType() == AppConst.REPEATED_TYPE.NONE || updatedInfo.getRepeatedType() == AppConst.REPEATED_TYPE.FROM_TO) {
 		
-		if (!endDate.equals("") && !startDate.equals("")) {
-			if (mDateTimeHelper.compareStringDates(startDate, endDate)>0) {
-				return String.format(AppConst.MESSAGE.INVALID_DEADLINE, currentTime);
+			if (!deadline.equals("") && !startDate.equals("")) {
+				if (mDateTimeHelper.compareStringDates(startDate, deadline)>0) {
+					return String.format(AppConst.MESSAGE.INVALID_DEADLINE, currentTime);
+				}
+			}
+		
+			if (!endDate.equals("") && !startDate.equals("")) {
+				if (mDateTimeHelper.compareStringDates(startDate, endDate)>0) {
+					return String.format(AppConst.MESSAGE.INVALID_DEADLINE, currentTime);
+				}
 			}
 		}
 		
@@ -438,12 +444,21 @@ public class MainLogic {
 				updatedInfo.setDeadline(mTask.getDeadline());					
 			}
 			
+			if (!taskInfo.contains(" repeat ")) {
+				updatedInfo.setRepeatedType(mTask.getRepeatedType());
+				updatedInfo.setPeriod(mTask.getPeriod());
+			}
+			
 			updatedInfo.setStatus(mTask.getStatus());
 			
 			for(int i=0; i<mAllTasks.size(); i++) {
 				if (isTasksMatched(updatedInfo, mAllTasks.get(i)) == 1) {
 					return AppConst.MESSAGE.TASK_UPDATED_EXIST;
 				}
+			}
+			
+			if (isCheckOverlap(updatedInfo)) {
+				return AppConst.MESSAGE.OVERLAP_TIME_PERIOD;
 			}
 			
 			mTask.setName(updatedInfo.getName());
@@ -749,6 +764,11 @@ public class MainLogic {
 		feedbackTasks.setPointer(possibleTasks);
 		return AppConst.MESSAGE.MANY_TASKS_MATCHED;
 	}
+	
+	protected String executeTimetable(Command mCommand, ArrayListPointer feedbackTasks) {
+		feedbackTasks.setPointer(mAllTasks);
+		return "ok";
+	}
 
 	
 	// -1 is different
@@ -768,15 +788,21 @@ public class MainLogic {
 			isTheSame = false;
 		}
 		
+		if (!task1.getEndDate().equals("") && !task1.getEndDate().equals(task2.getEndDate())) {
+			return -1;
+		} else if (task1.getEndDate().equals("") && !task2.getEndDate().equals("")) {
+			isTheSame = false;
+		}
+		
 		if (!task1.getDeadline().equals("") && !task1.getDeadline().equals(task2.getDeadline())) {
-			return -1; 
+			return -1;
 		} else if (task1.getDeadline().equals("") && !task2.getDeadline().equals("")) {
 			isTheSame = false;
 		}
 		
-		if (!task1.getEndDate().equals("") && !task1.getEndDate().equals(task2.getEndDate())) {
+		if (!task1.getPeriod().equals("") && !task1.getPeriod().equals(task2.getPeriod())) {
 			return -1;
-		} else if (task1.getEndDate().equals("") && !task2.getEndDate().equals("")) {
+		} else if (task1.getPeriod().equals("") && !task2.getPeriod().equals("")) {
 			isTheSame = false;
 		}
 		
@@ -794,6 +820,74 @@ public class MainLogic {
 			return 1;
 		}
 		return 0;
+	}
+	
+	protected boolean isCheckOverlap(Task newTask) {
+		if (newTask.getStartDate().equals("") || newTask.getEndDate().equals("")) {
+			return false;
+		}
+		
+		String startDate = newTask.getStartDate();
+		String endDate = newTask.getEndDate();
+		String currentTime = mDateTimeHelper.getCurrentTimeString();
+		if (newTask.getRepeatedType() != AppConst.REPEATED_TYPE.EVERY_WEEK) {
+			if (startDate.compareTo(currentTime)<=0) {
+				startDate = currentTime;
+			}
+		}
+		
+		boolean isRepeated = false;
+		if (newTask.getRepeatedType() != AppConst.REPEATED_TYPE.NONE) {
+			isRepeated = true;
+		}
+		
+		if (newTask.getRepeatedType() != AppConst.REPEATED_TYPE.EVERY_WEEK) {
+				
+			for(int i=0; i<mAllTasks.size(); i++) {
+				Task task = mAllTasks.get(i);
+				if (!task.getStartDate().equals("") && !task.getEndDate().equals("") && task.getRepeatedType()==AppConst.REPEATED_TYPE.NONE) {
+					if (mDateTimeHelper.isTwoEventOverlap(newTask.getStartDate(), newTask.getEndDate(), isRepeated, newTask.getPeriod(), task.getStartDate(), task.getEndDate(), false, "")) {
+						return true;
+					}
+				}
+				if (task.getRepeatedType() == AppConst.REPEATED_TYPE.FROM_TO || task.getRepeatedType() == AppConst.REPEATED_TYPE.EVERYDAY) {
+					if (mDateTimeHelper.isTwoEventOverlap(newTask.getStartDate(), newTask.getEndDate(), isRepeated, newTask.getPeriod(), task.getStartDate(), task.getEndDate(), true, task.getPeriod())) {
+						return true;
+					}
+				}
+				
+				if (task.getRepeatedType() == AppConst.REPEATED_TYPE.EVERY_WEEK) {
+					if (mDateTimeHelper.isEventOverlapWithRepeating(newTask.getStartDate(), newTask.getEndDate(), isRepeated, newTask.getPeriod(), task.getStartDate(), task.getPeriod())) {
+						return true;
+					}
+				}
+			}
+		}
+		
+		
+		
+		if (newTask.getRepeatedType() == AppConst.REPEATED_TYPE.EVERY_WEEK) {
+			for(int i=0; i<mAllTasks.size(); i++) {
+				Task task = mAllTasks.get(i);
+				if (!task.getStartDate().equals("") && !task.getEndDate().equals("") && task.getRepeatedType()==AppConst.REPEATED_TYPE.NONE) {
+					if (mDateTimeHelper.isEventOverlapWithRepeating(task.getStartDate(), task.getEndDate(), false, task.getPeriod(), newTask.getStartDate(), newTask.getPeriod())) {
+						return true;	
+					}
+				}
+				if (task.getRepeatedType() == AppConst.REPEATED_TYPE.FROM_TO || task.getRepeatedType() == AppConst.REPEATED_TYPE.EVERYDAY) {
+					if (mDateTimeHelper.isEventOverlapWithRepeating(task.getStartDate(), task.getEndDate(), true, task.getPeriod(), newTask.getStartDate(), newTask.getPeriod())) {
+						return true;
+					}
+				}
+				
+				if (task.getRepeatedType() == AppConst.REPEATED_TYPE.EVERY_WEEK) {
+					if (mDateTimeHelper.isTwoEventOverlap(newTask.getStartDate(), newTask.getStartDate(), true, newTask.getPeriod(), task.getStartDate(), task.getStartDate(), true, task.getPeriod())) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -854,6 +948,8 @@ public class MainLogic {
 				return executeClose(mCommand, feedbackTasks);
 			case AppConst.COMMAND_TYPE.OPEN:
 				return executeOpen(mCommand, feedbackTasks);
+			case AppConst.COMMAND_TYPE.TIMETABLE:
+				return executeTimetable(mCommand, feedbackTasks);
 			case AppConst.COMMAND_TYPE.EXIT:
 				return null;
 

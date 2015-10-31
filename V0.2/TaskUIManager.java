@@ -28,7 +28,10 @@ public class TaskUIManager {
     private static String NEW_LINE = "\n";
     private static String SLASH = "\\";
     private static int MAX_NUMBER_ROWS = 16;
+    private static String EVERYDAY = "Everyday";
+    private static String EVERY = "Every ";
 	private static DateTimeHelper mDateTimeHelper = new DateTimeHelper();
+	private static CommandParser mCommandParser = new CommandParser();
 	
     static JButton enterButton;
     public static JTextArea output;
@@ -40,41 +43,46 @@ public class TaskUIManager {
     // column to display in table
     static String[] columnNames = new String[] {"#", "Task Name",
                         "Deadline",
-                        "Start Date",
-                        "End Date",
+                        "Start Date/Time",
+                        "End Date/Time",
+                        "Period",
                         "Prioriry",
                         "Group",
                         "Status"
                         };
                         
-    static String[] timeTableColumnNames = new String[] { 	"8-9", 
+    static String[] timeTableColumnNames = new String[] { 	"#",
+    														"8-9", 
     														"9-10", 
     														"10-11", 
     														"11-12", 
     														"12-13", 
     														"13-14", 
-    														"14-16", 
+    														"14-15",
+    														"15-16", 
     														"16-17", 
     														"17-18", 
     														"18-19", 
     														"19-20"};
     static int[] columnWidth = new int[] {	40,
     										0,
-    										150,
-    										150,
-    										150,
+    										130,
+    										130,
+    										130,
+    										100,
     										80,
-    										150,
+    										130,
     										80
     	
     };
     static ArrayList<Task> dataTaskList = new ArrayList<Task>();
     static ArrayList<Task> mSaveDataList = new ArrayList<Task>();
 	static int windowHeight = 5;
-	static int windowWidth = 90;
+	static int windowWidth = 95;
 	static int rowHeightDefault = 25;
     static int userCommandCount = 0;
     static int userScrollCount = 0;
+    static int mTableRowCount = 0;
 
 	public TaskUIManager() {
 
@@ -96,6 +104,7 @@ public class TaskUIManager {
         String message = mMainLogic.process(AppConst.COMMAND_TYPE.SHOW_ALL, dataTaskListPointer);
         dataTaskList = dataTaskListPointer.getPointer();
         mSaveDataList = dataTaskList;
+        mTableRowCount = dataTaskList.size();
                 
         openToDoListWindow();
 
@@ -105,15 +114,37 @@ public class TaskUIManager {
 	}
 	
 	public static String[] getDataFromTask(Task task, int i) {
-		String[] data = new String[8];
+		String[] data = new String[9];
 		data[0] = String.valueOf(i);
 		data[1] = removeSlash(task.getName());
 		data[2] = mDateTimeHelper.convertToDisplayFormat(task.getDeadline());
-		data[3] = mDateTimeHelper.convertToDisplayFormat(task.getStartDate());
-		data[4] = mDateTimeHelper.convertToDisplayFormat(task.getEndDate());
-		data[5] = task.getPriority();
-		data[6] = removeSlash(task.getGroup());
-		data[7] = task.getStatus();
+		
+		int repeatedType = task.getRepeatedType();
+		switch (repeatedType) {
+			case AppConst.REPEATED_TYPE.FROM_TO: 
+				data[5] = task.getPeriod();
+				data[3] = mDateTimeHelper.convertDateMonthToDisplayFormat(task.getStartDate());
+				data[4] = mDateTimeHelper.convertDateMonthToDisplayFormat(task.getEndDate());
+				break;
+			case AppConst.REPEATED_TYPE.EVERY_WEEK:
+			case AppConst.REPEATED_TYPE.EVERYDAY:
+				data[3] = mDateTimeHelper.getStringStartTimeForStringPeriod(task.getPeriod());
+				data[4] = mDateTimeHelper.getStringEndTimeForStringPeriod(task.getPeriod());
+				if (repeatedType == AppConst.REPEATED_TYPE.EVERY_WEEK) { 
+					data[5] = EVERY + mDateTimeHelper.getStringDayInWeekForDate(task.getStartDate());
+				} else {
+					data[5] = EVERYDAY;
+				}
+				break;
+			
+			default: 
+				data[3] = mDateTimeHelper.convertToDisplayFormat(task.getStartDate());
+				data[4] = mDateTimeHelper.convertToDisplayFormat(task.getEndDate());
+				data[5] = "";
+		}
+		data[6] = task.getPriority();
+		data[7] = removeSlash(task.getGroup());
+		data[8] = task.getStatus();
 		return data;
 	}
 	
@@ -188,14 +219,22 @@ public class TaskUIManager {
 				Component comp = super.prepareRenderer(renderer, row, col);
 				Object value = getModel().getValueAt(row, col);
 				comp.setBackground(Color.white);
-				if (col == 5) {
-					if (value.equals(AppConst.TASK_FIELD.HIGH)) {
-						comp.setBackground(Color.red);
-					} else if (value.equals(AppConst.TASK_FIELD.MEDIUM)) {
-						comp.setBackground(Color.yellow);
-					} else if (value.equals(AppConst.TASK_FIELD.LOW)) {
-						comp.setBackground(Color.green);
+				
+				Object checkValue = getModel().getValueAt(row, 6);
+				if (!checkValue.equals("") && !checkValue.equals(" ")) {
+					if (col == 6) {
+						if (value.equals(AppConst.TASK_FIELD.HIGH)) {
+							comp.setBackground(Color.red);
+						} else if (value.equals(AppConst.TASK_FIELD.MEDIUM)) {
+							comp.setBackground(Color.yellow);
+						} else if (value.equals(AppConst.TASK_FIELD.LOW)) {
+							comp.setBackground(Color.green);
+						}
 					}
+				} else {
+					if (value.equals(" ")) {
+						comp.setBackground(Color.red);
+					} 
 				}
 				return comp;
     		}
@@ -206,7 +245,7 @@ public class TaskUIManager {
         DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
         tableModel.setColumnIdentifiers(columnNames);
         
-        for(int i=0; i<=7; i++) {
+        for(int i=0; i<=8; i++) {
         	if (i != 1) {
         		table.getColumnModel().getColumn(i).setPreferredWidth(columnWidth[i]);
         		table.getColumnModel().getColumn(i).setMaxWidth(columnWidth[i]);
@@ -221,8 +260,8 @@ public class TaskUIManager {
         
         DefaultTableCellRenderer centerRender = new DefaultTableCellRenderer();
 		centerRender.setHorizontalAlignment(SwingConstants.CENTER);
-		for(int i=0; i<=7; i++) {
-			if (i != 6 && i != 1 ) {
+		for(int i=0; i<=8; i++) {
+			if (i != 7 && i != 1 ) {
 				table.getColumnModel().getColumn(i).setCellRenderer(centerRender);
         	}
         }
@@ -298,7 +337,7 @@ public class TaskUIManager {
         
         if (event.getKeyCode() == KeyEvent.VK_PAGE_DOWN) {
         	userScrollCount++;
-        	if (userScrollCount + MAX_NUMBER_ROWS > dataTaskList.size()) {
+        	if (userScrollCount + MAX_NUMBER_ROWS > mTableRowCount) {
         		userScrollCount--;
         	}
         	
@@ -323,14 +362,77 @@ public class TaskUIManager {
     }
     
     public static void updateTable() {
-    
+         
+        ((DefaultTableCellRenderer)table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
     	DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
         tableModel.setRowCount(0);
-        for(int i=userScrollCount; i<dataTaskList.size(); i++) {
+        tableModel.setColumnIdentifiers(columnNames);
+        DefaultTableCellRenderer centerRender = new DefaultTableCellRenderer();
+		centerRender.setHorizontalAlignment(SwingConstants.CENTER);
+		for(int i=0; i<=8; i++) {
+			if (i != 7 && i != 1 ) {
+				table.getColumnModel().getColumn(i).setCellRenderer(centerRender);
+        	}
+        }
+        
+        for(int i=0; i<=8; i++) {
+        	if (i != 1) {
+        		table.getColumnModel().getColumn(i).setPreferredWidth(columnWidth[i]);
+        		table.getColumnModel().getColumn(i).setMaxWidth(columnWidth[i]);
+        	}
+        }
+        
+        for(int i=0; i<dataTaskList.size(); i++) {
         	String[] data = getDataFromTask(dataTaskList.get(i), i);
 			tableModel.addRow(data);
 		}
+		table.setModel(tableModel);
         tableModel.fireTableDataChanged();
+    }
+    
+    
+    public static void createTimetable(String userCommand) {
+    
+    	String[] commands = userCommand.split(" ");
+    		
+    	String startDate = mCommandParser.getStartDateForTimetable(userCommand);
+    	String endDate = mCommandParser.getEndDateForTimetable(userCommand);
+    	if (startDate == null || startDate.equals("") || endDate == null || endDate.equals("")) {
+    		updateTable();
+    		displayMessage(AppConst.MESSAGE.INVALID_DATE_TIME_FORMAT);
+    		return;
+    	}
+    	
+    	int from = mDateTimeHelper.getNumberOfDayFromThisYearForDate(mDateTimeHelper.getDayFromStringDate(startDate), mDateTimeHelper.getMonthFromStringDate(startDate));
+    	int to = mDateTimeHelper.getNumberOfDayFromThisYearForDate(mDateTimeHelper.getDayFromStringDate(endDate), mDateTimeHelper.getMonthFromStringDate(endDate));
+		if (from > to) {
+			displayMessage(AppConst.MESSAGE.INVALID_DATE_TIME_FORMAT);
+			updateTable();
+			return;
+		}
+		DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
+    	tableModel.setRowCount(0);
+    	tableModel.setColumnIdentifiers(timeTableColumnNames);		
+    	table.getColumnModel().getColumn(0).setPreferredWidth(150);
+        table.getColumnModel().getColumn(0).setMaxWidth(150);
+		 
+		for(int i=from; i<=to; i++) {   	
+			String date = mDateTimeHelper.getDateForNumberOfDays(i);
+			date += " 00:00";
+			int[] timetable = mDateTimeHelper.getTimetableForDate(date, dataTaskList);
+			String[] data = new String[13];
+			data[0] = mDateTimeHelper.convertDateMonthToDisplayFormat(date) + " (" + mDateTimeHelper.getStringDayInWeekForDate(date) + ")";
+			for(int j=1; j<=12; j++) {
+				if (timetable[j-1] == 1) {
+					data[j] = " ";
+				} else {
+					data[j] = "";
+				}
+			}
+			tableModel.addRow(data);
+		}
+		mTableRowCount = to - from + 1;
+    	tableModel.fireTableDataChanged();
     }
 
     public static class ButtonListener implements ActionListener
@@ -360,14 +462,17 @@ public class TaskUIManager {
                     	String message = mMainLogic.process(userCommand, dataTaskListPointer);
                         dataTaskList = dataTaskListPointer.getPointer();
                         mSaveDataList = dataTaskList;
-                    	
-        			   	// Message = null means user want to exit
-                    	if (message == null) {
+                        mTableRowCount = dataTaskList.size();
+                        userScrollCount = 0;
+                        
+                        String[] commands = userCommand.split(" ");
+                        if (commands[0].equals(AppConst.COMMAND_TYPE.TIMETABLE)) {
+                        	createTimetable(userCommand);
+                        } else if (message == null) {
                     		displayMessage(AppConst.MESSAGE.GOODBYE);
                     		frame.setVisible(false);
                     		frame.dispose();
                     	} else {
-                    		userScrollCount = 0;
                     		updateTable();
                     		displayMessage(message);
                     	}

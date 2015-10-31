@@ -15,9 +15,12 @@ public class Task {
 	private String startDate="";
 	private String endDate="";
 	private String taskInfo;
+	private String period = "00:00 23:59";
+	private int repeatedType = 0;
 
 	public Task(String newname) {
 		name = newname;
+		repeatedType = 0;
 	}
 
 	public String getName(){
@@ -50,6 +53,22 @@ public class Task {
 
 	public void setDeadline(String newDeadline){
 		deadline = newDeadline;
+	}
+	
+	public void setRepeatedType(int repeated) {
+		repeatedType = repeated;
+	}
+	
+	public int getRepeatedType() {
+		return repeatedType;
+	}
+	
+	public void setPeriod(String newPeriod) {
+		period = newPeriod;
+	}
+	
+	public String getPeriod() {
+		return period;
 	}
 	
 	public String getDisplay() {
@@ -114,6 +133,8 @@ public class Task {
 		newTask.setEndDate(endDate);
 		newTask.setStatus(status);
 		newTask.setTaskInfo(taskInfo);
+		newTask.setRepeatedType(repeatedType);
+		newTask.setPeriod(period);
 
 		return newTask;
 	}
