@@ -584,10 +584,10 @@ public class CommandParser {
    	
    		String st = " " + userCommand + " ";
    		st = st.toLowerCase();
-   		if (st.contains("from") && !st.contains("to")) {
+   		if (st.contains(" from ") && !st.contains(" to ")) {
    			return null;
    		}
-   		if (!st.contains("from") && st.contains("to")) {
+   		if (!st.contains(" from ") && st.contains(" to ")) {
    			return null;
    		}
    		
@@ -615,7 +615,9 @@ public class CommandParser {
 		if (result.equals("")) {
 			return result;
 		}
+		
 		result = mDateTimeHelper.getDateMonthFromString(result, 1);
+		System.out.println("Timetable start date: " + result);
 		return result;
 	}
 	
@@ -623,10 +625,10 @@ public class CommandParser {
 	
 		String st = " " + userCommand + " ";
    		st = st.toLowerCase();
-   		if (st.contains("from") && !st.contains("to")) {
+   		if (st.contains(" from ") && !st.contains(" to ")) {
    			return null;
    		}
-   		if (!st.contains("from") && st.contains("to")) {
+   		if (!st.contains(" from ") && st.contains(" to ")) {
    			return null;
    		}
 	
@@ -652,6 +654,7 @@ public class CommandParser {
 			return result;
 		}
 		result = mDateTimeHelper.getDateMonthFromString(result, 2);
+		System.out.println("Timetable end date: " + result);
 		return result;
 	}
 	

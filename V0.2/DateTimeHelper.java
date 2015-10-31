@@ -174,7 +174,17 @@ public class DateTimeHelper {
 	
 	protected String getToday() {
 		String dateTime = getCurrentTimeString();
-		return String.valueOf(getDayFromStringDate(dateTime)) + "/" + String.valueOf(getMonthFromStringDate(dateTime));
+		int day = getDayFromStringDate(dateTime);
+		String dayString = String.valueOf(day);
+		if (dayString.length() < 2) {
+			dayString = "0" + dayString;
+		}
+		int month = getMonthFromStringDate(dateTime);
+		String monthString = String.valueOf(month);
+		if (monthString.length() < 2) {
+			monthString = "0" + monthString;
+		}
+		return dayString + "/" + monthString;
 	}
 	
 	protected String getTomorrow() {
@@ -724,7 +734,7 @@ public class DateTimeHelper {
 	// next 2 days, next 2 weeks ...
 	
 	protected String getDateMonthFromString(String dateTime, int flag) {
-	
+		
 		dateTime = dateTime.toLowerCase();
 
 		if (dateTime.equals(NOW)) {
