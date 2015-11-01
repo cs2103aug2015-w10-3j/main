@@ -784,7 +784,7 @@ public class DateTimeHelper {
 		
 		for(int i=0; i<splits.length; i++) {
 			String st = splits[i];
-			if (st.contains("/")) {
+			if (st.contains("/") || st.contains("-")) {
 				month = getMonth(st);
 				date = getDate(st);
 				if (month != null && date != null && !month.equals("") && !date.equals("")) {
