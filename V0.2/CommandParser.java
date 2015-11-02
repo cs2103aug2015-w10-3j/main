@@ -613,7 +613,7 @@ public class CommandParser {
 			}
 		}
 		if (result.equals("")) {
-			return result;
+			result = "this mon";
 		}
 		
 		result = mDateTimeHelper.getDateMonthFromString(result, 1);
@@ -651,7 +651,7 @@ public class CommandParser {
 		}
 		
 		if (result.equals("")) {
-			return result;
+			result = "this sun";
 		}
 		result = mDateTimeHelper.getDateMonthFromString(result, 2);
 		System.out.println("Timetable end date: " + result);

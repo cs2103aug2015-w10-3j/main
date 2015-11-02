@@ -143,6 +143,7 @@ public class TaskUIManager {
 				data[5] = "";
 		}
 		data[6] = task.getPriority();
+		data[6] = data[6].substring(0, 1).toUpperCase() + data[6].substring(1);
 		data[7] = removeSlash(task.getGroup());
 		data[8] = task.getStatus();
 		return data;
@@ -221,20 +222,26 @@ public class TaskUIManager {
 				comp.setBackground(Color.white);
 				
 				Object checkValue = getModel().getValueAt(row, 6);
-				if (!checkValue.equals("") && !checkValue.equals(" ")) {
+				if (checkValue.equals("High") || checkValue.equals("Medium") || checkValue.equals("Low")) {
 					if (col == 6) {
-						if (value.equals(AppConst.TASK_FIELD.HIGH)) {
+						if (value.equals("High")) {
 							comp.setBackground(Color.red);
-						} else if (value.equals(AppConst.TASK_FIELD.MEDIUM)) {
+						} else if (value.equals("Medium")) {
 							comp.setBackground(Color.yellow);
-						} else if (value.equals(AppConst.TASK_FIELD.LOW)) {
+						} else if (value.equals("Low")) {
 							comp.setBackground(Color.green);
 						}
 					}
 				} else {
-					if (value.equals(" ")) {
+				
+					String st = (String)value;
+					if (st.endsWith(AppConst.TASK_FIELD.HIGH)) {
 						comp.setBackground(Color.red);
-					} 
+					} else if (st.endsWith(AppConst.TASK_FIELD.MEDIUM)) {
+						comp.setBackground(Color.yellow);
+					} else if (st.endsWith(AppConst.TASK_FIELD.LOW)) {
+						comp.setBackground(Color.green);
+					}
 				}
 				return comp;
     		}
@@ -423,8 +430,8 @@ public class TaskUIManager {
 			String[] data = new String[13];
 			data[0] = mDateTimeHelper.convertDateMonthToDisplayFormat(date) + " (" + mDateTimeHelper.getStringDayInWeekForDate(date) + ")";
 			for(int j=1; j<=12; j++) {
-				if (timetable[j-1] == 1) {
-					data[j] = " ";
+				if (timetable[j-1] != -1) {
+					data[j] = dataTaskList.get(timetable[j-1]).getName() + "     " + AppConst.TASK_FIELD.PRIORITY + dataTaskList.get(timetable[j-1]).getPriority();
 				} else {
 					data[j] = "";
 				}

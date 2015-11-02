@@ -782,18 +782,6 @@ public class MainLogic {
 			isTheSame = false;
 		}
 		
-		if (!task1.getStartDate().equals("") && !task1.getStartDate().equals(task2.getStartDate())) {
-			return -1;
-		} else if (task1.getStartDate().equals("") && !task2.getStartDate().equals("")) {
-			isTheSame = false;
-		}
-		
-		if (!task1.getEndDate().equals("") && !task1.getEndDate().equals(task2.getEndDate())) {
-			return -1;
-		} else if (task1.getEndDate().equals("") && !task2.getEndDate().equals("")) {
-			isTheSame = false;
-		}
-		
 		if (!task1.getDeadline().equals("") && !task1.getDeadline().equals(task2.getDeadline())) {
 			return -1;
 		} else if (task1.getDeadline().equals("") && !task2.getDeadline().equals("")) {
@@ -884,7 +872,7 @@ public class MainLogic {
 					}
 				
 					if (task.getRepeatedType() == AppConst.REPEATED_TYPE.EVERY_WEEK) {
-						if (mDateTimeHelper.isTwoEventOverlap(newTask.getStartDate(), newTask.getStartDate(), true, newTask.getPeriod(), task.getStartDate(), task.getStartDate(), true, task.getPeriod())) {
+						if (mDateTimeHelper.isEventOverlapWithRepeating(newTask.getStartDate(), newTask.getStartDate(), true, newTask.getPeriod(), task.getStartDate(), task.getPeriod())) {
 							return true;
 						}
 					}	

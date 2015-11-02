@@ -1244,7 +1244,7 @@ public class DateTimeHelper {
 	
 	protected int[] getTimetableForDate(String date, ArrayList<Task> allTasks) {
 		
-		int[] result = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		int[] result = new int[] {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 		int dayInWeek = getDayInWeekForDate(date);
 		int day = getNumberOfDayFromThisYearForDate(getDayFromStringDate(date), getMonthFromStringDate(date));
 		for(int i=0; i<allTasks.size(); i++) {
@@ -1276,7 +1276,7 @@ public class DateTimeHelper {
 					System.out.println(String.valueOf(startTime) + " " + String.valueOf(endTime));
 					for(int j=startTime; j<endTime; j++) {
 						if (j>=8 && j<=19) {
-							result[j-8] = 1;
+							result[j-8] = i;
 						}
 					}
 				}
@@ -1288,7 +1288,7 @@ public class DateTimeHelper {
 					System.out.println(String.valueOf(startTime) + " " + String.valueOf(endTime));
 					for(int j=startTime; j<endTime; j++) {
 						if (j>=8 && j<=19) {
-							result[j-8] = 1;
+							result[j-8] = i;
 						}
 					}
 				}
