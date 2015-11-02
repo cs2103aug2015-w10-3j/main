@@ -684,6 +684,12 @@ public class MainLogic {
 		int position = 0;
 		feedbackTasks.setPointer(mAllTasks);
 		Task taskToClose = mCommand.getNewTask();
+
+		String[] commands = mCommand.getCommandArgument().split(" ");
+		if (commands.length == 2 && commands[0].equals("id")) {
+			taskToClose = getTaskWithId(commands[1]);
+		}
+
 		if (taskToClose == null) {
 			return "";
 		}
@@ -734,6 +740,12 @@ public class MainLogic {
 		int position = 0;
 		feedbackTasks.setPointer(mAllTasks);
 		Task taskToOpen = mCommand.getNewTask();
+
+		String[] commands = mCommand.getCommandArgument().split(" ");
+		if (commands.length == 2 && commands[0].equals("id")) {
+			taskToOpen = getTaskWithId(commands[1]);
+		}
+
 		if (taskToOpen == null) {
 			return "";
 		}

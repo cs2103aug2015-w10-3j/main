@@ -28,12 +28,13 @@ public class CommandParser {
 		String[] commands = userCommand.split(" ");
 		
 		switch (commandType) {
+			
 			case AppConst.COMMAND_TYPE.ADD:
-			case AppConst.COMMAND_TYPE.DONE:
-			case AppConst.COMMAND_TYPE.UNDONE:
 				command.setNewTask(getTaskFromString(commandType, userCommand));
 				break;
-				
+			
+			case AppConst.COMMAND_TYPE.DONE:
+			case AppConst.COMMAND_TYPE.UNDONE:
 			case AppConst.COMMAND_TYPE.DELETE:
 				if (commands.length < 2) {
 					command.setNewTask(null);
