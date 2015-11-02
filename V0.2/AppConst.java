@@ -36,6 +36,7 @@ public interface AppConst {
 		String SHOW_DAY = "showday";
 		String SHOW_PRIORITY = "showpriority";
 		String SHOW_GROUP = "showgroup";
+		String SHOW_ID = "showid";
 		
 		String SET_FILE = "setfile";
 		
@@ -121,6 +122,7 @@ public interface AppConst {
 		String DISPLAY_BY_GROUP = "Displaying tasks in the order of their groups.";
 		String NOT_RECOGNIZED_SYNTAX = "Syntax not recognized. Use 'showby deadline' or 'showby priority' or 'showby group'";
 		String SHOWING_TASK = "These are your tasks for %s '%s'";
+		String SHOW_BY_ID = "Task number %s: %s";
 		String NOTHING_TO_SHOW = "You don't have any tasks to show for '%s'!\n";
 		String INVALID_DAY = "Invalid day format!\n";
 		

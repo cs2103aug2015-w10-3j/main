@@ -540,6 +540,11 @@ public class MainLogic {
 			}
 		}
 
+		if (mCommand.getCommandType().equals(AppConst.COMMAND_TYPE.SHOW_ID) ){
+			feedbackTasks.setPointer(mPreviousTasks);
+			return String.format(AppConst.MESSAGE.SHOW_BY_ID, argument,getTaskWithId(argument).getDisplay() );
+		}
+
 		for (int i=0;i<mAllTasks.size();i++){
 			switch (mCommand.getCommandType()){
 				case AppConst.COMMAND_TYPE.SHOW_DAY:
@@ -963,6 +968,7 @@ public class MainLogic {
 			case AppConst.COMMAND_TYPE.SHOW_DAY:
 			case AppConst.COMMAND_TYPE.SHOW_PRIORITY:
 			case AppConst.COMMAND_TYPE.SHOW_GROUP:
+			case AppConst.COMMAND_TYPE.SHOW_ID:
 				return executeShow(mCommand, feedbackTasks);
 
 			case AppConst.COMMAND_TYPE.SET_FILE:
