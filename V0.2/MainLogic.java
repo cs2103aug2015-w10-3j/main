@@ -573,7 +573,7 @@ public class MainLogic {
 
 				case AppConst.COMMAND_TYPE.SHOW_DONE:
 				case AppConst.COMMAND_TYPE.SHOW_UNDONE:
-					if (mAllTasks.get(i).getStatus().equals(argument.substring(4))){
+					if (mAllTasks.get(i).getStatus().equals(mCommand.getCommandType().substring(4))){
 						mTasks.add(mAllTasks.get(i));
 					}
 					break;
