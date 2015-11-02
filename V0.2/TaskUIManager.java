@@ -76,7 +76,6 @@ public class TaskUIManager {
     	
     };
     static ArrayList<Task> dataTaskList = new ArrayList<Task>();
-    static ArrayList<Task> mSaveDataList = new ArrayList<Task>();
 	static int windowHeight = 5;
 	static int windowWidth = 95;
 	static int rowHeightDefault = 25;
@@ -102,7 +101,6 @@ public class TaskUIManager {
         // Input a showall command upon launching Todoer
         String message = mMainLogic.process(AppConst.COMMAND_TYPE.SHOW_ALL, dataTaskListPointer);
         dataTaskList = dataTaskListPointer.getPointer();
-        mSaveDataList = dataTaskList;
         mTableRowCount = dataTaskList.size();
                 
         openToDoListWindow();
@@ -465,9 +463,9 @@ public class TaskUIManager {
                     	
                     	// Executed user command
                         ArrayListPointer dataTaskListPointer = new ArrayListPointer();   
+                        dataTaskListPoiter.setPointer(dataTaskList);
                     	String message = mMainLogic.process(userCommand, dataTaskListPointer);
                         dataTaskList = dataTaskListPointer.getPointer();
-                        mSaveDataList = dataTaskList;
                         mTableRowCount = dataTaskList.size();
                         userScrollCount = 0;
                         
