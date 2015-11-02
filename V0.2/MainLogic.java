@@ -542,7 +542,9 @@ public class MainLogic {
 
 		if (mCommand.getCommandType().equals(AppConst.COMMAND_TYPE.SHOW_ID) ){
 			feedbackTasks.setPointer(mPreviousTasks);
-			return String.format(AppConst.MESSAGE.SHOW_BY_ID, argument,getTaskWithId(argument).getDisplay() );
+			Task mTask = getTaskWithId(argument);
+			if (mTask==null) return AppConst.MESSAGE.INVALID_ID;
+			return String.format(AppConst.MESSAGE.SHOW_BY_ID, argument,mTask.getDisplay() );
 		}
 
 		for (int i=0;i<mAllTasks.size();i++){
@@ -569,7 +571,15 @@ public class MainLogic {
 					}
 					break;
 
+				case AppConst.COMMAND_TYPE.SHOW_DONE:
+				case AppConst.COMMAND_TYPE.SHOW_UNDONE:
+					if (mAllTasks.get(i).getStatus().equals(argument.substring(4))){
+						mTasks.add(mAllTasks.get(i));
+					}
+					break;
+
 				default: break;
+					
 			}
 		}
 
@@ -688,6 +698,7 @@ public class MainLogic {
 		String[] commands = mCommand.getCommandArgument().split(" ");
 		if (commands.length == 2 && commands[0].equals("id")) {
 			taskToClose = getTaskWithId(commands[1]);
+			if (taskToClose==null) return AppConst.MESSAGE.INVALID_ID;
 		}
 
 		if (taskToClose == null) {
@@ -744,6 +755,7 @@ public class MainLogic {
 		String[] commands = mCommand.getCommandArgument().split(" ");
 		if (commands.length == 2 && commands[0].equals("id")) {
 			taskToOpen = getTaskWithId(commands[1]);
+			if (taskToOpen==null) return AppConst.MESSAGE.INVALID_ID;
 		}
 
 		if (taskToOpen == null) {
@@ -981,6 +993,8 @@ public class MainLogic {
 			case AppConst.COMMAND_TYPE.SHOW_PRIORITY:
 			case AppConst.COMMAND_TYPE.SHOW_GROUP:
 			case AppConst.COMMAND_TYPE.SHOW_ID:
+			case AppConst.COMMAND_TYPE.SHOW_DONE:
+			case AppConst.COMMAND_TYPE.SHOW_UNDONE:
 				return executeShow(mCommand, feedbackTasks);
 
 			case AppConst.COMMAND_TYPE.SET_FILE:

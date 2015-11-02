@@ -37,6 +37,8 @@ public interface AppConst {
 		String SHOW_PRIORITY = "showpriority";
 		String SHOW_GROUP = "showgroup";
 		String SHOW_ID = "showid";
+		String SHOW_DONE = "showdone";
+		String SHOW_UNDONE = "showundone";
 		
 		String SET_FILE = "setfile";
 		
@@ -110,6 +112,7 @@ public interface AppConst {
 		String INVALID_DATE_TIME_FORMAT = "Invalid date time format!\n";
 		String INVALID_PRIORITY = "Invalid priority format!\n";
 		String INVALID_TASK_NAME = "Invalid task name! Task name can not be null, empty or space only!\n";
+		String INVALID_ID = "Invalid id\n";
 		
 		String OVERLAP_TIME_PERIOD = "Overlap time period! Please check your timetable before you add of update.\n";
 		
