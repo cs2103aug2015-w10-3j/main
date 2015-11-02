@@ -22,6 +22,7 @@ public class MainLogic {
 	private ArrayList<DataState> mHistory;
 	private int mCurrentState;
 	private ArrayList<Task> mAllTasks;
+	private ArrayList<Task> mPreviousTasks;
 	private ArrayList<String> mAllUserCommands;
 	private Storage mStorage;
 	private DateTimeHelper mDateTimeHelper;
@@ -208,6 +209,10 @@ public class MainLogic {
 		int position = 0;
 		feedbackTasks.setPointer(mAllTasks);
 		Task taskToDelete = mCommand.getNewTask();
+		String[] commands = mCommand.getCommandArgument().split(" ");
+		if (commands.length == 2 && commands[0].equals("id")) {
+			taskToDelete = getTaskWithId(commands[1]);
+		}
 		if (taskToDelete == null) {
 			return "";
 		}
@@ -347,9 +352,13 @@ public class MainLogic {
 		return message;
 	}
 
-	protected String executeUpdate(Command mCommand,  ArrayListPointer feedbackTasks){
+	protected String executeUpdate(Command mCommand,  ArrayListPointer feedbackTasks) {
 		Task updatedInfo = mCommand.getUpdatedTask();
 		Task taskToBeUpdated = mCommand.getNewTask();
+		String[] commands = mCommand.getCommandArgument().split(" ");
+		if (commands.length == 2 && commands[0].equals("id")) {
+			taskToBeUpdated = getTaskWithId(commands[1]);
+		}
 		feedbackTasks.setPointer(mAllTasks);
 		if (updatedInfo == null || taskToBeUpdated == null) {
 			return AppConst.MESSAGE.INVALID_UPDATE_FORMAT;
@@ -666,7 +675,7 @@ public class MainLogic {
 	}
 	
 	
-	protected String executeClose(Command mCommand, ArrayListPointer feedbackTasks) {
+	protected String executeDone(Command mCommand, ArrayListPointer feedbackTasks) {
 		int position = 0;
 		feedbackTasks.setPointer(mAllTasks);
 		Task taskToClose = mCommand.getNewTask();
@@ -716,7 +725,7 @@ public class MainLogic {
 		return AppConst.MESSAGE.MANY_TASKS_MATCHED;
 	}
 	
-	protected String executeOpen(Command mCommand, ArrayListPointer feedbackTasks) {
+	protected String executeUndone(Command mCommand, ArrayListPointer feedbackTasks) {
 		int position = 0;
 		feedbackTasks.setPointer(mAllTasks);
 		Task taskToOpen = mCommand.getNewTask();
@@ -895,6 +904,24 @@ public class MainLogic {
 		}
 		return result;
 	}
+	
+	protected Task getTaskWithId(String stringId) {
+		if (stringId == null || stringId.equals("")) {
+			return null;
+		}
+		int id = 0;
+		for(int i=0; i<stringId.length(); i++) {
+			if (stringId.charAt(i)<'0' || stringId.charAt(i)>'9') {
+				return null;
+			}
+			id = id * 10 + (stringId.charAt(i) - '0');
+		}
+		id = id - 1;
+		if (id < 0 || id >= mPreviousTasks.size()) {
+			return null;
+		}
+		return mPreviousTasks.get(id);
+	}
 
 	/**
 	 * the main function for the UI to call to execute a command
@@ -902,7 +929,7 @@ public class MainLogic {
 	 * 
 	 **/
 	protected String process(String userCommand, ArrayListPointer feedbackTasks) {
-
+		mPreviousTasks = feedbackTasks.getPointer();
 		addNewUserCommand(userCommand);
 		userCommand = removeSpace(userCommand);
 		Command mCommand = mCommandParser.parse(userCommand);
@@ -951,10 +978,10 @@ public class MainLogic {
 			case AppConst.COMMAND_TYPE.SEARCH:
 				return executeSearch(mCommand, feedbackTasks);
 
-			case AppConst.COMMAND_TYPE.CLOSE:
-				return executeClose(mCommand, feedbackTasks);
-			case AppConst.COMMAND_TYPE.OPEN:
-				return executeOpen(mCommand, feedbackTasks);
+			case AppConst.COMMAND_TYPE.DONE:
+				return executeDone(mCommand, feedbackTasks);
+			case AppConst.COMMAND_TYPE.UNDONE:
+				return executeUndone(mCommand, feedbackTasks);
 			case AppConst.COMMAND_TYPE.TIMETABLE:
 				return executeTimetable(mCommand, feedbackTasks);
 			case AppConst.COMMAND_TYPE.EXIT:

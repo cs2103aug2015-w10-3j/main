@@ -48,10 +48,10 @@ public interface AppConst {
 		String UPDATE = "update";
 		
 		// Close to mark a task is done
-		String CLOSE = "close";
+		String DONE = "done";
 		
 		// Open a task that is marked 'done'
-		String OPEN = "open";
+		String UNDONE = "undone";
 		
 		String TIMETABLE = "timetable";
 		

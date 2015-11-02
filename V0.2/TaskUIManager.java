@@ -112,7 +112,7 @@ public class TaskUIManager {
 	
 	public static String[] getDataFromTask(Task task, int i) {
 		String[] data = new String[9];
-		data[0] = String.valueOf(i);
+		data[0] = String.valueOf(i + 1);
 		data[1] = removeSlash(task.getName());
 		data[2] = mDateTimeHelper.convertToDisplayFormat(task.getDeadline());
 		
@@ -463,7 +463,7 @@ public class TaskUIManager {
                     	
                     	// Executed user command
                         ArrayListPointer dataTaskListPointer = new ArrayListPointer();   
-                        dataTaskListPoiter.setPointer(dataTaskList);
+                        dataTaskListPointer.setPointer(dataTaskList);
                     	String message = mMainLogic.process(userCommand, dataTaskListPointer);
                         dataTaskList = dataTaskListPointer.getPointer();
                         mTableRowCount = dataTaskList.size();

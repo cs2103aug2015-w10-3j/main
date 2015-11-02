@@ -25,13 +25,27 @@ public class CommandParser {
 		command.setCommandArgument(getCommandSecondArgument(userCommand));
 		command.setNewTask(null);
 		command.setUpdatedTask(null);
+		String[] commands = userCommand.split(" ");
 		
 		switch (commandType) {
 			case AppConst.COMMAND_TYPE.ADD:
-			case AppConst.COMMAND_TYPE.CLOSE:
-			case AppConst.COMMAND_TYPE.OPEN:
-			case AppConst.COMMAND_TYPE.DELETE:
+			case AppConst.COMMAND_TYPE.DONE:
+			case AppConst.COMMAND_TYPE.UNDONE:
 				command.setNewTask(getTaskFromString(commandType, userCommand));
+				break;
+				
+			case AppConst.COMMAND_TYPE.DELETE:
+				if (commands.length < 2) {
+					command.setNewTask(null);
+				} else if (commands[1].equals("id")) {
+					if (commands.length < 3) {
+						command.setNewTask(null);
+					} else {
+						command.setCommandArgument(commands[1] + " " + commands[2]);
+					}
+				} else {
+					command.setNewTask(getTaskFromString(commandType, userCommand));
+				}
 				break;
 			case AppConst.COMMAND_TYPE.UPDATE:
 				if (!userCommand.contains("TO")) {
@@ -46,9 +60,16 @@ public class CommandParser {
 					command.setUpdatedTask(null);
 					break;
 				}
-				oldTaskInfo = commandType + " " + oldTaskInfo;
+				if (!commands[1].equals("id")) {
+					oldTaskInfo = commandType + " " + oldTaskInfo;
+					command.setNewTask(getTaskFromString(commandType, oldTaskInfo));
+				} else {
+					System.out.println("Update task id: " + commands[2]);
+					command.setCommandArgument(commands[1] + " " + commands[2]);
+					command.setNewTask(null);
+				}
+				
 				newTaskInfo = commandType + " " + newTaskInfo;
-				command.setNewTask(getTaskFromString(commandType, oldTaskInfo));
 				command.setUpdatedTask(getTaskFromString(commandType, newTaskInfo));
 				break;
 			default:
@@ -60,17 +81,32 @@ public class CommandParser {
 	
 	private String getOldTaskInfoForUpdate(String userCommand) {
 		String[] splits = userCommand.split(" ");
-		String result = "";
-		for(int i=1; i<splits.length; i++) {
-			if (splits[i].equals("TO")) {
-				break;
-			}
-			if (result.length() > 0) {
-				result += " ";
-			}
-			result += splits[i];
+		if (splits.length < 2) {
+			return "";
 		}
-		return result;
+		String result = "";
+		if (!splits[1].equals("id")) {
+			for(int i=1; i<splits.length; i++) {
+				if (splits[i].equals("TO")) {
+					break;
+				}
+				if (result.length() > 0) {
+					result += " ";
+				}
+				result += splits[i];
+			}
+			return result;
+		} else {
+			if (splits.length < 3) {
+				return "";
+			}
+			for(int i=0; i<splits[2].length(); i++) {
+				if (splits[2].charAt(i)<'0' || splits[2].charAt(i)>'9') {
+					return "";
+				}
+			}
+			return splits[2];
+		}
 	}
 	
 	private String getNewTaskInfoForUpdate(String userCommand) {
