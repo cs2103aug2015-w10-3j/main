@@ -23,7 +23,7 @@ import javax.swing.text.DefaultCaret;
 public class TaskUIManager {
 
 	private static String ENTER = "Enter";
-    private static String APP_NAME = "To-Do";
+    private static String APP_NAME = "Todoer";
     private static String COMMAND_MESSAGE = "$" + APP_NAME + ": ";
     private static String NEW_LINE = "\n";
     private static String SLASH = "\\";
