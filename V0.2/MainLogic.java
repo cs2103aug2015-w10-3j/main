@@ -882,6 +882,20 @@ public class MainLogic {
 		return false;
 	}
 
+	protected String removeSpace(String userCommand) {
+		String[] commands = userCommand.split(" ");
+		String result = "";
+		for(int i=0; i<commands.length; i++) {
+			if (!commands[i].equals("") && !commands[i].equals(" ")) {
+				if (result.length() > 0) {
+					result += " ";
+				}
+				result += commands[i];
+			}
+		}
+		return result;
+	}
+
 	/**
 	 * the main function for the UI to call to execute a command
 	 * returns a feedback String and an ArrayList of Task in feedbackTasks
@@ -890,6 +904,7 @@ public class MainLogic {
 	protected String process(String userCommand, ArrayListPointer feedbackTasks) {
 
 		addNewUserCommand(userCommand);
+		userCommand = removeSpace(userCommand);
 		Command mCommand = mCommandParser.parse(userCommand);
 
 		//For most of the times the tasks to be displayed after each command is all the tasks.

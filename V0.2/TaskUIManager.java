@@ -91,16 +91,15 @@ public class TaskUIManager {
 	static MainLogic mMainLogic = new MainLogic();
 	public static void main(String[] argv) {
 
-		try
-        {
+		try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        ArrayListPointer dataTaskListPointer = new ArrayListPointer();   
+        ArrayListPointer dataTaskListPointer = new ArrayListPointer();
+        // Input a showall command upon launching Todoer
         String message = mMainLogic.process(AppConst.COMMAND_TYPE.SHOW_ALL, dataTaskListPointer);
         dataTaskList = dataTaskListPointer.getPointer();
         mSaveDataList = dataTaskList;
@@ -195,9 +194,8 @@ public class TaskUIManager {
 	}
 
 
-	private static void openToDoListWindow()
-    {
-        // Create a windown for app
+	private static void openToDoListWindow() {
+        // Create a window for app
         frame = new JFrame(APP_NAME);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         panel = new JPanel();
@@ -252,7 +250,7 @@ public class TaskUIManager {
         DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
         tableModel.setColumnIdentifiers(columnNames);
         
-        for(int i=0; i<=8; i++) {
+        for (int i = 0 ; i <= 8; i++) {
         	if (i != 1) {
         		table.getColumnModel().getColumn(i).setPreferredWidth(columnWidth[i]);
         		table.getColumnModel().getColumn(i).setMaxWidth(columnWidth[i]);
@@ -260,14 +258,14 @@ public class TaskUIManager {
         }
         
         // Set data for table
-        for(int i=0; i<dataTaskList.size(); i++) {
+        for (int i = 0; i < dataTaskList.size(); i++) {
             String[] data = getDataFromTask(dataTaskList.get(i), i);
             tableModel.addRow(data);
         }
         
         DefaultTableCellRenderer centerRender = new DefaultTableCellRenderer();
 		centerRender.setHorizontalAlignment(SwingConstants.CENTER);
-		for(int i=0; i<=8; i++) {
+		for (int i = 0 ; i <= 8; i++) {
 			if (i != 7 && i != 1 ) {
 				table.getColumnModel().getColumn(i).setCellRenderer(centerRender);
         	}
@@ -319,7 +317,7 @@ public class TaskUIManager {
         displayMessage(COMMAND_MESSAGE);
     }  
 
-	// Support history user commands by press key UP and DOWN
+	// Support historical user commands by press key UP and DOWN
     private static void panelKeyPressAction(KeyEvent event) {
         if (event.getKeyCode() == KeyEvent.VK_UP || event.getKeyCode() == KeyEvent.VK_DOWN) {
             String userCommand = "";
@@ -376,20 +374,20 @@ public class TaskUIManager {
         tableModel.setColumnIdentifiers(columnNames);
         DefaultTableCellRenderer centerRender = new DefaultTableCellRenderer();
 		centerRender.setHorizontalAlignment(SwingConstants.CENTER);
-		for(int i=0; i<=8; i++) {
+		for(int i = 0; i <= 8; i++) {
 			if (i != 7 && i != 1 ) {
 				table.getColumnModel().getColumn(i).setCellRenderer(centerRender);
         	}
         }
         
-        for(int i=0; i<=8; i++) {
+        for(int i = 0; i <= 8; i++) {
         	if (i != 1) {
         		table.getColumnModel().getColumn(i).setPreferredWidth(columnWidth[i]);
         		table.getColumnModel().getColumn(i).setMaxWidth(columnWidth[i]);
         	}
         }
         
-        for(int i=0; i<dataTaskList.size(); i++) {
+        for(int i = 0; i < dataTaskList.size(); i++) {
         	String[] data = getDataFromTask(dataTaskList.get(i), i);
 			tableModel.addRow(data);
 		}
@@ -400,6 +398,7 @@ public class TaskUIManager {
     
     public static void createTimetable(String userCommand) {
     
+    	userCommand = mMainLogic.removeSpace(userCommand);
     	String[] commands = userCommand.split(" ");
     		
     	String startDate = mCommandParser.getStartDateForTimetable(userCommand);
@@ -423,7 +422,7 @@ public class TaskUIManager {
     	table.getColumnModel().getColumn(0).setPreferredWidth(150);
         table.getColumnModel().getColumn(0).setMaxWidth(150);
 		 
-		for(int i=from; i<=to; i++) {   	
+		for(int i = from; i <= to; i++) {   	
 			String date = mDateTimeHelper.getDateForNumberOfDays(i);
 			date += " 00:00";
 			int[] timetable = mDateTimeHelper.getTimetableForDate(date, dataTaskList);

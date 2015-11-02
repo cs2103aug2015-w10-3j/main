@@ -12,7 +12,6 @@ public class DataState{
 		allTasks = new ArrayList<Task>();	
 		for (int i=0;i<tasks.size();i++)
 			allTasks.add(tasks.get(i).copy());
-
 	}
 
 	public ArrayList<Task> getAllTasks(){
