@@ -625,7 +625,7 @@ public class MainLogic {
 	}
 
 	protected String executeSearch(Command mCommand, ArrayListPointer feedbackTasks) {
-		String[] arguments = mCommand.getCommandArgument().split(" ");
+		String[] arguments = mCommand.getCommandArgument().toLowerCase().split(" ");
 
 		ArrayList<MatchCount> matchCount = new ArrayList<MatchCount>();
 		
