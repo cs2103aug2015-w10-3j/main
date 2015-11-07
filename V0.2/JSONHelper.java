@@ -61,6 +61,7 @@ public class JSONHelper {
 		JSONObject parser = new JSONObject();
 		parser.put("name", task.getName());
 		parser.put("deadline", task.getDeadline());
+		parser.put("repeatTime", task.getRepeatTime());
 		parser.put("startDate", task.getStartDate());
 		parser.put("endDate", task.getEndDate());
 		parser.put("priority", task.getPriority());
@@ -69,6 +70,7 @@ public class JSONHelper {
 		parser.put("taskInfo", task.getTaskInfo());
 		parser.put("repeatedType", String.valueOf(task.getRepeatedType()));
 		parser.put("period", task.getPeriod());
+		parser.put("taskId", String.valueOf(task.getTaskId()));
 		
 		try{
 			StringWriter out = new StringWriter();
@@ -91,6 +93,7 @@ public class JSONHelper {
 		    Task task = new Task((String)jsonObj.get("name"));
 		    
 		    task.setDeadline((String)jsonObj.get("deadline"));
+		    task.setRepeatTime((String)jsonObj.get("repeatTime"));
 		    task.setStartDate((String)jsonObj.get("startDate"));
 		    task.setEndDate((String)jsonObj.get("endDate"));
 		    
@@ -103,7 +106,8 @@ public class JSONHelper {
 		    task.setRepeatedType(Integer.parseInt((String)jsonObj.get("repeatedType")));
 		    
 		    task.setPeriod((String)jsonObj.get("period"));
-
+			task.setTaskId(Integer.parseInt((String)jsonObj.get("taskId")));
+	
 		    return task;
 
       	}catch(ParseException pe){

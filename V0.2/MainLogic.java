@@ -2,6 +2,7 @@
 import java.io.*;
 import java.util.*;
 import java.lang.*;
+import java.text.SimpleDateFormat;
 
 public class MainLogic {
 
@@ -39,7 +40,7 @@ public class MainLogic {
 		mSettingsStorage = new Storage();
 		mSettingsStorage.setFileURL(SETTINGS_FILE);
 		//mSettings = mSettingsStorage.readSettings();
-		mSettings.setDataFileUrl("mike_nusmods.txt");
+		mSettings.setDataFileUrl("test.txt");
 		mDataStorage = new Storage();
 		mDataStorage.setFileURL(mSettings.getDataFileUrl());
 		
@@ -105,8 +106,59 @@ public class MainLogic {
 	        if (o2.getDeadline().equals("")) {
 	        	return -1;
 	        }
-	        return mDateTimeHelper.compareStringDates(o1.getDeadline(), o2.getDeadline());
+	        int x = mDateTimeHelper.compareStringDates(o1.getDeadline(), o2.getDeadline());
+	        if (x != 0) {
+	        	return x;
+	        }
+	        
+	        x = 2;
+			if (o1.getPriority().equals(AppConst.TASK_FIELD.HIGH)) {
+				x = 3;
+			} else if (o1.getPriority().equals(AppConst.TASK_FIELD.LOW)) {
+				x = 1;
+			}
+			
+			int y = 2;
+			if (o2.getPriority().equals(AppConst.TASK_FIELD.HIGH)) {
+				y = 3;
+			} else if (o2.getPriority().equals(AppConst.TASK_FIELD.LOW)) {
+				y = 1;
+			}
+			
+			if (x > y) {
+				return -1;
+			}
+			return 1;
 	    }
+	}
+	
+	private class TaskNotificationCompare implements Comparator<Task> {
+		@Override
+		public int compare(Task o1, Task o2) {
+			String s1 = o1.getDeadline();
+			String s2 = o2.getDeadline();
+			int x = 2;
+			if (o1.getPriority().equals(AppConst.TASK_FIELD.HIGH)) {
+				x = 3;
+			} else if (o1.getPriority().equals(AppConst.TASK_FIELD.LOW)) {
+				x = 1;
+			}
+			
+			int y = 2;
+			if (o2.getPriority().equals(AppConst.TASK_FIELD.HIGH)) {
+				y = 3;
+			} else if (o2.getPriority().equals(AppConst.TASK_FIELD.LOW)) {
+				y = 1;
+			}
+			int xx = mDateTimeHelper.compareStringDates(s2, s1);
+			if (xx != 0) {
+				return xx;
+			}
+			if (x > y) {
+				return -1;
+			}
+			return 1;
+		}
 	}
 	
 	private class TaskStartDateCompare implements Comparator<Task> {
@@ -196,6 +248,8 @@ public class MainLogic {
 		if (isCheckOverlap(newTask, -1)) {
 			return AppConst.MESSAGE.OVERLAP_TIME_PERIOD;
 		}
+		
+		newTask.setRepeatTime(newTask.getDeadline());
 
 		mAllTasks.add(newTask);
 		updateHistory();
@@ -453,6 +507,8 @@ public class MainLogic {
 				updatedInfo.setDeadline(mTask.getDeadline());					
 			}
 			
+			updatedInfo.setRepeatTime(updatedInfo.getDeadline());
+			
 			if (!taskInfo.contains(" repeat ")) {
 				updatedInfo.setRepeatedType(mTask.getRepeatedType());
 				updatedInfo.setPeriod(mTask.getPeriod());
@@ -472,6 +528,7 @@ public class MainLogic {
 			
 			mTask.setName(updatedInfo.getName());
 			mTask.setDeadline(updatedInfo.getDeadline());
+			mTask.setRepeatTime(updatedInfo.getRepeatTime());
 			mTask.setStartDate(updatedInfo.getStartDate());
 			mTask.setEndDate(updatedInfo.getEndDate());
 			mTask.setPriority(updatedInfo.getPriority());
@@ -590,7 +647,7 @@ public class MainLogic {
 		return String.format(AppConst.MESSAGE.SHOWING_TASK, mCommand.getCommandType().substring(4), argument);
 	}
 
-	protected String executeSetFile(Command mCommand,  ArrayListPointer feedbackTasks){
+	protected String executeSetFile(Command mCommand,  ArrayListPointer feedbackTasks) {
 		//update the internal settings object and save it to the setting file.
 		mSettings.setDataFileUrl(mCommand.getCommandArgument());
 		mSettingsStorage.writeSettings(mSettings);
@@ -598,6 +655,7 @@ public class MainLogic {
 		//Set the new file URL for the dataStorage and reload tasks;
 		mDataStorage.setFileURL(mCommand.getCommandArgument());
 		initialiseTasks();
+		feedbackTasks.setPointer(mAllTasks);
 
 		return String.format(AppConst.MESSAGE.CHANGED_SUCCESSFUL, mCommand.getCommandArgument());
 	}
@@ -808,6 +866,89 @@ public class MainLogic {
 		return "ok";
 	}
 
+
+	protected String executeRemind(ArrayListPointer feedbackTasks) {
+		ArrayList<Task> result = new ArrayList<Task>();
+	
+		// get current time, exactly for 1 seconds
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM HH:mm:ss");
+		String currentTime = dateFormat.format(new Date());
+		
+		// only execute when the second is 00
+		if (!currentTime.endsWith("00")) {
+			return null;
+		}
+		boolean isHasDeadlineComming = false;
+		for(int i=0; i<mAllTasks.size(); i++) {
+			String repeatTime = mAllTasks.get(i).getRepeatTime();
+			if (!repeatTime.equals("") && mDateTimeHelper.compareStringDates(currentTime, repeatTime)>=0 && mAllTasks.get(i).getStatus().equals(AppConst.TASK_FIELD.UNDONE)) {
+				if (currentTime.startsWith(repeatTime)) {
+					isHasDeadlineComming = true;
+				}
+				result.add(mAllTasks.get(i));
+			}
+		}
+		if (result.size() == 0 || !isHasDeadlineComming) {
+			return null;
+		}
+		
+		Collections.sort(result,new TaskNotificationCompare());
+		feedbackTasks.setPointer(result);
+		return AppConst.MESSAGE.REMIND_DEADLINE;
+	}
+	
+	protected String executeRepeat(Command mCommand, ArrayListPointer feedbackTasks) {
+		String[] commands = mCommand.getCommandArgument().split(" ");
+		if (commands.length != 3) {
+			return AppConst.MESSAGE.INVALID_REPEAT_COMMAND;
+		}
+		if (!commands[0].equals("id")) {
+			return AppConst.MESSAGE.INVALID_REPEAT_COMMAND;
+		}
+		Task task = getTaskWithId(commands[1]);
+		if (task == null) {
+			return AppConst.MESSAGE.INVALID_REPEAT_COMMAND;
+		}
+		if (task.getDeadline().equals("")) {
+			return AppConst.MESSAGE.TASK_HAS_NO_DEADLINE;
+		}
+		int time = 0;
+		for(int i=0; i<commands[2].length()-1; i++) {
+			if (commands[2].charAt(i) < '0' || commands[2].charAt(i) > '9') {
+				return AppConst.MESSAGE.INVALID_REPEAT_COMMAND;
+			}
+			time = time * 10 + (commands[2].charAt(i) - '0');
+		}		
+		if (commands[2].charAt(commands[2].length()-1) == 'h') {
+			time *= 60;
+		} else if (commands[2].charAt(commands[2].length()-1) == 'm') {
+		} else if (commands[2].charAt(commands[2].length()-1) < '0' || commands[2].charAt(commands[2].length()-1) > '9') {
+			return AppConst.MESSAGE.INVALID_REPEAT_COMMAND;
+		} else {
+			time = time * 10 + (commands[2].charAt(commands[2].length()-1) - '0');
+		}
+		String message = "";
+		if (time == 0) {
+			task.setRepeatTime("");
+			message = AppConst.MESSAGE.TURN_OFF_REPEAT_SUCCESSFUL;
+		} else {
+			task.setRepeatTime(mDateTimeHelper.getDateTimeAfterFewMinuteFromNow(time));
+			message = AppConst.MESSAGE.SET_REPEAT_SUCCESSFUL;
+		}
+		for(int i=0; i<mAllTasks.size(); i++) {
+			int x = isTasksMatched(task, mAllTasks.get(i));
+			if (x == 1) {
+				mAllTasks.get(i).setRepeatTime(task.getRepeatTime());
+				break;
+			}
+			
+		}
+		updateHistory();
+		mDataStorage.rewriteContent(mAllTasks);
+		feedbackTasks.setPointer(mAllTasks);
+		return message;
+	}
+	
 	
 	// -1 is different
 	// 1 is the same
@@ -893,7 +1034,6 @@ public class MainLogic {
 		}
 		
 		
-		
 		if (newTask.getRepeatedType() == AppConst.REPEATED_TYPE.EVERY_WEEK) {
 			for(int i=0; i<mAllTasks.size(); i++) {
 				if (i != position) {
@@ -951,6 +1091,14 @@ public class MainLogic {
 		}
 		return mPreviousTasks.get(id);
 	}
+	
+	private int getNextTaskId() {
+		int result = 0;
+		for(int i=0; i<mAllTasks.size(); i++) {
+			result = Math.max(result, mAllTasks.get(i).getTaskId());
+		}
+		return result + 1;
+	}
 
 	/**
 	 * the main function for the UI to call to execute a command
@@ -959,7 +1107,9 @@ public class MainLogic {
 	 **/
 	protected String process(String userCommand, ArrayListPointer feedbackTasks) {
 		mPreviousTasks = feedbackTasks.getPointer();
-		addNewUserCommand(userCommand);
+		if (!userCommand.startsWith(AppConst.COMMAND_TYPE.REMIND)) {
+			addNewUserCommand(userCommand);
+		}
 		userCommand = removeSpace(userCommand);
 		Command mCommand = mCommandParser.parse(userCommand);
 
@@ -1018,7 +1168,10 @@ public class MainLogic {
 				return executeTimetable(mCommand, feedbackTasks);
 			case AppConst.COMMAND_TYPE.EXIT:
 				return null;
-
+			case AppConst.COMMAND_TYPE.REMIND:
+				return executeRemind(feedbackTasks);
+			case AppConst.COMMAND_TYPE.REPEAT:
+				return executeRepeat(mCommand, feedbackTasks);
 			default:
 				return String.format(AppConst.MESSAGE.SYNTAX_ERROR, userCommand);
 		}

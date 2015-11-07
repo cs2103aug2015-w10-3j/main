@@ -695,5 +695,103 @@ public class CommandParser {
 		return result;
 	}
 	
+	
+	private int getNumberFromString(String st, int pos) {
+		int number = 0;
+		for(int i=pos; i<st.length(); i++) {
+			if (st.charAt(i)<'0' || st.charAt(i)>'9') {
+				break;
+			}
+			number = number * 10 + (st.charAt(i) - '0');
+		}
+		return number;
+	}
+	
+	private boolean isNumber(String st) {
+		if (st == null || st.length() == 0) {
+			return false;
+		}
+		for(int i=0; i<st.length(); i++) {
+			if (st.charAt(i)<'0' || st.charAt(i)>'9') {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	protected ArrayList<Integer> getListOfId(String id) {
+		String[] ids = id.split(" ");
+		id = "";
+		for(int i=0; i<ids.length; i++) {
+			if (i>0) {
+				if (isNumber(ids[i]) && isNumber(ids[i-1])) {
+					id += " ";
+				}
+			}
+			id += ids[i];
+		}
+		id += " ";
+		ArrayList<Integer> result = new ArrayList<Integer>();
+		int pos = -1, i = 0;
+		while (i<id.length()) {
+			if (id.charAt(i)>='0' && id.charAt(i)<='9') {
+				if (pos == -1) {
+					pos = i;
+				}
+				i++;
+			} else if (id.charAt(i)=='-') {
+				if (pos != -1) {
+					int start = getNumberFromString(id, pos);
+					int end = getNumberFromString(id, i+1);
+					if (start<=end && start!=0) {
+						for(int j=start; j<=end; j++) {
+							result.add(j);
+						}
+					} else {
+						return null;
+					}
+					i++;  pos = -1;
+					while (i<id.length()) {
+						if (id.charAt(i)<'0' || id.charAt(i)>'9') {
+							break;
+						}
+						i++;
+					}
+				} else {
+					return null;
+				}
+			} else if (id.charAt(i)=='.' && i<id.length()-1 && id.charAt(i+1)=='.') {
+				i++;
+				if (pos != -1) {
+					int start = getNumberFromString(id, pos);
+					int end = getNumberFromString(id, i+1);
+					if (start<=end && start!=0) {
+						for(int j=start; j<=end; j++) {
+							result.add(j);
+						}
+					} else {
+						return null;
+					}
+					i++	;  pos = -1;
+					while (i<id.length()) {
+						if (id.charAt(i)<'0' || id.charAt(i)>'9') {
+							break;
+						}
+						i++;
+					}
+				} else {
+					return null;
+				}
+			} else if (id.charAt(i)=='.' || id.charAt(i)==',' || id.charAt(i)==' ') {
+				if (pos != -1) {
+					result.add(getNumberFromString(id, pos));
+				}
+				i++;  pos = -1;
+			} else {
+				return null;	
+			}
+		}
+		return result;
+	}
 
 }

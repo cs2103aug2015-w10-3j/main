@@ -2,6 +2,11 @@ import java.io.*;
 import java.util.Scanner;
 import java.util.*;
 import java.lang.*;
+import java.lang.Throwable;
+
+import java.awt.Toolkit;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -16,6 +21,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.JOptionPane;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
@@ -30,6 +36,7 @@ public class TaskUIManager {
     private static int MAX_NUMBER_ROWS = 16;
     private static String EVERYDAY = "Everyday";
     private static String EVERY = "Every ";
+    private static String NOTIFICATION = "Notification!";
 	private static DateTimeHelper mDateTimeHelper = new DateTimeHelper();
 	private static CommandParser mCommandParser = new CommandParser();
 	
@@ -39,6 +46,8 @@ public class TaskUIManager {
     static JFrame frame;
     static JPanel panel;
     static JTable table;
+    static Toolkit toolkit;
+    static Timer timer;
     
     // column to display in table
     static String[] columnNames = new String[] {"#", "Task Name",
@@ -82,6 +91,9 @@ public class TaskUIManager {
     static int userCommandCount = 0;
     static int userScrollCount = 0;
     static int mTableRowCount = 0;
+    // check deadline task for every 1 second
+    static int timeRemind = 1;
+    static int timeDismiss = 4;
 
 	public TaskUIManager() {
 
@@ -96,7 +108,7 @@ public class TaskUIManager {
         catch (Exception ex) {
             ex.printStackTrace();
         }
-
+        
         ArrayListPointer dataTaskListPointer = new ArrayListPointer();
         // Input a showall command upon launching Todoer
         String message = mMainLogic.process(AppConst.COMMAND_TYPE.SHOW_ALL, dataTaskListPointer);
@@ -108,8 +120,58 @@ public class TaskUIManager {
         displayMessage(AppConst.MESSAGE.WELCOME);
         assert message != null;
         displayMessage(message);
+        
+        toolkit = Toolkit.getDefaultToolkit();
+	    timer = new Timer();
+		timer.scheduleAtFixedRate(new RemindTask(), 0, timeRemind * 1000);
+        
 	}
 	
+	public static class RemindTask extends TimerTask {
+	
+		public void run() {
+			
+			/*
+			* 
+			*
+			*/
+			ArrayListPointer dataTaskListPointer = new ArrayListPointer();   
+            dataTaskListPointer.setPointer(dataTaskList);
+			String message = mMainLogic.process(AppConst.COMMAND_TYPE.REMIND, dataTaskListPointer);
+			if (message != null) {				
+				dataTaskList = dataTaskListPointer.getPointer();
+				mTableRowCount = dataTaskList.size();
+				userScrollCount = 0;
+				updateTable();
+				output.setText("");
+				displayMessage(message);
+				
+				// show notification to users
+				// option pane with no buttons.
+				JOptionPane opt = new JOptionPane(	AppConst.MESSAGE.NOTIFICATIONS, 
+													JOptionPane.INFORMATION_MESSAGE, 
+													JOptionPane.DEFAULT_OPTION, 
+													null, 
+													new Object[]{"OK"}); 
+		  		final JDialog dlg = opt.createDialog(NOTIFICATION);
+		  		new Thread(new Runnable() {
+					public void run() {
+				    try {
+				      Thread.sleep(timeDismiss * 1000);
+				      dlg.dispose();
+
+				    }
+				    catch ( Throwable th ) {
+				    	
+				    }
+				  }
+				}).start();
+		  		dlg.setVisible(true);
+			}
+			toolkit.beep();
+		}
+	}
+
 	public static String[] getDataFromTask(Task task, int i) {
 		String[] data = new String[9];
 		data[0] = String.valueOf(i + 1);
@@ -428,7 +490,7 @@ public class TaskUIManager {
 			data[0] = mDateTimeHelper.convertDateMonthToDisplayFormat(date) + " (" + mDateTimeHelper.getStringDayInWeekForDate(date) + ")";
 			for(int j=1; j<=12; j++) {
 				if (timetable[j-1] != -1) {
-					data[j] = dataTaskList.get(timetable[j-1]).getName() + "     " + AppConst.TASK_FIELD.PRIORITY + dataTaskList.get(timetable[j-1]).getPriority();
+					data[j] = dataTaskList.get(timetable[j-1]).getName() + "           " + AppConst.TASK_FIELD.PRIORITY + dataTaskList.get(timetable[j-1]).getPriority();
 				} else {
 					data[j] = "";
 				}

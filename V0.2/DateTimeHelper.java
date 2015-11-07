@@ -2,6 +2,7 @@ import java.util.*;
 import java.util.*;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
+	
 
 public class DateTimeHelper {
 	
@@ -221,7 +222,6 @@ public class DateTimeHelper {
 		if (date == null) {
 			return dateTime;
 		}
-		System.out.println("Date Time: " + dateTime);
 		SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 		String time = " " + timeFormat.format(date);
 		
@@ -246,8 +246,6 @@ public class DateTimeHelper {
 		if (dateTime == null || dateTime.equals("")) {
 			return dateTime;
 		}
-		
-		System.out.println("Date time to display: " + dateTime);
 		
 		dateTime = dateTime.toLowerCase();
 		Date date = convertStringToDate(dateTime);
@@ -1126,6 +1124,47 @@ public class DateTimeHelper {
 		String minute = String.valueOf(period.charAt(length-2)) + String.valueOf(period.charAt(length-1));
 		return hour + ":" + minute;
 	}
+	
+	
+	protected String getDateTimeAfterFewMinuteFromNow(int minute) {
+		
+		String currentTime = getCurrentTimeString();
+		int day = getDayFromStringDate(currentTime);
+		int month = getMonthFromStringDate(currentTime);
+		int time = getEndTimeFromStringPeriod(currentTime);
+		time += minute;
+		while (time >= 24*60) {
+			time -= 24*60;
+			day++;
+			if (day > daysInMonth[month-1]) {
+				day -= daysInMonth[month-1];
+				month++;
+			}
+		}
+		String dayString = String.valueOf(day);
+		if (dayString.length()<2) {
+			dayString = "0" + dayString;
+		}
+		
+		String monthString = String.valueOf(month);
+		if (monthString.length()<2) {
+			monthString = "0" + monthString;
+		}
+		
+		String hourString = String.valueOf(time/60);
+		if (hourString.length()<2) {
+			hourString = "0" + hourString;
+		}
+		
+		String minuteString = String.valueOf(time % 60);
+		if (minuteString.length()<2) {
+			minuteString = "0" + minuteString;
+		}
+		
+		return dayString + "/" + monthString + " " + hourString + ":" + minuteString;
+	}
+	
+	
 	
 	protected boolean isTwoEventOverlap(String fromDateTime1, 
 										String toDateTime1, 

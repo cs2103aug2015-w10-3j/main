@@ -13,7 +13,8 @@ public interface AppConst {
 				"group",
 				"grp",
 				"priority",
-				"TO"
+				"TO",
+				"for",
 				};
 	}
 
@@ -58,6 +59,9 @@ public interface AppConst {
 		
 		String TIMETABLE = "timetable";
 		
+		String REMIND = "remind";
+		String REPEAT = "repeat";
+		
 	}
 	
 	interface TASK_FIELD {
@@ -80,6 +84,7 @@ public interface AppConst {
 		String STATUS = "status";
 		String DONE = "done";
 		String UNDONE = "undone";
+		
 	}
 	
 	interface REPEATED_TYPE {
@@ -165,6 +170,12 @@ public interface AppConst {
 		
 		String TASK_NOT_FOUND = "Error: '%s' not found!\n";
 		String SYNTAX_ERROR = "Syntax error: command(%s) not found.\n";	
+		String REMIND_DEADLINE = "You have some deadline tasks coming!!! These tasks are not done yet! Use 'done' command to mark it as done.\n";
+		String NOTIFICATIONS = "You have some deadline tasks coming!!! Please complete these tasks!\n";
+		String SET_REPEAT_SUCCESSFUL = "Set repeat successful!\n";
+		String INVALID_REPEAT_COMMAND = "Invalid repeat command! Can not find the task!\n";
+		String TASK_HAS_NO_DEADLINE = "Task has no deadline!\n";
+		String TURN_OFF_REPEAT_SUCCESSFUL = "Turn off repeat successful!\n";
 	}
 
 }

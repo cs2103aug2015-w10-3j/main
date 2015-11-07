@@ -12,12 +12,14 @@ public class Task {
 	private String group="";
 	private String status="undone";
 	private String deadline="";
+	private String repeatTime = "";
 	private String startDate="";
 	private String endDate="";
 	private String taskInfo;
 	private String period = "00:00 23:59";
 	private int repeatedType = 0;
-
+	private int taskId = 0;
+	
 	public Task(String newname) {
 		name = newname;
 		repeatedType = 0;
@@ -53,6 +55,14 @@ public class Task {
 
 	public void setDeadline(String newDeadline){
 		deadline = newDeadline;
+	}
+	
+	public String getRepeatTime() {
+		return repeatTime;	
+	}	
+	
+	public void setRepeatTime(String newRepeatTime) {
+		repeatTime = newRepeatTime;
 	}
 	
 	public void setRepeatedType(int repeated) {
@@ -123,10 +133,19 @@ public class Task {
 	public void setTaskInfo(String newTaskInfo) {
 		taskInfo = newTaskInfo;
 	}
+	
+	public int getTaskId() {
+		return taskId;
+	}
+	
+	public void setTaskId(int newTaskId) {
+		taskId = newTaskId;
+	}
 
 	public Task copy(){
 		Task newTask = new Task(name);
 		newTask.setDeadline(deadline);
+		newTask.setRepeatTime(repeatTime);
 		newTask.setGroup(group);
 		newTask.setPriority(priority);
 		newTask.setStartDate(startDate);
@@ -135,6 +154,7 @@ public class Task {
 		newTask.setTaskInfo(taskInfo);
 		newTask.setRepeatedType(repeatedType);
 		newTask.setPeriod(period);
+		newTask.setTaskId(taskId);
 
 		return newTask;
 	}
