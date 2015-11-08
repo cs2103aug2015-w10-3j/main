@@ -26,7 +26,7 @@ Todoer is a keystroke-orientated task scheduler that provides functionality for 
 3. You will be greeted with an interface that has (*see below*) a main panel (**A**), a console (**B**), and a command bar (**C**). This command bar is where you enter commands to tell Todoer what to do. The console displays helpful feedback for your actions and the main panel displays your tasks.
 
 <br>
-![add image](doc/images/V0.5/interface empty.jpg)
+![add image](doc/images/V0.5/interface empty.JPG)
  
 
 4. **Try adding a task!**: Type `add do homework by tomorrow` in the command bar. You will see your first task added to the table in the main panel. The deadline for this task is tomorrow and its exact date will be added into the `deadline` column.
@@ -41,43 +41,49 @@ To learn more details of Todoer features, refer to the 'Feature Details' section
 # Feature Details
 ## Adding a task
 1. Type `add <task_name>` into the command bar. This adds the most basic task, without any deadlines or additional information; to add additional information in a task, see the below steps.
+
 > Example: **`add do homework`**
 <br>
-![add image](doc/images/V0.5/add floating.jpg)
+![add image](doc/images/V0.5/add floating.JPG)
 2. **`OPTIONAL: Deadlines`**: Type `add <task_name> by <deadline>`. Replace \<deadline> with a future date, the following formats are acceptable:
-  1. tomorrow
-  2. next <day>. (e.g. next Tuesday/Tue)
-  3. dd/mm (e.g. 20/12)
-  4. dd mmm (e.g. 20 Dec)
-  5. dd mmmm (e.g. 20 December)
+  * tomorrow
+  * next <day>. (e.g. next Tuesday/Tue)
+  * dd/mm (e.g. 20/12)
+  * dd mmm (e.g. 20 Dec)
+  * dd mmmm (e.g. 20 December)
 
 You may append a time to the date for a more specific deadline. AM/PM or 24 hour time formats are acceptable. (The default is "23:59" if time is not specified) 
 
 > Example: **`add do homework by 20 Dec 4pm`**
+
 > Todoer is human readable and friendly! Experiment with different datetime formats, you will find that most of them are recognized. See the cheatsheet section for a list of all recognized formats.
 <br>
-![add image](doc/images/V0.5/add deadline.jpg)
+![add image](doc/images/V0.5/add deadline.JPG)
 
 3. **`OPTIONAL: Groups and Priority`**: Append `group <group_name>` and/or `priority <high/meduim/low>` to your add command. Replace \<group_name> with an appropriate categorization of your choice and choose one of **high**, **medium**, or **low** to indicate how urgent the task is to you. 
 
 > Example: **`add do homework by 20 Dec 4pm group CS2103 priority high`**
 
 <br>
-![add image](doc/images/V0.5/add grouppriority.jpg)
+![add image](doc/images/V0.5/add grouppriority.JPG)
 
 4. **`OPTIONAL: Start time/End time`** Append a `from <start_datetime> to <end_datetime>` to your add command. As usual, replace the fields with a flexible datetime of your choice. Use this feature when you have an event task that will occupy a known duration on your schedule.
 
 > Example: **`add interview with XXX company from 21 Dec 230pm to 21 Dec 430pm`**
+
 > The start time and end time defaults to 00:00 and 23:59 respectively if not specified.
  
 <br>
-![add image](doc/images/V0.5/add startendtime.jpg)
+![add image](doc/images/V0.5/add startendtime.JPG)
 
 4. **`OPTIONAL: Recurring tasks`** Append `from <start time> to <end time> repeat <period>. The repeat keyword will schedule the specified task continuously over the given \<period>. The following formats for \<period> are acceptable:
-1. every day
-2. every <day_of_week>
+  * every day
+  * every \<day_of_week>
+
 > Example: **`add CS2103 lecture from 2pm to 4pm repeat every Friday`**
-3. every <day_of_week> from <start_date> to <end_date>
+
+3. every <day_of_week> from \<start_date> to \<end_date>
+
 > Example: **`add practice guitar from 6pm to 7pm repeat every Mon from 16/12 to 30/12`**
 
 ###### Keyword List
@@ -136,7 +142,7 @@ This section describes the different ways in which you can view your tasks, eith
 1. Type `timetable <date to display>` or `timetable from <date> to <date>` or simply, `timetable` to display for this week.
 
 <br>
-![add image](doc/images/V0.5/timetable.jpg)
+![add image](doc/images/V0.5/timetable.JPG)
 
 > Tip: Use the Page Up/Page Down keys to scroll up and down
 
