@@ -19,7 +19,7 @@ Todoer is a keystroke-orientated task scheduler that provides functionality for 
 
 # Getting Started
 
-1. **Download Todoer**: You can save Todoer into any folder of your choice. All your data will    be saved in this folder.
+1. **Download Todoer**: You can save Todoer into any folder of your choice. All your data will be saved in this folder.
 
 2. **Launch Todoer**: by simply double-clicking the `Todoer.exe file`.
 
@@ -60,7 +60,7 @@ To learn more details of Todoer features, refer to the 'Feature Details' section
 ![add image](doc/images/V0.5/add deadline.JPG)
 
 ### **`OPTIONAL: Groups and Priority`**
-1. Append `group <group_name>` and/or `priority <high/meduim/low>` to your add command. Replace \<group_name> with an appropriate categorization of your choice and choose one of **high**, **medium**, or **low** to indicate how urgent the task is to you. 
+1. Append `group <group_name>` and/or `priority <high/meduim/low>` to your `add` command. Replace \<group_name> with an appropriate categorization of your choice and choose one of **high**, **medium**, or **low** to indicate how urgent the task is to you. 
 
 > Example: **`add do homework by 20 Dec 4pm group CS2103 priority high`**
 
@@ -68,7 +68,7 @@ To learn more details of Todoer features, refer to the 'Feature Details' section
 ![add image](doc/images/V0.5/add grouppriority.JPG)
 
 ### **`OPTIONAL: Start time/End time`**
-1. Append a `from <start_datetime> to <end_datetime>` to your add command. As usual, replace the fields with a flexible datetime of your choice. Use this feature when you have an event task that will occupy a known duration on your schedule.
+1. Append a `from <start_datetime> to <end_datetime>` to your `add` command. As usual, replace the fields with a flexible datetime of your choice. Use this feature when you have an event task that will occupy a known duration on your schedule.
 
 > Example: **`add interview with XXX company from 21 Dec 230pm to 21 Dec 430pm`**
 
@@ -83,12 +83,14 @@ To learn more details of Todoer features, refer to the 'Feature Details' section
   * every \<day_of_week>
 
   > Example: **`add CS2103 lecture from 2pm to 4pm repeat every Friday`**
-
   * every <day_of_week> from \<start_date> to \<end_date>
 
   > Example: **`add practice guitar from 6pm to 7pm repeat every Mon from 16/12 to 30/12`**
+  
+  <br>
+  ![add image](doc/images/V0.5/add recurrent.JPG)
 
-###### Keyword List
+### Keyword List
 
 | Keyword   | Usage                                            |
 |-------------|----------------------------------------------------------|
@@ -132,6 +134,11 @@ This section describes the different ways in which you can view your tasks, eith
 ###### Sort on a field
 1. Type `showby <field_name>`. Replace \<field_name> with **deadline**/**start date**/**end date**/**priority**/**group**/**status** to sort your tasks accordingly.
 
+> Example `showby deadline`
+
+  <br>
+  ![add image](doc/images/V0.5/showbydeadline.JPG)
+
 ###### Show all tasks
 1. Type `showall` to display all tasks.
 
@@ -166,12 +173,12 @@ This section describes the different ways in which you can view your tasks, eith
 
 | Command            | Usage                                                                                      |
 |--------------------|--------------------------------------------------------------------------------------------------|
-| add     | **add** \<task_name>. May append optional parameters: <ul><li>**by** <deadline></li><li>**group** \<group_name></li><li>**priority** \<high/medium/low></li><li>**group** \<group_name></li><li>**from** \<start_datetime> **to** \<end_datetime></li><li>**repeat** \<period></li></ul> |
-| done         | **done** \<task_name> or **done id** <id_number> |
+| add     | **add** \<task_name>. May append optional parameters: <ul><li>**by** \<deadline></li><li>**group** \<group_name></li><li>**priority** \<high/medium/low></li><li>**group** \<group_name></li><li>**from** \<start_datetime> **to** \<end_datetime></li><li>**repeat** \<period></li></ul> |
+| done         | **done** \<task_name> or **done id** \<id_number> |
 | delete  | <ul><li>**delete** \<task_name> or **delete** id <id_number></li><li>**deleteby** \<field> \<value_of_field></li><li>**deleteall**</li></ul>			                                             |
 | update            | **update** \<task_name> TO \<keyword> \<new_value>                                                     |
 | show               | <ul><li>**showday** \<date></li><li>**showpriority** \<high/medium/low></li><li>**showgroup** \<groupname></li><li>**showby** \<column_field></li><li>**showall**</li></ul>                            |
 | timetable	|
-| setfile           | set file that saves your tasks to disk                                                   |
-| help               | Get help for a particular command                       |
-| exit               | Exit Todoer                                                                                      |
+| setfile           | **setfile** \<file_path>                                                   |
+| help               | Display the helpsheet                       |
+| exit               | Exit Todoer                                                                        |
