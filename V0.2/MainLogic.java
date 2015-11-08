@@ -615,6 +615,7 @@ public class MainLogic {
 				updatedInfo.setPeriod(mTask.getPeriod());
 			}
 			
+			
 			updatedInfo.setStatus(mTask.getStatus());
 			
 			for(int i=0; i<mAllTasks.size(); i++) {
@@ -635,6 +636,8 @@ public class MainLogic {
 			mTask.setPriority(updatedInfo.getPriority());
 			mTask.setGroup(updatedInfo.getGroup());
 			mTask.setTaskInfo(updatedInfo.getDisplay());
+			mTask.setPeriod(updatedInfo.getPeriod());
+			mTask.setRepeatedType(updatedInfo.getRepeatedType());
 			
 			if (mTask.getParentTaskId() == mTask.getTaskId()) {
 				int pos1 = findTasksMatched(mPreviousTasks.get(position), mAllTasks, pointer);
