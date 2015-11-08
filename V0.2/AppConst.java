@@ -168,6 +168,7 @@ public interface AppConst {
 		String UPDATED_SUCCESSFUL = "Updated successfully!\n";
 		String INVALID_UPDATE_FORMAT = "Invalid update format, use 'update <oldTask> TO <newTask>' oldTask and newTask can not be null, empty or space only!\n";
 		String TASK_UPDATED_EXIST = "Can not update, this new task was already exist!\n";
+		String CAN_NOT_UPDATE = "Can not update for this task! You only can delete it!\n";
 		
 		// Change file name
 		String CHANGED_SUCCESSFUL = "Successful changed data file to '%s'!\n";

@@ -3,6 +3,12 @@ import java.util.Scanner;
 import java.util.*;
 import java.lang.*;
 import java.lang.Throwable;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.*;
+import java.net.URL;
+import javax.swing.*;
+import  sun.audio.*; 
 
 import java.awt.Toolkit;
 import java.util.Timer;
@@ -106,6 +112,7 @@ public class TaskUIManager {
     // check deadline task for every 1 second
     static int timeRemind = 1 * 1000;
     static int timeDismiss = 30 * 1000;
+	static int timePlaySound = 4 * 1000;
 
 	public TaskUIManager() {
 
@@ -165,18 +172,31 @@ public class TaskUIManager {
 													JOptionPane.DEFAULT_OPTION, 
 													null, 
 													new Object[]{OK_BUTTON}); 
+													
 		  		final JDialog dlg = opt.createDialog(NOTIFICATION);
 		  		new Thread(new Runnable() {
-					public void run() {
-				    try {
-				      Thread.sleep(timeDismiss);
-				      dlg.dispose();
-
-				    }
-				    catch ( Throwable th ) {
-				    	
-				    }
-				  }
+		  			public void run() {		
+		  				try {
+		  					InputStream in = new FileInputStream("sound1.wav");
+							AudioStream as = new AudioStream(in);	
+							AudioPlayer.player.start(as);  
+							Thread.sleep(timePlaySound);
+							AudioPlayer.player.stop(as);
+						} catch (Throwable th) {
+							
+						}
+		  			}
+		  		}).start();
+		  		new Thread(new Runnable() {
+		  		
+					public void run() {	 
+						try {
+		  					Thread.sleep(timeDismiss);
+							dlg.dispose();
+						} catch (Throwable th) {
+						}
+											
+				  	}
 				}).start();
 		  		dlg.setVisible(true);
 			}

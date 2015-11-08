@@ -576,7 +576,10 @@ public class MainLogic {
 		} else if (possibleTasks.size() == 1) {
 		
 			Task mTask = mAllTasks.get(findTasksMatched(mPreviousTasks.get(position), mAllTasks, pointer));
-
+			if (mTask.getParentTaskId() != mTask.getTaskId()) {
+				return AppConst.MESSAGE.CAN_NOT_UPDATE;
+			}
+	
 			if ( updatedInfo.getName().equals("") ){
 				updatedInfo.setName(mTask.getName());					
 			}
@@ -633,11 +636,10 @@ public class MainLogic {
 			mTask.setGroup(updatedInfo.getGroup());
 			mTask.setTaskInfo(updatedInfo.getDisplay());
 			
-			if (mTask.getParentTaskId() == mTask.getTaskId() || mTask.getRepeatedType() == AppConst.REPEATED_TYPE.FROM_TO || mTask.getRepeatedType() == AppConst.REPEATED_TYPE.EVERY_WEEK) {
+			if (mTask.getParentTaskId() == mTask.getTaskId()) {
 				int pos1 = findTasksMatched(mPreviousTasks.get(position), mAllTasks, pointer);
 				deleteTasks(pos1);
 				addNewTasks(mTask);
-
 			}
 			updateHistory();
 			mDataStorage.rewriteContent(mAllTasks);
