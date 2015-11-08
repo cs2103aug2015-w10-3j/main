@@ -148,15 +148,19 @@ This section describes the different ways in which you can view your tasks, eith
 1. Type `search <keyword>` to find all tasks that have \<keyword> in them.
 
 ### Timetable
-1. Type `timetable <date to display>` or `timetable from <date> to <date>` or simply, `timetable` to display for this week. <br>
+1. Type:
+  * `timetable <date to display>` **or**
+  * `timetable from <date> to <date>` **or**
+  * `timetable` to display the view for this week:<br>
 ![add image](doc/images/V0.5/timetable.JPG)
 
-> Tip: Use the `Page Up`/`Page Down` keys to scroll up and down
+> Tip: Use the `Page Up`/`Page Down` keys to scroll up and down!
 
 ## Updating a task
 1. Type `update <task_to_be_updated> TO <keyword> <new value>`
-2. Refer to the keyword list in the add section [link?]
+2. Refer to the [Keyword List](https://github.com/cs2103aug2015-w10-3j/main/blob/master/User%20Guide%20V0.5.md#keyword-list) in the add section for the list of \<keyword>.
 > Example: `update id 1 TO priority low`
+
 > Take note that the keyword `TO` is capitalized
 
 ## Settings
@@ -178,7 +182,7 @@ This section describes the different ways in which you can view your tasks, eith
 | delete  | <ul><li>**delete** \<task_name> or **delete** id <id_number></li><li>**deleteby** \<field> \<value_of_field></li><li>**deleteall**</li></ul>			                                             |
 | update            | **update** \<task_name> TO \<keyword> \<new_value>                                                     |
 | show               | <ul><li>**showday** \<date></li><li>**showpriority** \<high/medium/low></li><li>**showgroup** \<groupname></li><li>**showby** \<column_field></li><li>**showall**</li></ul>                            |
-| timetable	| **timetable** to show this week or **timetable from** \<startdate> **to** \<enddate> |
+| timetable	| <ul><li>**timetable** to show this week</li><li>**timetable from** \<startdate> **to** \<enddate></li><li>**timetable next** \<period></li></ul> |
 | setfile           | **setfile** \<file_path>                                                   |
 | help               | Display the helpsheet                       |
 | exit               | Exit Todoer                                                                        |
