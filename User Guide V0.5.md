@@ -7,8 +7,12 @@ Todoer is a keystroke-orientated task scheduler that provides functionality for 
 - [Getting Started](#getting-started)
 - [Feature Details](#feature-details)
   - [Adding a task](#adding-a-task)
-  - [Deleting a task](#deleting-a-task)
+  - [Marking a task done](#marking-a-task-done)
+  - [Deleting tasks](#deleting-tasks)
   - [Viewing tasks](#viewing-tasks)
+    - [Showing tasks](#showing-tasks)
+    - [Searching tasks](#searching-tasks)
+    - [Timetable](#timetable)
   - [Updating a task](#updating-a-task)
   - [Settings](#settings)
   - [Exiting](#exiting)
@@ -55,7 +59,6 @@ To learn more details of Todoer features, refer to the 'Feature Details' section
 > Example: **`add do homework by 20 Dec 4pm`**
 
 > Todoer is human readable and friendly! Experiment with different datetime formats, you will find that most of them are recognized. See the cheatsheet section for a list of all recognized formats.
-
 <br>
 ![add image](doc/images/V0.5/add deadline.JPG)
 
@@ -83,14 +86,14 @@ To learn more details of Todoer features, refer to the 'Feature Details' section
   * every \<day_of_week>
 
   > Example: **`add CS2103 lecture from 2pm to 4pm repeat every Friday`**
+  
   * every <day_of_week> from \<start_date> to \<end_date>
 
   > Example: **`add practice guitar from 6pm to 7pm repeat every Mon from 16/12 to 30/12`**
-  
   <br>
   ![add image](doc/images/V0.5/add recurrent.JPG)
 
-### Keyword List
+### **`Keyword List`**
 
 | Keyword   | Usage                                            |
 |-------------|----------------------------------------------------------|
@@ -119,7 +122,7 @@ To learn more details of Todoer features, refer to the 'Feature Details' section
 ###### Deleting all tasks
 1. Type `deleteall` into the command bar. 
 
-> Tip: Use the undo/redo commands to reverse your actions.
+> Tip: Use the `undo`/`redo` commands to reverse your actions.
 
 ## Viewing tasks
 This section describes the different ways in which you can view your tasks, either by sorting on certain fields (e.g. in ascending deadline), or displaying only a subset of all your tasks (e.g. only tomorrow's tasks), or by searching for specific tasks, or in an intuitive timetable view.
@@ -135,7 +138,6 @@ This section describes the different ways in which you can view your tasks, eith
 1. Type `showby <field_name>`. Replace \<field_name> with **deadline**/**start date**/**end date**/**priority**/**group**/**status** to sort your tasks accordingly.
 
 > Example `showby deadline`
-
   <br>
   ![add image](doc/images/V0.5/showbydeadline.JPG)
 
@@ -146,21 +148,19 @@ This section describes the different ways in which you can view your tasks, eith
 1. Type `search <keyword>` to find all tasks that have \<keyword> in them.
 
 ### Timetable
-1. Type `timetable <date to display>` or `timetable from <date> to <date>` or simply, `timetable` to display for this week.
-
-<br>
+1. Type `timetable <date to display>` or `timetable from <date> to <date>` or simply, `timetable` to display for this week. <br>
 ![add image](doc/images/V0.5/timetable.JPG)
 
-> Tip: Use the Page Up/Page Down keys to scroll up and down
+> Tip: Use the `Page Up`/`Page Down` keys to scroll up and down
 
 ## Updating a task
-1. Type `update <task_to_be_updated> TO <keyword> <new value>
+1. Type `update <task_to_be_updated> TO <keyword> <new value>`
 2. Refer to the keyword list in the add section [link?]
 > Example: `update id 1 TO priority low`
 > Take note that the keyword `TO` is capitalized
 
 ## Settings
-###### Change the file that saves your tasks to disks
+###### Change the file that saves your tasks to disks:
 1. Type `setfile <filepath>`
 
 ## Exiting
