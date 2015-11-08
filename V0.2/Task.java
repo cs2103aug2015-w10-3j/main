@@ -19,6 +19,7 @@ public class Task {
 	private String period = "00:00 23:59";
 	private int repeatedType = 0;
 	private int taskId = 0;
+	private int parentTaskId = 0;
 	
 	public Task(String newname) {
 		name = newname;
@@ -82,23 +83,7 @@ public class Task {
 	}
 	
 	public String getDisplay() {
-		String result = name;
-		if (!deadline.equals("")) {
-			result += " by " + deadline;
-		}
-		if (!startDate.equals("")) {
-			result += " from " + startDate;	
-		}	
-		if (!endDate.equals("")) {
-			result += " to " + endDate;
-		}
-		if (!priority.equals("")) {
-			result += " priority " + priority;
-		}
-		if (!group.equals("")) {
-			result += " group " + group;
-		}
-		return result;
+		return name;
 		
 	}
 
@@ -141,6 +126,14 @@ public class Task {
 	public void setTaskId(int newTaskId) {
 		taskId = newTaskId;
 	}
+	
+	public int getParentTaskId() {
+		return parentTaskId;
+	}
+	
+	public void setParentTaskId(int newParentTaskId) {
+		parentTaskId = newParentTaskId;
+	}
 
 	public Task copy(){
 		Task newTask = new Task(name);
@@ -155,6 +148,7 @@ public class Task {
 		newTask.setRepeatedType(repeatedType);
 		newTask.setPeriod(period);
 		newTask.setTaskId(taskId);
+		newTask.setParentTaskId(parentTaskId);
 
 		return newTask;
 	}

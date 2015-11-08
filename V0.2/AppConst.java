@@ -16,6 +16,26 @@ public interface AppConst {
 				"TO",
 				"for",
 				};
+		String FROM = "from";
+		String TO = "to";
+		String BY = "by";
+		String BEFORE = "before";
+		String REPEAT = "repeat";
+		String GROUP = "group";
+		String GRP = "grp";
+		String PRIORITY = "priority";
+		String FOR = "for";
+		
+		String FROM1 = " from ";
+		String TO1 = " to ";
+		String BY1 = " by ";
+		String BEFORE1 = " before ";
+		String REPEAT1 = " repeat ";
+		String GROUP1 = " group ";
+		String GRP1 = " grp ";
+		String PRIORITY1 = " priority ";
+		String FOR1 = " for ";
+		
 	}
 
 	interface COMMAND_TYPE {
@@ -84,6 +104,8 @@ public interface AppConst {
 		String STATUS = "status";
 		String DONE = "done";
 		String UNDONE = "undone";
+		
+		String ID = "id";
 		
 	}
 	

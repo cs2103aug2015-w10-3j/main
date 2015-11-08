@@ -38,7 +38,7 @@ public class CommandParser {
 			case AppConst.COMMAND_TYPE.DELETE:
 				if (commands.length < 2) {
 					command.setNewTask(null);
-				} else if (commands[1].equals("id")) {
+				} else if (commands[1].equals(AppConst.TASK_FIELD.ID)) {
 					if (commands.length < 3) {
 						command.setNewTask(null);
 					} else {
@@ -49,7 +49,7 @@ public class CommandParser {
 				}
 				break;
 			case AppConst.COMMAND_TYPE.UPDATE:
-				if (!userCommand.contains("TO")) {
+				if (!userCommand.contains(AppConst.KEY_WORD.TO.toUpperCase())) {
 					command.setNewTask(null);
 					command.setUpdatedTask(null);
 					break;
@@ -61,11 +61,10 @@ public class CommandParser {
 					command.setUpdatedTask(null);
 					break;
 				}
-				if (!commands[1].equals("id")) {
+				if (!commands[1].equals(AppConst.TASK_FIELD.ID)) {
 					oldTaskInfo = commandType + " " + oldTaskInfo;
 					command.setNewTask(getTaskFromString(commandType, oldTaskInfo));
 				} else {
-					System.out.println("Update task id: " + commands[2]);
 					command.setCommandArgument(commands[1] + " " + commands[2]);
 					command.setNewTask(null);
 				}
@@ -86,9 +85,9 @@ public class CommandParser {
 			return "";
 		}
 		String result = "";
-		if (!splits[1].equals("id")) {
+		if (!splits[1].equals(AppConst.TASK_FIELD.ID)) {
 			for(int i=1; i<splits.length; i++) {
-				if (splits[i].equals("TO")) {
+				if (splits[i].equals(AppConst.KEY_WORD.TO.toUpperCase())) {
 					break;
 				}
 				if (result.length() > 0) {
@@ -114,7 +113,7 @@ public class CommandParser {
 		String[] splits = userCommand.split(" ");
 		String result = "";
 		for(int i=1; i<splits.length; i++) {
-			if (splits[i].equals("TO")) {
+			if (splits[i].equals(AppConst.KEY_WORD.TO.toUpperCase())) {
 				for(int j=i+1; j<splits.length; j++) {
 					if (result.length() > 0) {
 						result += " ";
@@ -130,7 +129,7 @@ public class CommandParser {
 	private Task getTaskFromString(String commandType, String userCommand) {
 		String[] splits = userCommand.split(" ");
 		for(int i=0; i<splits.length; i++) {
-			if (splits[i].equals("repeat")) {
+			if (splits[i].equals(AppConst.KEY_WORD.REPEAT)) {
 				return getTaskRepeatFromString(commandType, userCommand);
 			}
 		}
@@ -212,7 +211,7 @@ public class CommandParser {
 		String splits[] = userCommand.split(" ");
 		int position = 0;
 		for(int i=0; i<splits.length; i++) {
-			if (splits[i].equals("repeat")) {
+			if (splits[i].equals(AppConst.KEY_WORD.REPEAT)) {
 				position = i;
 				break;
 			}	
@@ -220,7 +219,7 @@ public class CommandParser {
 		String startDate = null;
 		String endDate = null;
 		if (position < splits.length-1) {
-			if (splits[position+1].equals("from")) {
+			if (splits[position+1].equals(AppConst.KEY_WORD.FROM)) {
 				startDate = getStartDateForPeriod(userCommand);
 				endDate = getEndDateForPeriod(userCommand);
 				if (startDate != null) {
@@ -272,7 +271,7 @@ public class CommandParser {
 		String[] splits = userCommand.split(" ");
 		int position = 0;
 		for(int i=0; i<splits.length; i++) {
-			if (splits[i].equals("repeat")) {
+			if (splits[i].equals(AppConst.KEY_WORD.REPEAT)) {
 				position = i;
 				if (mPosition == -1) {
 					mPosition = i;
@@ -284,14 +283,14 @@ public class CommandParser {
 		}
 		String startTime = "";
 		for(int i=0; i<position; i++) {
-			if (splits[i].equals("from")) {
+			if (splits[i].equals(AppConst.KEY_WORD.FROM)) {
 				if (mPosition == -1) {
 					mPosition = i;
 				} else {
 					mPosition = Math.min(mPosition, i);
 				}
 				for(int j=i+1; j<position; j++) {
-					if (splits[j].equals("to")) {
+					if (splits[j].equals(AppConst.KEY_WORD.TO)) {
 						break;
 					} else {
 						startTime += splits[j];
@@ -303,14 +302,14 @@ public class CommandParser {
 		
 		String endTime = "";
 		for(int i=0; i<position; i++) {
-			if (splits[i].equals("to")) {
+			if (splits[i].equals(AppConst.KEY_WORD.TO)) {
 				if (mPosition == -1) {
 					mPosition = i;
 				} else {
 					mPosition = Math.min(mPosition, i);
 				}
 				for(int j=i+1; j<position; j++) {
-					if (splits[j].equals("repeat")) {
+					if (splits[j].equals(AppConst.KEY_WORD.REPEAT)) {
 						break;
 					} else {
 						endTime += splits[j];
@@ -340,7 +339,7 @@ public class CommandParser {
 		String[] splits = userCommand.toLowerCase().split(" ");
 		int position = -1;
 		for(int i=0; i<splits.length; i++) {
-			if (splits[i].equals("repeat")) {
+			if (splits[i].equals(AppConst.KEY_WORD.REPEAT)) {
 				position = i;
 				if (mPosition == -1) {
 					mPosition = i;
@@ -353,12 +352,12 @@ public class CommandParser {
 		if (position == -1 || position > splits.length-1) {
 			return null;
 		}
-		if (!splits[position+1].equals("from")) {
+		if (!splits[position+1].equals(AppConst.KEY_WORD.FROM)) {
 			return null;
 		}
 		String startDate = "";
 		for(int i=position+2; i<splits.length; i++) {
-			if (splits[i].equals("to")) {
+			if (splits[i].equals(AppConst.KEY_WORD.TO)) {
 				break;
 			}
 			if (i>position+2) {
@@ -387,16 +386,16 @@ public class CommandParser {
 		String[] splits = userCommand.toLowerCase().split(" ");
 		int position = 0;
 		for(int i=0; i<splits.length; i++) {
-			if (splits[i].equals("repeat")) {
+			if (splits[i].equals(AppConst.KEY_WORD.REPEAT)) {
 				position = i;
 				break;
 			}
 		}
 		String endDate = "";
 		for(int i=position+1; i<splits.length; i++) {
-			if (splits[i].equals("to")) {
+			if (splits[i].equals(AppConst.KEY_WORD.TO)) {
 				for(int j=i+1; j<splits.length; j++) {
-					if (splits[j].equals("priority") || splits[j].equals("group") || splits[j].equals("grp") || splits[j].equals("by") || splits[j].equals("before")) {
+					if (splits[j].equals(AppConst.KEY_WORD.PRIORITY) || splits[j].equals(AppConst.KEY_WORD.GROUP) || splits[j].equals(AppConst.KEY_WORD.GRP) || splits[j].equals(AppConst.KEY_WORD.BY) || splits[j].equals(AppConst.KEY_WORD.BEFORE)) {
 						break;
 					}
 					endDate += " " + splits[j];
@@ -417,7 +416,7 @@ public class CommandParser {
         String[] splits = userCommand.split(" ");
         String time = "";
         for(int i = splits.length - 1; i >= 0; i--) {
-            if (splits[i].equals("by") || splits[i].equals("before")) {
+            if (splits[i].equals(AppConst.KEY_WORD.BY) || splits[i].equals(AppConst.KEY_WORD.BEFORE)) {
                 String result = "";
                 if (mPosition == -1) {
    					mPosition = i;
@@ -428,7 +427,7 @@ public class CommandParser {
    					continue;
    				}
                 for(int j = i+1; j < splits.length; j++) {
-                    if (splits[j].equals("grp") || splits[j].equals("group") || splits[j].equals("priority") || splits[j].equals("from") || splits[j].equals("to")) {
+                    if (splits[j].equals(AppConst.KEY_WORD.GRP) || splits[j].equals(AppConst.KEY_WORD.GROUP) || splits[j].equals(AppConst.KEY_WORD.PRIORITY) || splits[j].equals(AppConst.KEY_WORD.FROM) || splits[j].equals(AppConst.KEY_WORD.TO)) {
                         break;
                     } else {
                         if (j != i+1) {
@@ -450,7 +449,7 @@ public class CommandParser {
     private String getPriorityForTask(String userCommand) {
         String[] splits = userCommand.split(" ");
         for(int i=splits.length - 1; i >= 0; i--) {
-            if (splits[i].equals("priority")) {
+            if (splits[i].equals(AppConst.KEY_WORD.PRIORITY)) {
             	if (mPosition == -1) {
                     mPosition = i;
                 } else {
@@ -459,10 +458,10 @@ public class CommandParser {
                 if (i == splits.length-1) { 
    					continue;
    				}
-                if (splits[i+1].equals("high") || splits[i+1].equals("low") || splits[i+1].equals("medium")) {
+                if (splits[i+1].equals(AppConst.TASK_FIELD.HIGH) || splits[i+1].equals(AppConst.TASK_FIELD.LOW) || splits[i+1].equals(AppConst.TASK_FIELD.MEDIUM)) {
                     System.out.println(splits[i+1]);
                     return splits[i+1];
-                } else if (!splits[i+1].equals("to") && !splits[i+1].equals("from") && !splits[i+1].equals("group") && !splits[i+1].equals("grp") && !splits[i+1].equals("by") && !splits[i+1].equals("before")) {
+                } else if (!splits[i+1].equals(AppConst.KEY_WORD.TO) && !splits[i+1].equals(AppConst.KEY_WORD.FROM) && !splits[i+1].equals(AppConst.KEY_WORD.GROUP) && !splits[i+1].equals(AppConst.KEY_WORD.GRP) && !splits[i+1].equals(AppConst.KEY_WORD.BY) && !splits[i+1].equals(AppConst.KEY_WORD.BEFORE)) {
                 	return null;
                 }
             }
@@ -474,7 +473,7 @@ public class CommandParser {
     	String[] splits = userCommand.split(" ");
     	String result = "";
     	for(int i=0; i<splits.length; i++) {
-    		if (splits[i].equals("from")) {
+    		if (splits[i].equals(AppConst.KEY_WORD.FROM)) {
    				if (mPosition == -1) {
    					mPosition = i;
    				} else {
@@ -484,7 +483,7 @@ public class CommandParser {
    					break;
    				}
    				for(int j=i+1; j<splits.length; j++) {
-   					if (splits[j].equals("to") || splits[j].equals("priority") || splits[j].equals("group") || splits[j].equals("grp") || splits[j].equals("by") || splits[j].equals("before")) {
+   					if (splits[j].equals(AppConst.KEY_WORD.TO) || splits[j].equals(AppConst.KEY_WORD.PRIORITY) || splits[j].equals(AppConst.KEY_WORD.GROUP) || splits[j].equals(AppConst.KEY_WORD.GRP) || splits[j].equals(AppConst.KEY_WORD.BY) || splits[j].equals(AppConst.KEY_WORD.BEFORE)) {
    						break;
    					} else {
    						if (j>i+1) {
@@ -512,7 +511,7 @@ public class CommandParser {
    		String[] splits = userCommand.split(" ");
    		String time = "";
    		for(int i=splits.length-1; i>=0; i--) {
-   			if (splits[i].equals("to")) {
+   			if (splits[i].equals(AppConst.KEY_WORD.TO)) {
    				if (mPosition == -1) {
    					mPosition = i;
    				} else {
@@ -522,7 +521,7 @@ public class CommandParser {
    					continue;
    				}
    				for(int j=i+1; j<splits.length; j++) {
-   					if (splits[j].equals("priority") || splits[j].equals("group") || splits[j].equals("grp") || splits[j].equals("by") || splits[j].equals("before") || splits[j].equals("from")) {
+   					if (splits[j].equals(AppConst.KEY_WORD.PRIORITY) || splits[j].equals(AppConst.KEY_WORD.GROUP) || splits[j].equals(AppConst.KEY_WORD.GRP) || splits[j].equals(AppConst.KEY_WORD.BY) || splits[j].equals(AppConst.KEY_WORD.BEFORE) || splits[j].equals(AppConst.KEY_WORD.FROM)) {
    						break;
    					} else {
    						if (j>i+1) {
@@ -543,7 +542,7 @@ public class CommandParser {
     private String getGroupForTask(String userCommand) {
         String[] splits = userCommand.split(" ");
         for(int i=splits.length - 1; i >= 0; i--) {
-            if (splits[i].equals("grp") || splits[i].equals("group")) {
+            if (splits[i].equals(AppConst.KEY_WORD.GRP) || splits[i].equals(AppConst.KEY_WORD.GROUP)) {
                 if (mPosition == -1) {
    					mPosition = i;
    				} else {
@@ -554,7 +553,7 @@ public class CommandParser {
    				}
                 String result = "";
                 for(int j=i+1; j<splits.length; j++) {
-                	if (splits[j].equals("priority") || splits[j].equals("by") || splits[j].equals("before") || splits[j].equals("from") || splits[j].equals("to")) {
+                	if (splits[j].equals(AppConst.KEY_WORD.PRIORITY) || splits[j].equals(AppConst.KEY_WORD.BY) || splits[j].equals(AppConst.KEY_WORD.BEFORE) || splits[j].equals(AppConst.KEY_WORD.FROM) || splits[j].equals(AppConst.KEY_WORD.TO)) {
                 		break;
                 	}
                 	if (j > i + 1) {
@@ -621,10 +620,10 @@ public class CommandParser {
    	
    		String st = " " + userCommand + " ";
    		st = st.toLowerCase();
-   		if (st.contains(" from ") && !st.contains(" to ")) {
+   		if (st.contains(AppConst.KEY_WORD.FROM1) && !st.contains(AppConst.KEY_WORD.TO1)) {
    			return null;
    		}
-   		if (!st.contains(" from ") && st.contains(" to ")) {
+   		if (!st.contains(AppConst.KEY_WORD.FROM1) && st.contains(AppConst.KEY_WORD.TO1)) {
    			return null;
    		}
    		
@@ -632,10 +631,10 @@ public class CommandParser {
 		String result = "";
 		boolean isHasFrom = false;
 		for(int i=0; i<commands.length; i++) {
-			if (commands[i].equals("from")) {
+			if (commands[i].equals(AppConst.KEY_WORD.FROM)) {
 				for(int j=i+1; j<commands.length; j++) {
 				
-					if (commands[j].equals("to")) {
+					if (commands[j].equals(AppConst.KEY_WORD.TO)) {
 						break;	
 					}
 					result += " " + commands[j];
@@ -654,7 +653,6 @@ public class CommandParser {
 		}
 		
 		result = mDateTimeHelper.getDateMonthFromString(result, 1);
-		System.out.println("Timetable start date: " + result);
 		return result;
 	}
 	
@@ -662,10 +660,10 @@ public class CommandParser {
 	
 		String st = " " + userCommand + " ";
    		st = st.toLowerCase();
-   		if (st.contains(" from ") && !st.contains(" to ")) {
+   		if (st.contains(AppConst.KEY_WORD.FROM1) && !st.contains(AppConst.KEY_WORD.TO1)) {
    			return null;
    		}
-   		if (!st.contains(" from ") && st.contains(" to ")) {
+   		if (!st.contains(AppConst.KEY_WORD.FROM1) && st.contains(AppConst.KEY_WORD.TO1)) {
    			return null;
    		}
 	
@@ -673,7 +671,7 @@ public class CommandParser {
 		String result = "";
 		boolean isHasTo = false;
 		for(int i=0; i<commands.length; i++) {
-			if (commands[i].equals("to")) {
+			if (commands[i].equals(AppConst.KEY_WORD.TO)) {
 				for(int j=i+1; j<commands.length; j++) {
 					result += " " + commands[j];
 				}

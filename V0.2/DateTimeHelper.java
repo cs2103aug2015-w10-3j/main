@@ -27,6 +27,9 @@ public class DateTimeHelper {
 	private static final String DAY = "day";
 	private static final String DAYS = "days";
 	private static final String THIS = "this";
+	private static final String ZERO = "0";
+	private static final String DOUBLE_ZERO = "00";
+	private static final String SLASH = "/";
 	
 	private static int[] daysInMonth = new int[] {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 	
@@ -163,12 +166,12 @@ public class DateTimeHelper {
 			String dayString = String.valueOf(day);
 			String monthString = String.valueOf(month);
 			if (dayString.length() < 2) {
-				dayString = "0" + dayString;
+				dayString = ZERO + dayString;
 			}
 			if (monthString.length() < 2) {
-				monthString = "0" + monthString;
+				monthString = ZERO + monthString;
 			}
-			return dayString + "/" + monthString;
+			return dayString + SLASH + monthString;
 		}
 		return "";
 	}
@@ -178,14 +181,14 @@ public class DateTimeHelper {
 		int day = getDayFromStringDate(dateTime);
 		String dayString = String.valueOf(day);
 		if (dayString.length() < 2) {
-			dayString = "0" + dayString;
+			dayString = ZERO + dayString;
 		}
 		int month = getMonthFromStringDate(dateTime);
 		String monthString = String.valueOf(month);
 		if (monthString.length() < 2) {
-			monthString = "0" + monthString;
+			monthString = ZERO + monthString;
 		}
-		return dayString + "/" + monthString;
+		return dayString + SLASH + monthString;
 	}
 	
 	protected String getTomorrow() {
@@ -200,12 +203,12 @@ public class DateTimeHelper {
 			String dayString = String.valueOf(day);
 			String monthString = String.valueOf(month);
 			if (dayString.length() < 2) {
-				dayString = "0" + dayString;
+				dayString = ZERO + dayString;
 			}
 			if (monthString.length() < 2) {
-				monthString = "0" + monthString;
+				monthString = ZERO + monthString;
 			}
-			return dayString + "/" + monthString;
+			return dayString + SLASH + monthString;
 		}
 		return "";
 	}
@@ -310,7 +313,7 @@ public class DateTimeHelper {
 		
 		int leng = time.length();
 		if (leng<=2) {
-			return "00";
+			return DOUBLE_ZERO;
 		}
 		String minute = String.valueOf(time.charAt(leng-2)) + String.valueOf(time.charAt(leng-1));
 		if (!isNumber(minute)) {
@@ -322,7 +325,7 @@ public class DateTimeHelper {
 		}
 		minute = String.valueOf(x);
 		if (minute.length() < 2) {
-			minute = "0" + minute;
+			minute = ZERO + minute;
 		}
 		return minute;
 	}
@@ -343,7 +346,7 @@ public class DateTimeHelper {
 				time = String.valueOf(x);
 			}
 			if (time.length() < 2) {
-				time = "0" + time;
+				time = ZERO + time;
 			}
 			System.out.println(time);
 			return time;
@@ -370,7 +373,7 @@ public class DateTimeHelper {
 		
 		hour = String.valueOf(x);
 		if (hour.length() < 2) {
-			hour = "0" + hour;
+			hour = ZERO + hour;
 		}
 		System.out.println(hour);
 		
@@ -460,10 +463,10 @@ public class DateTimeHelper {
 				return time;
 			}
 			if (hour.length()<2) {
-				hour = "0" + hour;
+				hour = ZERO + hour;
 			}
 			if (minute.length()<2) {
-				minute = "0" + minute;
+				minute = ZERO + minute;
 			}
 			return hour + ":" + minute;
 		}
@@ -523,7 +526,7 @@ public class DateTimeHelper {
 		} else if (count == 1) {
 			String result = String.valueOf(res);
 			if (result.length()<2) {
-				result = "0" + result;
+				result = ZERO + result;
 			}
 			return result;
 		}	
@@ -554,7 +557,7 @@ public class DateTimeHelper {
 			return null;
 		}
 		if (month.length() < 2) {
-			month = "0" + month;
+			month = ZERO + month;
 		}
 		return month;
 	}
@@ -579,7 +582,7 @@ public class DateTimeHelper {
 			return null;
 		}
 		if (date.length() < 2) {
-			date = "0" + date;
+			date = ZERO + date;
 		}
 		return date;
 		
@@ -644,13 +647,13 @@ public class DateTimeHelper {
 		
 			String dayString = String.valueOf(day);
 			if (dayString.length() < 2) {
-				dayString = "0" + dayString;
+				dayString = ZERO + dayString;
 			}
 			String monthString = String.valueOf(month);
 			if (monthString.length() < 2) {
-				monthString = "0" + monthString;
+				monthString = ZERO + monthString;
 			}
-			return dayString + "/" + monthString;
+			return dayString + SLASH + monthString;
 		}
 		return null;
 	}
@@ -667,14 +670,14 @@ public class DateTimeHelper {
 		if (day > 0 && day < 32 && month > 0 && month < 13) {
 			String dayString = String.valueOf(day);
 			if (dayString.length() < 2) {
-				dayString = "0" + dayString;
+				dayString = ZERO + dayString;
 			}
 			String monthString = String.valueOf(month);
 			if (monthString.length() < 2) {
-				monthString = "0" + monthString;
+				monthString = ZERO + monthString;
 			
 			}
-			return day + "/" + month;
+			return day + SLASH + month;
 		}	
 		return null;
 	}
@@ -713,14 +716,14 @@ public class DateTimeHelper {
 		if (day > 0 && day < 32 && month > 0 && month < 13) {
 			String dayString = String.valueOf(day);
 			if (dayString.length() < 2) {
-				dayString = "0" + dayString;
+				dayString = ZERO + dayString;
 			}
 			String monthString = String.valueOf(month);
 			if (monthString.length() < 2) {
-				monthString = "0" + monthString;
+				monthString = ZERO + monthString;
 			
 			}
-			return dayString + "/" + monthString;
+			return dayString + SLASH + monthString;
 		}
 		
 		return null;
@@ -767,13 +770,13 @@ public class DateTimeHelper {
 				return null;
 			}
 			if (date.length() < 2) {
-				date = "0" + date;
+				date = ZERO + date;
 			}
 			
 			if (month.length() < 2) {
-				month = "0" + month;
+				month = ZERO + month;
 			}
-			result = date + "/" + month;
+			result = date + SLASH + month;
 			numberResult = 1;
 			
 		}
@@ -782,7 +785,7 @@ public class DateTimeHelper {
 		
 		for(int i=0; i<splits.length; i++) {
 			String st = splits[i];
-			if (st.contains("/") || st.contains("-")) {
+			if (st.contains(SLASH) || st.contains("-")) {
 				month = getMonth(st);
 				date = getDate(st);
 				if (month != null && date != null && !month.equals("") && !date.equals("")) {
@@ -799,13 +802,13 @@ public class DateTimeHelper {
 			numberResult = 1;
 			
 			if (date.length() < 2) {
-				date = "0" + date;
+				date = ZERO + date;
 			}
 			
 			if (month.length() < 2) {
-				month = "0" + month;
+				month = ZERO + month;
 			}
-			result = date + "/" + month;
+			result = date + SLASH + month;
 		}
 		
 		for(int i=0; i<splits.length; i++) {
@@ -1008,14 +1011,14 @@ public class DateTimeHelper {
 			
 			String dayString = String.valueOf(day_);
 			if (dayString.length() < 2) {
-				dayString = "0" + dayString;
+				dayString = ZERO + dayString;
 			}
 			String monthString = String.valueOf(month_);
 			if (monthString.length() < 2) {
-				monthString = "0" + monthString;
+				monthString = ZERO + monthString;
 			}
 			
-			return dayString + "/" + monthString;
+			return dayString + SLASH + monthString;
 		}
 		
 		return null;
@@ -1088,13 +1091,13 @@ public class DateTimeHelper {
 		}
 		String dayString = String.valueOf(day);
 		if (dayString.length() < 2) {
-			dayString = "0" + dayString;
+			dayString = ZERO + dayString;
 		}
 		String monthString = String.valueOf(month);
 		if (monthString.length() < 2) {
-			monthString = "0" + monthString;
+			monthString = ZERO + monthString;
 		}
-		return dayString + "/" + monthString;
+		return dayString + SLASH + monthString;
 	}
 	
 	// period has format: HH:mm HH:mm
@@ -1143,25 +1146,25 @@ public class DateTimeHelper {
 		}
 		String dayString = String.valueOf(day);
 		if (dayString.length()<2) {
-			dayString = "0" + dayString;
+			dayString = ZERO + dayString;
 		}
 		
 		String monthString = String.valueOf(month);
 		if (monthString.length()<2) {
-			monthString = "0" + monthString;
+			monthString = ZERO + monthString;
 		}
 		
 		String hourString = String.valueOf(time/60);
 		if (hourString.length()<2) {
-			hourString = "0" + hourString;
+			hourString = ZERO + hourString;
 		}
 		
 		String minuteString = String.valueOf(time % 60);
 		if (minuteString.length()<2) {
-			minuteString = "0" + minuteString;
+			minuteString = ZERO + minuteString;
 		}
 		
-		return dayString + "/" + monthString + " " + hourString + ":" + minuteString;
+		return dayString + SLASH + monthString + " " + hourString + ":" + minuteString;
 	}
 	
 	

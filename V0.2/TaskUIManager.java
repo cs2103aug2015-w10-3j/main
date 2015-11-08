@@ -36,18 +36,16 @@ public class TaskUIManager {
     private static int MAX_NUMBER_ROWS = 16;
     private static String EVERYDAY = "Everyday";
     private static String EVERY = "Every ";
+    
     private static String NOTIFICATION = "Notification!";
-	private static DateTimeHelper mDateTimeHelper = new DateTimeHelper();
-	private static CommandParser mCommandParser = new CommandParser();
-	
-    static JButton enterButton;
-    public static JTextArea output;
-    public static JTextField input;
-    static JFrame frame;
-    static JPanel panel;
-    static JTable table;
-    static Toolkit toolkit;
-    static Timer timer;
+    private static String OK_BUTTON = "OK";
+    
+    // String to display for priority
+    private static final String HIGH = "High";
+    private static final String MEDIUM = "Medium";
+    private static final String LOW = "Low";
+    
+    private static final String TIME_ZERO = " 00:00";
     
     // column to display in table
     static String[] columnNames = new String[] {"#", "Task Name",
@@ -72,7 +70,8 @@ public class TaskUIManager {
     														"16-17", 
     														"17-18", 
     														"18-19", 
-    														"19-20"};
+    														"19-20"
+    														};
     static int[] columnWidth = new int[] {	40,
     										0,
     										130,
@@ -82,8 +81,20 @@ public class TaskUIManager {
     										80,
     										130,
     										80
-    	
-    };
+    										};
+    
+	private static DateTimeHelper mDateTimeHelper = new DateTimeHelper();
+	private static CommandParser mCommandParser = new CommandParser();
+	
+    static JButton enterButton;
+    public static JTextArea output;
+    public static JTextField input;
+    static JFrame frame;
+    static JPanel panel;
+    static JTable table;
+    static Toolkit toolkit;
+    static Timer timer;								
+    										
     static ArrayList<Task> dataTaskList = new ArrayList<Task>();
 	static int windowHeight = 5;
 	static int windowWidth = 95;
@@ -91,9 +102,10 @@ public class TaskUIManager {
     static int userCommandCount = 0;
     static int userScrollCount = 0;
     static int mTableRowCount = 0;
+    
     // check deadline task for every 1 second
-    static int timeRemind = 1;
-    static int timeDismiss = 4;
+    static int timeRemind = 1 * 1000;
+    static int timeDismiss = 30 * 1000;
 
 	public TaskUIManager() {
 
@@ -123,7 +135,7 @@ public class TaskUIManager {
         
         toolkit = Toolkit.getDefaultToolkit();
 	    timer = new Timer();
-		timer.scheduleAtFixedRate(new RemindTask(), 0, timeRemind * 1000);
+		timer.scheduleAtFixedRate(new RemindTask(), 0, timeRemind);
         
 	}
 	
@@ -152,12 +164,12 @@ public class TaskUIManager {
 													JOptionPane.INFORMATION_MESSAGE, 
 													JOptionPane.DEFAULT_OPTION, 
 													null, 
-													new Object[]{"OK"}); 
+													new Object[]{OK_BUTTON}); 
 		  		final JDialog dlg = opt.createDialog(NOTIFICATION);
 		  		new Thread(new Runnable() {
 					public void run() {
 				    try {
-				      Thread.sleep(timeDismiss * 1000);
+				      Thread.sleep(timeDismiss);
 				      dlg.dispose();
 
 				    }
@@ -280,18 +292,17 @@ public class TaskUIManager {
 				comp.setBackground(Color.white);
 				
 				Object checkValue = getModel().getValueAt(row, 6);
-				if (checkValue.equals("High") || checkValue.equals("Medium") || checkValue.equals("Low")) {
+				if (checkValue.equals(HIGH) || checkValue.equals(MEDIUM) || checkValue.equals(LOW)) {
 					if (col == 6) {
-						if (value.equals("High")) {
+						if (value.equals(HIGH)) {
 							comp.setBackground(Color.red);
-						} else if (value.equals("Medium")) {
+						} else if (value.equals(MEDIUM)) {
 							comp.setBackground(Color.yellow);
-						} else if (value.equals("Low")) {
+						} else if (value.equals(LOW)) {
 							comp.setBackground(Color.green);
 						}
 					}
 				} else {
-				
 					String st = (String)value;
 					if (st.endsWith(AppConst.TASK_FIELD.HIGH)) {
 						comp.setBackground(Color.red);
@@ -484,13 +495,15 @@ public class TaskUIManager {
 		 
 		for(int i = from; i <= to; i++) {   	
 			String date = mDateTimeHelper.getDateForNumberOfDays(i);
-			date += " 00:00";
+			
+			// TIME_ZERO = 00:00
+			date += TIME_ZERO;
 			int[] timetable = mDateTimeHelper.getTimetableForDate(date, dataTaskList);
 			String[] data = new String[13];
 			data[0] = mDateTimeHelper.convertDateMonthToDisplayFormat(date) + " (" + mDateTimeHelper.getStringDayInWeekForDate(date) + ")";
 			for(int j=1; j<=12; j++) {
 				if (timetable[j-1] != -1) {
-					data[j] = dataTaskList.get(timetable[j-1]).getName() + "           " + AppConst.TASK_FIELD.PRIORITY + dataTaskList.get(timetable[j-1]).getPriority();
+					data[j] = dataTaskList.get(timetable[j-1]).getName() + "                      " + AppConst.TASK_FIELD.PRIORITY + dataTaskList.get(timetable[j-1]).getPriority();
 				} else {
 					data[j] = "";
 				}
