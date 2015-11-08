@@ -178,7 +178,7 @@ This section describes the different ways in which you can view your tasks, eith
 | delete  | <ul><li>**delete** \<task_name> or **delete** id <id_number></li><li>**deleteby** \<field> \<value_of_field></li><li>**deleteall**</li></ul>			                                             |
 | update            | **update** \<task_name> TO \<keyword> \<new_value>                                                     |
 | show               | <ul><li>**showday** \<date></li><li>**showpriority** \<high/medium/low></li><li>**showgroup** \<groupname></li><li>**showby** \<column_field></li><li>**showall**</li></ul>                            |
-| timetable	|
+| timetable	| **timetable** to show this week or **timetable from** \<startdate> **to** \<enddate> |
 | setfile           | **setfile** \<file_path>                                                   |
 | help               | Display the helpsheet                       |
 | exit               | Exit Todoer                                                                        |
