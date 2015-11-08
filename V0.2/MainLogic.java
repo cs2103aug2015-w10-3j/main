@@ -624,7 +624,7 @@ public class MainLogic {
 				}
 			}
 			
-			if (isCheckOverlap(updatedInfo, position)) {
+			if (isCheckOverlap(updatedInfo, findTasksMatched(mPreviousTasks.get(position), mAllTasks, pointer))) {
 				return AppConst.MESSAGE.OVERLAP_TIME_PERIOD;
 			}
 			
@@ -1126,10 +1126,12 @@ public class MainLogic {
 			isRepeated = true;
 		}
 		
+		int parentTaskId = mAllTasks.get(position).getParentTaskId();
+		
 		if (newTask.getRepeatedType() != AppConst.REPEATED_TYPE.EVERY_WEEK) {
 				
 			for(int i=0; i<mAllTasks.size(); i++) {
-				if (i != position) {
+				if (mAllTasks.get(i).getParentTaskId() != parentTaskId) {
 					Task task = mAllTasks.get(i);
 					if (!task.getStartDate().equals("") && !task.getEndDate().equals("") && task.getRepeatedType()==AppConst.REPEATED_TYPE.NONE) {
 						if (mDateTimeHelper.isTwoEventOverlap(newTask.getStartDate(), newTask.getEndDate(), isRepeated, newTask.getPeriod(), task.getStartDate(), task.getEndDate(), false, "")) {
@@ -1149,7 +1151,7 @@ public class MainLogic {
 		
 		if (newTask.getRepeatedType() == AppConst.REPEATED_TYPE.EVERY_WEEK) {
 			for(int i=0; i<mAllTasks.size(); i++) {
-				if (i != position) {
+				if (mAllTasks.get(i).getParentTaskId() != parentTaskId) {
 					Task task = mAllTasks.get(i);
 					if (!task.getStartDate().equals("") && !task.getEndDate().equals("") && task.getRepeatedType()==AppConst.REPEATED_TYPE.NONE) {
 						if (mDateTimeHelper.isEventOverlapWithRepeating(task.getStartDate(), task.getEndDate(), false, task.getPeriod(), newTask.getStartDate(), newTask.getPeriod())) {
