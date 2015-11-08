@@ -381,11 +381,11 @@ public class MainLogic {
 		feedbackTasks.setPointer(mPreviousTasks);
 		Task taskToDelete = mCommand.getNewTask();
 		String[] commands = mCommand.getCommandArgument().split(" ");
-		if (commands.length == 2 && commands[0].equals(AppConst.TASK_FIELD.ID)) {
-			taskToDelete = getTaskWithId(commands[1]);
+		if (commands[0].equals(AppConst.TASK_FIELD.ID)) {
+			return executeDeleteById(mCommand, feedbackTasks);
 		}
 		if (taskToDelete == null) {
-			return "";
+			return AppConst.MESSAGE.INVALID_ID;
 		}
 		if (taskToDelete.getDeadline() == null || taskToDelete.getStartDate() == null || taskToDelete.getEndDate() == null) {
 			return AppConst.MESSAGE.INVALID_DATE_TIME_FORMAT;
@@ -413,6 +413,34 @@ public class MainLogic {
 		}
 		feedbackTasks.setPointer(possibleTasks);
 		return AppConst.MESSAGE.MANY_TASKS_MATCHED;
+	}
+	
+	protected String executeDeleteById(Command mCommand, ArrayListPointer feedbackTasks) {
+		String command = mCommand.getCommandArgument();
+		command = command.substring(3, command.length());
+		ArrayList<Integer> list = mCommandParser.getListOfId(command);
+		if (list == null) {
+			return AppConst.MESSAGE.INVALID_ID;
+		}
+		for(int i=0; i<list.size(); i++) {
+			int x = list.get(i);
+			if (x<1 || x>mPreviousTasks.size()) {
+				return AppConst.MESSAGE.INVALID_ID;
+			}
+		}
+		ArrayListPointer pointer = new ArrayListPointer();
+		for(int i=0; i<list.size(); i++) {
+			int	x = list.get(i);
+			Task task = mPreviousTasks.get(x-1);
+			int position = findTasksMatched(task, mAllTasks, pointer);
+			if (pointer.getPointer().size() == 1) {
+				deleteTasks(position);
+			}
+		}
+		updateHistory();
+		mDataStorage.rewriteContent(mAllTasks);
+		feedbackTasks.setPointer(getTasksToDisplay(mAllTasks, -1));
+		return AppConst.MESSAGE.REMOVE_TASKS_SUCCESSFUL;
 	}
 	
 	protected String executeDeleteAll(Command mCommand, ArrayListPointer feedbackTasks) {
@@ -874,9 +902,8 @@ public class MainLogic {
 		Task taskToClose = mCommand.getNewTask();
 
 		String[] commands = mCommand.getCommandArgument().split(" ");
-		if (commands.length == 2 && commands[0].equals(AppConst.TASK_FIELD.ID)) {
-			taskToClose = getTaskWithId(commands[1]);
-			if (taskToClose==null) return AppConst.MESSAGE.INVALID_ID;
+		if (commands[0].equals(AppConst.TASK_FIELD.ID)) {
+			return executeDoneById(mCommand, feedbackTasks);
 		}
 
 		if (taskToClose == null) {
@@ -912,14 +939,41 @@ public class MainLogic {
 		return AppConst.MESSAGE.MANY_TASKS_MATCHED;
 	}
 	
+	protected String executeDoneById(Command mCommand, ArrayListPointer feedbackTasks) {
+		String command = mCommand.getCommandArgument();
+		command = command.substring(3, command.length());
+		ArrayList<Integer> list = mCommandParser.getListOfId(command);
+		if (list == null) {
+			return AppConst.MESSAGE.INVALID_ID;
+		}
+		for(int i=0; i<list.size(); i++) {
+			int x = list.get(i);
+			if (x<1 || x>mPreviousTasks.size()) {
+				return AppConst.MESSAGE.INVALID_ID;
+			}
+		}
+		ArrayListPointer pointer = new ArrayListPointer();
+		for(int i=0; i<list.size(); i++) {
+			int	x = list.get(i);
+			Task task = mPreviousTasks.get(x-1);
+			int position = findTasksMatched(task, mAllTasks, pointer);
+			if (pointer.getPointer().size() == 1) {
+				markDone(position);
+			}
+		}
+		updateHistory();
+		mDataStorage.rewriteContent(mAllTasks);
+		feedbackTasks.setPointer(getTasksToDisplay(mAllTasks, -1));
+		return AppConst.MESSAGE.TASKS_DONE;
+	}
+	
 	protected String executeUndone(Command mCommand, ArrayListPointer feedbackTasks) {
 		feedbackTasks.setPointer(mPreviousTasks);
 		Task taskToOpen = mCommand.getNewTask();
 
 		String[] commands = mCommand.getCommandArgument().split(" ");
-		if (commands.length == 2 && commands[0].equals(AppConst.TASK_FIELD.ID)) {
-			taskToOpen = getTaskWithId(commands[1]);
-			if (taskToOpen==null) return AppConst.MESSAGE.INVALID_ID;
+		if (commands[0].equals(AppConst.TASK_FIELD.ID)) {
+			return executeUndoneById(mCommand, feedbackTasks);	
 		}
 
 		if (taskToOpen == null) {
@@ -951,6 +1005,34 @@ public class MainLogic {
 		}
 		feedbackTasks.setPointer(possibleTasks);
 		return AppConst.MESSAGE.MANY_TASKS_MATCHED;
+	}
+	
+	protected String executeUndoneById(Command mCommand, ArrayListPointer feedbackTasks) {
+		String command = mCommand.getCommandArgument();
+		command = command.substring(3, command.length());
+		ArrayList<Integer> list = mCommandParser.getListOfId(command);
+		if (list == null) {
+			return AppConst.MESSAGE.INVALID_ID;
+		}
+		for(int i=0; i<list.size(); i++) {
+			int x = list.get(i);
+			if (x<1 || x>mPreviousTasks.size()) {
+				return AppConst.MESSAGE.INVALID_ID;
+			}
+		}
+		ArrayListPointer pointer = new ArrayListPointer();
+		for(int i=0; i<list.size(); i++) {
+			int	x = list.get(i);
+			Task task = mPreviousTasks.get(x-1);
+			int position = findTasksMatched(task, mAllTasks, pointer);
+			if (pointer.getPointer().size() == 1) {
+				markUndone(position);
+			}
+		}
+		updateHistory();
+		mDataStorage.rewriteContent(mAllTasks);
+		feedbackTasks.setPointer(getTasksToDisplay(mAllTasks, -1));
+		return AppConst.MESSAGE.TASKS_UNDONE;
 	}
 	
 	protected String executeTimetable(Command mCommand, ArrayListPointer feedbackTasks) {
@@ -1126,7 +1208,10 @@ public class MainLogic {
 			isRepeated = true;
 		}
 		
-		int parentTaskId = mAllTasks.get(position).getParentTaskId();
+		int parentTaskId = -1;
+		if (position != -1) {
+			parentTaskId = mAllTasks.get(position).getParentTaskId();
+		}
 		
 		if (newTask.getRepeatedType() != AppConst.REPEATED_TYPE.EVERY_WEEK) {
 				

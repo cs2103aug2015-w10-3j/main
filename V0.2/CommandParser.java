@@ -42,7 +42,14 @@ public class CommandParser {
 					if (commands.length < 3) {
 						command.setNewTask(null);
 					} else {
-						command.setCommandArgument(commands[1] + " " + commands[2]);
+						String st = "";
+						for(int i=1; i<commands.length; i++) {
+							if (i>1) {
+								st += " ";
+							}
+							st += commands[i];
+						}
+						command.setCommandArgument(st);
 					}
 				} else {
 					command.setNewTask(getTaskFromString(commandType, userCommand));

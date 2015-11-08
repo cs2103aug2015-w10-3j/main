@@ -163,6 +163,7 @@ public interface AppConst {
 		String DELETED_FIELD = "Removed all tasks with %s '%s' successfully!\n";
 		String DELETED_NO_TASK = "No more tasks with %s '%s' to delete!\n";
 		String NO_TASK_TO_DELETE = "No more tasks to delete!\n";
+		String REMOVE_TASKS_SUCCESSFUL = "Tasks are removed successfully!\n";
 		
 		// Update
 		String UPDATED_SUCCESSFUL = "Updated successfully!\n";
@@ -185,11 +186,13 @@ public interface AppConst {
 		String NOTHING_MATCHED = "Nothing matched! Use 'showall' to show all your tasks!\n";
 		String SHOWING_RESULT = "Showing results for '%s'";
 		
-		// Mark done/undone, use open and close commands
+		// Mark done/undone
 		String MARKED_DONE_SUCCESSFUL = "Task is marked 'done' successfully!\n";
 		String MARKED_UNDONE_SUCCESSFUL = "Task is marked 'undone' successfully. You can update the new deadline for this task by using 'update' command!\n";
 		String TASK_CLOSED = "Task is already closed!\n";
 		String TASK_OPENED = "Task is already opened!\n";
+		String TASKS_DONE = "Tasks are marked done successfully!\n";
+		String TASKS_UNDONE = "Tasks are marked undone successfully!\n";
 		
 		String TASK_NOT_FOUND = "Error: '%s' not found!\n";
 		String SYNTAX_ERROR = "Syntax error: command(%s) not found.\n";	
