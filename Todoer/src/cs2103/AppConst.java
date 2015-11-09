@@ -342,7 +342,7 @@ public interface AppConst {
 	    
 	    static int DEFAULT_WINDOW_HEIGHT = 5;
 		static int DEFAULT_WINDOW_WIDTH = 95;
-		static double DEFAULT_RATIO = 0.08;
+		static double DEFAULT_RATIO = 0.06;
 		static int MAX_NUMBER_ROWS = 16;
 		static int MAX_NUMBER_TASKS_SEARCH_RESULT = 10;
 		static int DEFAULT_COLUMN_WIDTH = 150;
@@ -401,7 +401,7 @@ public interface AppConst {
 				{	"add <task_name> ",
 					"done <task_name>",
 					"delete <task_name>",
-					"update <task_name> TO <keyword> <new_value>",
+					"update <task1> TO <task2>",
 					"showday <date>",
 				},
 				{
