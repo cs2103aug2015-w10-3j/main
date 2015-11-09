@@ -32,7 +32,6 @@ public class MainLogic {
 		mSettingsStorage = new Storage();
 		mSettingsStorage.setFileURL(AppConst.SETTINGS_FILE);
 		mSettings = mSettingsStorage.readSettings();
-		// mSettings.setDataFileUrl("test.txt");
 		mDataStorage = new Storage();
 		mDataStorage.setFileURL(mSettings.getDataFileUrl());
 		
@@ -107,10 +106,6 @@ public class MainLogic {
 		String startDate = newTask.getStartDate();
 		String endDate = newTask.getEndDate();
 		String currentTime = mDateTimeHelper.getCurrentTimeString();
-		
-		//if (!startDate.equals("") && mDateTimeHelper.compareStringDates(currentTime, startDate)>0) {
-		//	return String.format(AppConst.MESSAGE.INVALID_START_DATE, currentTime);		
-		//}
 			
 		if (newTask.getRepeatedType() == AppConst.REPEATED_TYPE.NONE || newTask.getRepeatedType() == AppConst.REPEATED_TYPE.FROM_TO) { 
 		
@@ -307,13 +302,13 @@ public class MainLogic {
 	
 	protected String executeDeleteAll(Command mCommand, ArrayListPointer feedbackTasks) {
 		if (mAllTasks.size() == 0) {
-			feedbackTasks.setPointer(mAllTasks);
+			feedbackTasks.setPointer(getTasksToDisplay(mAllTasks, -1));
 			return AppConst.MESSAGE.NO_TASK_TO_DELETE;
 		}
 		mAllTasks = new ArrayList<Task>();
 		updateHistory();
 		mDataStorage.rewriteContent(mAllTasks);
-		feedbackTasks.setPointer(mAllTasks);
+		feedbackTasks.setPointer(getTasksToDisplay(mAllTasks, -1));
 		return AppConst.MESSAGE.DELETED_ALL;
 	}
 	
@@ -810,7 +805,7 @@ public class MainLogic {
 				markDone(position);
 				updateHistory();
 				mDataStorage.rewriteContent(getTasksToDisplay(mAllTasks, -1));
-				feedbackTasks.setPointer(mAllTasks);
+				feedbackTasks.setPointer(getTasksToDisplay(mAllTasks, -1));
 				return AppConst.MESSAGE.MARKED_DONE_SUCCESSFUL;
 			}
 				
@@ -1005,7 +1000,7 @@ public class MainLogic {
 		}
 		updateHistory();
 		mDataStorage.rewriteContent(mAllTasks);
-		feedbackTasks.setPointer(mAllTasks);
+		feedbackTasks.setPointer(getTasksToDisplay(mAllTasks, -1));
 		return message;
 	}
 	
