@@ -107,7 +107,8 @@ To learn more details of Todoer features, refer to the 'Feature Details' section
 ## Marking a task done
 1. Type `done <task_name>` into the command bar to mark \<task_name> as a completed task.
 2. Alternatively, type `done id <id_number>` to mark the task with id \<id_number> done.
-3. If you wish to permanently delete a task from your records, see the `delete` section below.
+3. You may mark a range of tasks complete by typing `done id <start_range>-<end_range>`
+4. If you wish to permanently delete a task from your records, see the `delete` section below.
 
 ## Deleting tasks
 ###### Deleting a specific task
@@ -118,6 +119,10 @@ To learn more details of Todoer features, refer to the 'Feature Details' section
 1. Type `deleteby <field> <value_of_field>`. Replace \<field> by one of the column names in the main panel.
 
 > Example: `deleteby group CS2103`, `deleteby status done`
+
+2. Type `delete id <start_range>-<end_range>` to delete all tasks in the given id range.
+
+> Example: `delete id 3-5`
 
 ###### Deleting all tasks
 1. Type `deleteall` into the command bar. 
@@ -178,9 +183,9 @@ This section describes the different ways in which you can view your tasks, eith
 
 | Command            | Usage                                                                                      |
 |--------------------|--------------------------------------------------------------------------------------------------|
-| add     | **add** \<task_name>. May append optional parameters: <ul><li>**by** \<deadline></li><li>**group** \<group_name></li><li>**priority** \<high/medium/low></li><li>**group** \<group_name></li><li>**from** \<start_datetime> **to** \<end_datetime></li><li>**repeat** \<period></li></ul> |
-| done         | **done** \<task_name> or **done id** \<id_number> |
-| delete  | <ul><li>**delete** \<task_name> or **delete** id <id_number></li><li>**deleteby** \<field> \<value_of_field></li><li>**deleteall**</li></ul>			                                             |
+| add     | **add** \<task_name>. May append optional parameters: <ul><li>**by** \<deadline></li><li>**group** \<group_name></li><li>**priority** \<high/medium/low></li><li>**from** \<start_datetime> **to** \<end_datetime></li><li>**repeat** \<period></li></ul> |
+| done         | **done** \<task_name> or **done id** \<id_number> or **done id** \<start_range>-\<end_range> |
+| delete  | <ul><li>**delete** \<task_name> or **delete id** <id_number></li><li>**delete id** \<start_range>-\<end_range></li><li>**deleteby** \<field> \<value_of_field></li><li>**deleteall**</li></ul>			                                             |
 | update            | **update** \<task_name> TO \<keyword> \<new_value>                                                     |
 | show               | <ul><li>**showday** \<date></li><li>**showpriority** \<high/medium/low></li><li>**showgroup** \<groupname></li><li>**showby** \<column_field></li><li>**showall**</li></ul>                            |
 | timetable	| <ul><li>**timetable** to show this week</li><li>**timetable from** \<startdate> **to** \<enddate></li><li>**timetable next** \<period></li></ul> |
