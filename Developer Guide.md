@@ -13,7 +13,7 @@ This guide describes the design and implementation of Todoer. It will help you u
 - [Logic Component](#logiccomponent)
   - [MainLogic Class](#mainlogic-class)
   - [Task Class](#task-class)
-  - [History Class](#history-class]
+  - [History Class](#history-class)
 - [Parser Component](#commandparsercomponent)
 - [Storage Component](#storagecomponent)
   - [JSONConverter Class](#jsonconverter-class)
@@ -168,7 +168,7 @@ The Parser component consists of a `CommandParser` class which receives the raw 
 The `Storage` component consists of a `Storage` class that manages the reading and writing of data between the program and the file system. Since we are storing tasks as JSON strings in the data files, there is also a `JSONConverter` class that encodes and decodes between JSON strings and `Task` objects.
 
 ## `Storage` class
-This class has public methods for the `MainLogic` to call to read and write the content of the tasks to the data files. The data files consist of a cache (default to be cache.txt) that stores the users’ tasks to disk as well as a configuration file (config.txt) that remembers the user’s settings for Todoer. The `Storage` class also has a private internal arrayList entryList that mirrors the content in the cache file.
+This class has public methods for the `MainLogic` to call to read and write the content of the tasks to the data files. The data files consist of a cache (default to be data.txt) that stores the users’ tasks to disk. The `Storage` class also has a private internal arrayList entryList that mirrors the content in the cache file.
 
 ###### Notable API
 
