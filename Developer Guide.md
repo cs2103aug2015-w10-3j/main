@@ -83,7 +83,7 @@ This class defines the looks and feels of the `Text field` (or command bar) and 
 ![add image](doc/images/V0.5/logicDiagram.png)
 > Figure 3: Structure of the Logic Component
 
-At the heart of the Logic component is the `MainLogic` class that is responsible for executing the user’s commands. A `Task` class is also used to represent the tasks to be done. A `History` class stores a record of the data state in `DataState` objects after each user action modification. There are also several helper classes: `DateTimeHelper`, `Settings`, and `Comparators`.
+At the heart of the Logic component is the `MainLogic` class that is responsible for executing the user’s commands. A `Task` class is also used to represent the tasks to be done. A `History` class stores a record of the data state in `DataState` objects after each user action modification. There are also several helper classes: `DateTimeHelper`, `Settings`, and `Comparators`; the helper classes will not be discussed in this developer guide, you may find the API in Appendix A.
 
 ## `MainLogic` Class 
 
@@ -156,7 +156,7 @@ The diagram (see Figure 3) below demonstrates how the major components of the so
 
 | Return type   | Method and Description                                            |
 |-------------|----------------------------------------------------------|
-| void | updateHistory(): update history after user modifications to task data |
+| void | updateHistory(ArrayList<Task>): update history after user modifications to task data |
 | ArrayList<Task> | undo(): returns the list of tasks before last user modification |
 | ArrayList<Task> | redo(): returns the list of tasks after the next user modification |
 
