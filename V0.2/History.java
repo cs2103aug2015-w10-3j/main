@@ -15,27 +15,46 @@ public class History{
 	 * 
 	 * */
 	public void updateHistory(ArrayList<Task> allTasks){
-		if (currentState < mHistory.size()-1){
+		System.out.println("--------------------");
+		System.out.println("update history, currentState = " +currentState );
+		System.out.println("current size:" + mHistory.size() );
 
-			while (mHistory.size()>currentState+1)
-				mHistory.remove(mHistory.size()-1);
-		}
-		mHistory.add(new DataState(allTasks));
+		ArrayList<DataState> mH = new ArrayList<DataState>();
+		for (int i=0;i<=currentState;i++) mH.add(mHistory.get(i));
+
+		mH.add(new DataState(allTasks));
+		mHistory = mH;
 		currentState++;
+
+		System.out.println("after update, current state=" + currentState);
+		System.out.println("current size:" + mHistory.size() );
+
+		System.out.println("currentState="+ currentState);
+
 	}
 
 	public ArrayList<Task> undo(){
+		System.out.println("--------------------");
+		System.out.println("undo");
+		
 		if (currentState>0) {
 			currentState--;
-			return mHistory.get(currentState).getAllTasks();
+			System.out.println("currentState="+ currentState);
+			DataState duplicate = new DataState(mHistory.get(currentState).getAllTasks());
+
+			return duplicate.getAllTasks();
 		}
 
 		return null;
 	}
 
 	public ArrayList<Task> redo(){
+		System.out.println("--------------------");
+		System.out.println("redo");
+
 		if (currentState < mHistory.size()-1){
 			currentState++;
+			System.out.println("currentState="+ currentState);
 			return mHistory.get(currentState).getAllTasks();
 		}
 		return null;
