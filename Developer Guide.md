@@ -9,10 +9,11 @@ This guide describes the design and implementation of Todoer. It will help you u
 - [Architecture](#architecture)
 - [UI Component](#uicomponent)
   - [MainApp Class](#mainapp-class)
-  - [UIController Class](#uicontroller-class)
+  - [TableHelper Class](#tablehelper-class)
 - [Logic Component](#logiccomponent)
   - [MainLogic Class](#mainlogic-class)
   - [Task Class](#task-class)
+  - [History Class](#history-class]
 - [Parser Component](#commandparsercomponent)
 - [Storage Component](#storagecomponent)
   - [JSONConverter Class](#jsonconverter-class)
@@ -48,7 +49,7 @@ Todoer's UI consists of two packages: `control` and `view`. The `control` packag
 UI maintains a reference to Logic, calling Logic’s methods directly to trigger processing of user-entered commands.
 
 ## `MainApp` Class
-This is the starting point and main driver of the whole program. It initialises an instance of the `MainLogic` class in `Logic` to be used throughout the lifetime of the program. `MainApp` can passes the value of the user input to the `MainLogic` class to get back a feedback string. The `MainApp` then decides what to be displayed on the UI through calling methods of the `TableHelper` class.
+This is the starting point and main driver of the whole program. It initialises an instance of the `MainLogic` class in `Logic` to be used throughout the lifetime of the program. `MainApp` can passes the value of the user input to the `MainLogic` class to get back a feedback string. The `MainApp` then generates what is to be displayed on the UI through calling methods of the `TableHelper` class.
 
 ## `TableHelper` Class
 
@@ -108,7 +109,7 @@ String command = "", taskInfo = "";
 ```
 The code snippets above show how the list of all tasks is represented as an ArrayList of Task object in the `MainLogic`. When processing a command, `MainLogic` will add/delete/update these `Task` objects accordingly and rewrite the data to the files when necessary.
 
-The diagram (see Figure 3) below demonstrates how the major components of the software interact in a typical cycle of command execution. The raw user command “delete task1” in this example would first be fed from the UI to the Logic, and then to the CommandParser. Upon receiving the command’s details from the CommandParser, the Logic can either read or write the tasks’ content from the Storage however it sees fit and finally, return a feedback string to the UI to be displayed to the user.
+The diagram (see Figure 4) below demonstrates how the major components of the software interact in a typical cycle of command execution. The raw user command “delete task1” in this example would first be fed from the UI to the Logic, and then to the CommandParser. Upon receiving the command’s details from the CommandParser, the Logic can either read or write the tasks’ content from the Storage however it sees fit and finally, return a feedback string to the UI to be displayed to the user.
 
 ![add image](doc/images/del seqDiagram.png)
 > Figure 4: Object interactions for execution of 'delete' command in Todoer
@@ -150,7 +151,7 @@ The diagram (see Figure 3) below demonstrates how the major components of the so
 ![add image](doc/images/V0.5/parserDiagram.png)
 > Figure 5: Structure of the Parser Component
 
-The Parser component consists of a `CommandParser` class which receives the raw user input and creates a `Command` object which is executed by the `Logic` component
+The Parser component consists of a `CommandParser` class which receives the raw user input from the `Logic` component and creates a `Command` object which is executed by `Logic`.
 
 ###### Notable API
 
@@ -197,7 +198,7 @@ Run TestTodoer.java in Eclipse IDE to test Todoer.
 There are several additions that can be made to Todoer to further increase its usefulness and usability.
 
 ###### Notifications/Events
-We seek to develop the functionality to update/remind the Todoer user about urgent tasks or tasks that are nearing due date with say, pop-ups or audio notifications.
+We seek to further develop the pop-up and audio notification functionality to update/remind the Todoer user about urgent tasks or tasks that are nearing due date. We would like to allow user to be to customize the frequency and sound of these notifications.
 
 ###### Further improved GUI
 We would like to implement additional helpful features such as auto-fill commands (by referencing the user’s past command history) and by displaying urgent/important tasks more prominently (perhaps with color coding).
