@@ -4,137 +4,193 @@ Todoer is a keystroke-orientated task scheduler that provides functionality for 
 # Table of Contents
 <!-- MarkdownTOC -->
 
-- [Installation and Setup](#installation-and-setup)
+- [Getting Started](#getting-started)
 - [Feature Details](#feature-details)
   - [Adding a task](#adding-a-task)
-  - [Deleting a task](#deleting-a-task)
-  - [Updating a task](#updating-a-task)
+  - [Marking a task done](#marking-a-task-done)
+  - [Deleting tasks](#deleting-tasks)
   - [Viewing tasks](#viewing-tasks)
+    - [Showing tasks](#showing-tasks)
+    - [Searching tasks](#searching-tasks)
+    - [Timetable](#timetable)
+  - [Updating a task](#updating-a-task)
   - [Settings](#settings)
   - [Exiting](#exiting)
-  - [Help Panel](#help-panel)
+  - [Help](#help)
+  - [Notifications](#notifications)
 - [Cheatsheet](#cheatsheet)
 
 <!-- /MarkdownTOC -->
 
-# Installation and Setup
+# Getting Started
 
-1. **Download Todoer**: You can save Todoer into any folder of your choice. All your data will    be saved 
+1. **Download Todoer**: You can save Todoer into any folder of your choice. All your data will be saved in this folder.
 
-2. **Launch Todoer**: by simply double-clicking the `Todoer.exe file`.
+2. **Launch Todoer**: by simply double-clicking the `Todoer.jar file`.
 
-3. You will be greeted with a simple interface that has a console and a command bar. 
-   This command bar is where you enter commands to tell Todoer what to do. 
+3. You will be greeted with an interface that has (*see below*) a main panel (**A**), a console (**B**), and a command bar (**C**). This command bar is where you enter commands to tell Todoer what to do. The console displays helpful feedback for your actions while the main panel displays your tasks. <br> ![add image](doc/images/V0.5/interface empty.JPG)
+ 
 
-5. **Set notifications for Todoer**: When launching for the first time, Todoer will ask you to set the frequency and audio controls for notifications and reminders about tasks that are nearing deadlines.
-   
-6. **Add a task**: Type `add 'do laundry'` in the command bar. Follow the prompts to add your first task!
+4. **Try adding a task!**: Type `add do homework by tomorrow` in the command bar. You will see your first task added to the table in the main panel. The deadline for this task is tomorrow and its exact date will be added into the `deadline` column.
 
 7. **Try more commands**: 
      * `showall` - See all outstanding tasks
-     * `delete 'do laundry'` - Mark the task as done
+     * `done do homework` - Mark the task as done
      * `exit` - Exit Todoer using the command bar
 
 To learn more details of Todoer features, refer to the 'Feature Details' section below.
 
 # Feature Details
 ## Adding a task
-###### Add a task using the console wizard
-1. Type `add <task_name>` into the command bar (replace \<task_name> with the name of your task).
-2. The console will display instructions: **Specify a task description:**. Type in a suitable task description in the command bar. <br>
-![add image](doc/images/add_sample.png)
-3. Follow the remaning console instructions to finish adding the task. Note you can enter a `-` if you wish to leave a field blank.
+1. Type `add <task_name>` into the command bar. This adds the most basic task, without any deadlines or additional information; to add additional information in a task, see the below steps.
 
-> Tip: Enter `Ctrl + C` during the console wizard prompts to abort the current operation.
+> Example: **`add do homework`**
+<br>
+![add image](doc/images/V0.5/add floating.JPG)
 
-###### Add a task using a one-line command
-1. Type `add <task_name> <description> <deadline> <priority> <group>` in the command bar.
+### **`OPTIONAL: Deadlines`**
+1. Type `add <task_name> by <deadline>`. Replace \<deadline> with a future date, the following formats are acceptable:
+  * tomorrow
+  * next <day>. (e.g. next Tuesday/Tue)
+  * dd/mm (e.g. 20/12)
+  * dd mmm (e.g. 20 Dec)
+  * dd mmmm (e.g. 20 December)
+2. You may append a time to the date for a more specific deadline. AM/PM or 24 hour time formats are acceptable. (The default is "23:59" if time is not specified) 
 
-   | Parameter	 | Usage	                                            |
-   |-------------|----------------------------------------------------------|
-   | task_name   | Name of task to be added                                 |
-   | description | Short description of the task for additional reference   |
-   | deadline    | Format: `DDMMYY` > e.g. 270915 for (27th September 2015) |
-   | priority    | Scale: 1 (lowest) - 10 (highest)                         |
-   | group       | Assign the task to a group                               |
-	
+> Example: **`add do homework by 20 Dec 4pm`**
 
-   Example: 
-   * `add 'do assignment 1' 'algebra homework' '251015' '10' 'MA1101'`
+> Todoer is human readable and friendly! Experiment with different datetime formats, you will find that most of them are recognized. See the cheatsheet section for a list of all recognized formats.
+<br>
+![add image](doc/images/V0.5/add deadline.JPG)
 
-## Deleting a task
-1. Type `delete <task_name>` into the command bar (replace \<task_name> with the name of the task you wish to delete).
+### **`OPTIONAL: Groups and Priority`**
+1. Append `group <group_name>` and/or `priority <high/meduim/low>` to your `add` command. Replace \<group_name> with an appropriate categorization of your choice and choose one of **high**, **medium**, or **low** to indicate how urgent the task is to you. 
 
-## Updating a task
-###### Update a task using the console wizard
-1. Type `update <task_name>` in the command bar (replace \<task_name> with the name of the task you wish to update).
-2. The console will display the task that you wished to update along with instructions: **Enter the detail you wish to update:**. 
-3. Follow the remaning console instructions to finish updating the task.
+> Example: **`add do homework by 20 Dec 4pm group CS2103 priority high`**
 
-###### Add a task using a one-line command
-1. Type `update <task_name> <field_to_update> <new_value>` in the command bar.
-   
-   | Parameter	 | Usage	                                            |
-   |-------------|----------------------------------------------------------|
-   | task_name   | Name of task to be updated                              |
-   | field_to_update | Possible fields: task_name, description, deadline, priority or group |
-   | new_value    | Value that will replace previous value for the field_to_update |
+<br>
+![add image](doc/images/V0.5/add grouppriority.JPG)
+
+### **`OPTIONAL: Start time/End time`**
+1. Append a `from <start_datetime> to <end_datetime>` to your `add` command. As usual, replace the fields with a flexible datetime of your choice. Use this feature when you have an event task that will occupy a known duration on your schedule.
+
+> Example: **`add interview with XXX company from 21 Dec 230pm to 21 Dec 430pm`**
+
+> (The start time and end time defaults to 00:00 and 23:59 respectively if not specified.)
+ 
+<br>
+![add image](doc/images/V0.5/add startendtime.JPG)
+
+### **`OPTIONAL: Recurring tasks`**
+1. Append `from <start time> to <end time> repeat <period>` to your `add` command. The repeat keyword will schedule the specified task continuously over the given \<period>. The following formats for \<period> are acceptable:
+  * every day
+  * every \<day_of_week>
+
+  > Example: **`add CS2103 lecture from 2pm to 4pm repeat every Friday`**
+  <br>
+  ![add image](doc/images/V0.5/add recurrent.JPG)
+
+### **`Keyword List`**
+
+| Keyword   | Usage                                            |
+|-------------|----------------------------------------------------------|
+| add | add \<task_name>   |
+| by | by \<deadline>   |
+| group | group \<group_name>   |
+| priority | priority \<high/medium/low>   |
+| from...to | from \<start_datetime> to \<end_datetime>   |
+| repeat | repeat \<period>   |
+
+## Marking a task done
+1. Type `done <task_name>` into the command bar to mark \<task_name> as a completed task.
+2. Alternatively, type `done id <id_number>` to mark the task with id \<id_number> done.
+3. You may mark a range of tasks complete by typing `done id <start_range>-<end_range>`
+4. If you wish to permanently delete a task from your records, see the `delete` section below.
+
+## Deleting tasks
+###### Deleting a specific task
+1. Type `delete <task_name>` into the command bar. Replace \<task_name> with the name of the task you wish to delete.
+2. Alternatively, type `delete id <id_number>` to delete the task with id \<id_number> as displayed in the main panel.
+
+###### Deleting a group of tasks
+1. Type `deleteby <field> <value_of_field>`. Replace \<field> by one of the column names in the main panel.
+
+> Example: `deleteby group CS2103`, `deleteby status done`
+
+2. Type `delete id <start_range>-<end_range>` to delete all tasks in the given id range.
+
+> Example: `delete id 3-5`
+
+###### Deleting all tasks
+1. Type `deleteall` into the command bar. 
+
+> Tip: Use the `undo`/`redo` commands to reverse your actions.
 
 ## Viewing tasks
-###### Show all the tasks:
-1. Type `show` or `show all`  into the command bar.
-2. The console will display all the tasks in the ascending order of their deadlines. Tasks with no deadlines will be displayed in a **Tasks with no Deadline** section.
+This section describes the different ways in which you can view your tasks, either by sorting on certain fields (e.g. in ascending deadline), or displaying only a subset of all your tasks (e.g. only tomorrow's tasks), or by searching for specific tasks, or in an intuitive timetable view.
+### Showing tasks
+###### Show tasks for a particular day
+1. Type `showday <date>`
+> Example: `showday 02/12`, `showday tomorrow`
 
-###### Show tasks in a certain group:
-1. Type `show <group_name>` into the command bar (replace <group_name> with the name of the group of tasks you wish to see).
-2. The console will display all the tasks in that particular group in the ascending order of their deadlines. <br>
-![show image](doc/images/show_sample.png)
+###### Showpriority and Showgroup
+1. Type `showpriority <high/medium/low>` or `showgroup <group_name>`
 
-###### Show tasks with deadlines within a certain time period:
-1. Type `show <deadline>` into the command bar. See below for possible arguments:
+###### Sort on a field
+1. Type `showby <field_name>`. Replace \<field_name> with **deadline**/**start date**/**end date**/**priority**/**group**/**status** to sort your tasks accordingly.
 
-  | \<deadline>	| Usage	                                            |
-  |-------------|----------------------------------------------------------|
-  | \<DDMMYY>   | Show all tasks due on <DDMMYY>  |
-  | today | show all tasks due today |
-  | tomorrow	| show all tasks due tomorrow |
-  | this week	| show all tasks due this week |
-  | no deadline	| show all tasks that have no deadline |
+> Example `showby deadline`
+  <br>
+  ![add image](doc/images/V0.5/showbydeadline.JPG)
 
+###### Show all tasks
+1. Type `showall` to display all tasks.
 
-The console will display tasks with deadlines that fall within the respective time period, in ascending order of their deadlines.
+### Search
+1. Type `search <keyword>` to find all tasks that have \<keyword> in them.
 
-###### Show tasks in order of importance instead of deadlines:
-Simply append `important` to any of the above commands. The tasks will be displayed in order of their priority.
+### Timetable
+1. Type:
+  * `timetable <date to display>` **or**
+  * `timetable from <date> to <date>` **or**
+  * `timetable` to display the view for this week:
+  <br>
+  ![add image](doc/images/V0.5/timetable.JPG)
 
-Examples:  
-* `show tomorrow important`
-* `show 271115 important`
+> Tip: Use the `Page Up`/`Page Down` keys to scroll up and down!
+
+## Updating a task
+1. Type `update <task_to_be_updated> TO <keyword> <new value>`
+2. Refer to the [Keyword List](https://github.com/cs2103aug2015-w10-3j/main/blob/master/User%20Guide%20V0.5.md#keyword-list) in the add section for the list of \<keyword>.
+
+> Example: `update id 1 TO priority low`
+
+> Take note that the keyword `TO` is capitalized
 
 ## Settings
-###### Change notification settings, and adjust other UI options
-1. Type `settings` in the command bar.
+###### Change the file that saves your tasks to disks:
+1. Type `setfile <filepath>`
 
 ## Exiting
 1. Type `exit` in the command bar. The program will exit.
 
-## Help Panel
-###### Guide to using the help panel found on the left side of the UI
-1. The help panel displays the cheatsheet by default.
-2. Type `help <command>` in the command bar to get detailed help about \<command>.
+## Help
+1. Type `help` in the command bar. (Type `showall` to revert back to the default view)
 
-   > Example: `help add` <br>
-   ![help image](doc/images/help_sample.png)
-3. Type `help` to reset the help panel to the default cheatsheet.
+# Notifications
+
+Todoer will alert you with a pop-up and audio when you have tasks nearing deadline.
 
 # Cheatsheet
 
-| Command            | Description                                                                                      |
+| Command            | Usage                                                                                      |
 |--------------------|--------------------------------------------------------------------------------------------------|
-| add \<task_name>    | Add a task called \<task_name> with optional parameters: <ul><li>description</li><li>deadline</li><li>priority</li><li>group</li></ul> |
-| delete \<task_name> | Deletes \<task_name> from your tasks                                                              |
-| update \<task_name> | Updates the details of \<task_name>                                                               |
-| show               | View all tasks (in a group or those due within a certain time period)                            |
-| settings           | Modify Todoer settings                                                                           |
-| help               | Get help for a particular command                                                                |
-| exit               | Exit Todoer                                                                                      |
+| add     | **add** \<task_name>. May append optional parameters: <ul><li>**by** \<deadline></li><li>**group** \<group_name></li><li>**priority** \<high/medium/low></li><li>**from** \<start_datetime> **to** \<end_datetime></li><li>**repeat** \<period></li></ul> |
+| done         | **done** \<task_name> or **done id** \<id_number> or **done id** \<start_range>-\<end_range> |
+| delete  | <ul><li>**delete** \<task_name> or **delete id** <id_number></li><li>**delete id** \<start_range>-\<end_range></li><li>**deleteby** \<field> \<value_of_field></li><li>**deleteall**</li></ul>			                                             |
+| update            | **update** \<task_name> TO \<keyword> \<new_value>                                                     |
+| show               | <ul><li>**showday** \<date></li><li>**showpriority** \<high/medium/low></li><li>**showgroup** \<groupname></li><li>**showby** \<column_field></li><li>**showall**</li></ul>                            |
+| timetable	| <ul><li>**timetable** to show this week</li><li>**timetable from** \<startdate> **to** \<enddate></li><li>**timetable next** \<period></li></ul> |
+| setfile           | **setfile** \<file_path>                                                   |
+| help               | Display the cheatsheet                                                     |
+| exit               | Exit Todoer                                                                        |
