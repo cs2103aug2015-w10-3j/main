@@ -1,46 +1,45 @@
 package cs2103;
-import java.util.*;
 
-public class Command{
+public class Command {
 	private String commandType;
 	private String commandArgument;
 	private Task newTask;
 	private Task updatedTask;
 
-	public Command(){
+	public Command() {
 		newTask = new Task("");
 		updatedTask = new Task("");
 	}
 
-	public String getCommandType(){
+	public String getCommandType() {
 		return commandType;
 	}
 
-	public void setCommandType(String newCommandType){
+	public void setCommandType(String newCommandType) {
 		commandType = newCommandType;
 	}
 
-	public String getCommandArgument(){
+	public String getCommandArgument() {
 		return commandArgument;
 	}
 
-	public void setCommandArgument(String newCommandArgument){
+	public void setCommandArgument(String newCommandArgument) {
 		commandArgument = newCommandArgument;
 	}
 
-	public Task getNewTask(){
+	public Task getNewTask() {
 		return newTask;
 	}
 
-	public void setNewTask(Task newNewTask){
+	public void setNewTask(Task newNewTask) {
 		newTask = newNewTask;
 	}
 
-	public Task getUpdatedTask(){
+	public Task getUpdatedTask() {
 		return updatedTask;
 	}
 
-	public void setUpdatedTask(Task newUpdatedTask){
+	public void setUpdatedTask(Task newUpdatedTask) {
 		updatedTask = newUpdatedTask;
 	}
 

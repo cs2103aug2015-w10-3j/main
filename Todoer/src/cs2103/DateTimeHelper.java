@@ -1,58 +1,20 @@
 package cs2103;
 import java.util.*;
-import java.util.*;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 	
 
 public class DateTimeHelper {
 	
-	private static final String TODAY = "Today";
-	private static final String TOMORROW = "Tomorrow";
-	private static final String YESTERDAY = "Yesterday";
-	private static final String YTD = "ytd";
-	private static final String TMR = "tmr";
-	private static final String NOW = "now";
-	private static SimpleDateFormat standardTimeFormat = new SimpleDateFormat("dd/MM HH:mm");
-	private static SimpleDateFormat displayDateTimeFormat = new SimpleDateFormat("dd MMM HH:mm");
-	private static final String startDateTime = "00:00";
-	private static final String endDateTime = "23:59";
-	private static final String AM = "am";
-	private static final String PM = "pm";
-	private static final String NEXT = "next";
-	private static final String NXT = "nxt";
-	private static final String LAST = "last";
-	private static final String WEEKS = "weeks";
-	private static final String WEEK = "week";
-	private static final String LATER = "later";
-	private static final String DAY = "day";
-	private static final String DAYS = "days";
-	private static final String THIS = "this";
-	private static final String ZERO = "0";
-	private static final String DOUBLE_ZERO = "00";
-	private static final String SLASH = "/";
 	
-	private static int[] daysInMonth = new int[] {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	private static SimpleDateFormat mStandardTimeFormat = new SimpleDateFormat("dd/MM HH:mm");
+	private static SimpleDateFormat mDisplayDateTimeFormat = new SimpleDateFormat("dd MMM HH:mm");
 	
-	private static final String[] months = new String[] {"january", 
-														 "february", 
-														 "march", 
-														 "april", 
-														 "may", 
-														 "june", 
-														 "july", 
-														 "august", 
-														 "september", 
-														 "october", 
-														 "november", 
-														 "december"};
-	private static final String[] days = new String[] {"monday",
-													   "tuesday",
-													   "wednesday",
-													   "thursday",
-													   "friday",
-													   "saturday",
-													   "sunday"};
+	
+	private static int[] mDaysInMonth = AppConst.DATE_TIME.NUMBER_DAYS_IN_MONTH;
+	
+	private static final String[] mMonths = AppConst.DATE_TIME.MONTH_NAMES;
+	private static final String[] mDays = AppConst.DATE_TIME.DAY_IN_WEEK;
 										
 	
 	public DateTimeHelper() {
@@ -67,10 +29,10 @@ public class DateTimeHelper {
 		
 		int day = getDayFromStringDate(dateTime);
 		int month = getMonthFromStringDate(dateTime);
-		if (day <= 0 || month <= 0 || month > 12) {
+		if (day <= 0 || month <= 0 || month > AppConst.DATE_TIME.NUMBER_MONTHS) {
 			return false;
 		}
-		if (day > daysInMonth[month-1]) {
+		if (day > mDaysInMonth[month-1]) {
 			return false;
 		}
 		return true;
@@ -93,8 +55,8 @@ public class DateTimeHelper {
 	// string 'date' should have format dd/MM HH:mm or dd/MM
 	protected int getHourFromStringDate(String date) {
 		int position = 0;
-		for(int i=date.length()-1; i>=0; i--) {
-			if (date.charAt(i) == ':') {
+		for(int i = date.length()-1; i >= 0; i--) {
+			if (date.charAt(i) == AppConst.DATE_TIME.COLON.charAt(0)) {
 				position = i; break;
 			}
 		}
@@ -108,8 +70,8 @@ public class DateTimeHelper {
 	// string 'date' should have format dd/MM HH:mm or dd/MM
 	protected int getMinuteFromStringDate(String date) {
 		int position = 0;
-		for(int i=date.length()-1; i>=0; i--) {
-			if (date.charAt(i) == ':') {
+		for(int i = date.length()-1; i >= 0; i--) {
+			if (date.charAt(i) == AppConst.DATE_TIME.COLON.charAt(0)) {
 				position = i; break;
 			}
 		}
@@ -135,7 +97,6 @@ public class DateTimeHelper {
 	protected boolean isYesterday(String dateTime) {
 		int day = getDayFromStringDate(dateTime);
 		int month = getMonthFromStringDate(dateTime);
-		String date = getCurrentTimeString();
 		int yesterdayDay = getDayFromStringDate(getYesterday());
 		int yesterdayMonth = getMonthFromStringDate(getYesterday());
 		if (day == yesterdayDay && month == yesterdayMonth) {
@@ -161,18 +122,18 @@ public class DateTimeHelper {
 		int month = getMonthFromStringDate(dateTime);
 		day--;
 		if (day == 0 && month != 1) {
-			month--;  day = daysInMonth[month-1];		
+			month--;  day = mDaysInMonth[month-1];		
 		}
-		if (month > 0 && month < 13 && day > 0 && day <= daysInMonth[month-1]) {
+		if (month > 0 && month < 13 && day > 0 && day <= mDaysInMonth[month-1]) {
 			String dayString = String.valueOf(day);
 			String monthString = String.valueOf(month);
 			if (dayString.length() < 2) {
-				dayString = ZERO + dayString;
+				dayString = AppConst.DATE_TIME.ZERO + dayString;
 			}
 			if (monthString.length() < 2) {
-				monthString = ZERO + monthString;
+				monthString = AppConst.DATE_TIME.ZERO + monthString;
 			}
-			return dayString + SLASH + monthString;
+			return dayString + AppConst.DATE_TIME.SLASH + monthString;
 		}
 		return "";
 	}
@@ -182,14 +143,14 @@ public class DateTimeHelper {
 		int day = getDayFromStringDate(dateTime);
 		String dayString = String.valueOf(day);
 		if (dayString.length() < 2) {
-			dayString = ZERO + dayString;
+			dayString = AppConst.DATE_TIME.ZERO + dayString;
 		}
 		int month = getMonthFromStringDate(dateTime);
 		String monthString = String.valueOf(month);
 		if (monthString.length() < 2) {
-			monthString = ZERO + monthString;
+			monthString = AppConst.DATE_TIME.ZERO + monthString;
 		}
-		return dayString + SLASH + monthString;
+		return dayString + AppConst.DATE_TIME.SLASH + monthString;
 	}
 	
 	protected String getTomorrow() {
@@ -197,19 +158,19 @@ public class DateTimeHelper {
 		int day = getDayFromStringDate(dateTime);
 		int month = getMonthFromStringDate(dateTime);
 		day++;
-		if (day > daysInMonth[month-1]) {
+		if (day > mDaysInMonth[month-1]) {
 			day = 1; month++;
 		}
-		if (month > 0 && month < 13 && day > 0 && day <= daysInMonth[month-1]) {
+		if (month > 0 && month < 13 && day > 0 && day <= mDaysInMonth[month-1]) {
 			String dayString = String.valueOf(day);
 			String monthString = String.valueOf(month);
 			if (dayString.length() < 2) {
-				dayString = ZERO + dayString;
+				dayString = AppConst.DATE_TIME.ZERO + dayString;
 			}
 			if (monthString.length() < 2) {
-				monthString = ZERO + monthString;
+				monthString = AppConst.DATE_TIME.ZERO + monthString;
 			}
-			return dayString + SLASH + monthString;
+			return dayString + AppConst.DATE_TIME.SLASH + monthString;
 		}
 		return "";
 	}
@@ -226,27 +187,27 @@ public class DateTimeHelper {
 		if (date == null) {
 			return dateTime;
 		}
-		SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+		SimpleDateFormat timeFormat = new SimpleDateFormat(AppConst.DATE_TIME.TIME_FORMAT);
 		String time = " " + timeFormat.format(date);
 		
 		if (isYesterday(dateTime)) {
-			return YESTERDAY + time;
+			return AppConst.DATE_TIME.YESTERDAY + time;
 		}
 		
 		if (isToday(dateTime)) {
-			return TODAY + time;
+			return AppConst.DATE_TIME.TODAY + time;
 		}
 		if (isTomorrow(dateTime)) {
-			return TOMORROW + time;
+			return AppConst.DATE_TIME.TOMORROW + time;
 		}
 		
-		return displayDateTimeFormat.format(date);			 
+		return mDisplayDateTimeFormat.format(date);			 
 	}
 	
 	
 	protected String convertDateMonthToDisplayFormat(String dateTime) {
 		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM");
+		SimpleDateFormat dateFormat = new SimpleDateFormat(AppConst.DATE_TIME.DISPLAY_DATE_FORMAT);
 		if (dateTime == null || dateTime.equals("")) {
 			return dateTime;
 		}
@@ -258,21 +219,21 @@ public class DateTimeHelper {
 		}
 		
 		if (isYesterday(dateTime)) {
-			return YESTERDAY;
+			return AppConst.DATE_TIME.YESTERDAY;
 		}
 		
 		if (isToday(dateTime)) {
-			return TODAY;
+			return AppConst.DATE_TIME.TODAY;
 		}
 		if (isTomorrow(dateTime)) {
-			return TOMORROW;
+			return AppConst.DATE_TIME.TOMORROW;
 		}
 		
 		return dateFormat.format(date);
 	}
 	
 	protected String getCurrentTimeString() {
-		return standardTimeFormat.format(new Date());
+		return mStandardTimeFormat.format(new Date());
 	}
 	
 	protected Date getCurrentDate() {
@@ -281,14 +242,14 @@ public class DateTimeHelper {
 	
 	protected Date convertStringToDate(String dateTime) {
 		try {
-			return standardTimeFormat.parse(dateTime);
+			return mStandardTimeFormat.parse(dateTime);
 		} catch (ParseException pe) {
 			return null;	
 		}
 	}
 	
 	protected String convertDateToString(Date dateTime) {
-		return standardTimeFormat.format(dateTime);
+		return mStandardTimeFormat.format(dateTime);
 	}
 	
 	protected int compareDates(Date date1, Date date2) {
@@ -313,20 +274,20 @@ public class DateTimeHelper {
 	protected String getMinutesFromString(String time) {
 		
 		int leng = time.length();
-		if (leng<=2) {
-			return DOUBLE_ZERO;
+		if (leng <= 2) {
+			return AppConst.DATE_TIME.DOUBLE_ZERO;
 		}
 		String minute = String.valueOf(time.charAt(leng-2)) + String.valueOf(time.charAt(leng-1));
 		if (!isNumber(minute)) {
 			return null;
 		}
 		int x = Integer.parseInt(minute);
-		if (x >= 60) {
+		if (x >= AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR) {
 			return null;
 		}
 		minute = String.valueOf(x);
 		if (minute.length() < 2) {
-			minute = ZERO + minute;
+			minute = AppConst.DATE_TIME.ZERO + minute;
 		}
 		return minute;
 	}
@@ -341,19 +302,18 @@ public class DateTimeHelper {
 			}
 			if (flag == 2) {
 				int x = Integer.parseInt(time);
-				if (x < 12) {
-					x += 12;
+				if (x < AppConst.DATE_TIME.NUMBER_AM) {
+					x += AppConst.DATE_TIME.NUMBER_AM;
 				}
 				time = String.valueOf(x);
 			}
 			if (time.length() < 2) {
-				time = ZERO + time;
+				time = AppConst.DATE_TIME.ZERO + time;
 			}
-			System.out.println(time);
 			return time;
 		}
 		String hour = "";
-		for(int i=0; i<time.length()-2; i++) {
+		for(int i = 0; i < time.length()-2; i++) {
 			if (time.charAt(i)<'0' || time.charAt(i)>'9') {
 				break;
 			}
@@ -364,25 +324,23 @@ public class DateTimeHelper {
 		}
 		int x = Integer.parseInt(hour);
 		if (flag == 2) {
-			if (x < 12) {
-				x += 12;
+			if (x < AppConst.DATE_TIME.NUMBER_AM) {
+				x += AppConst.DATE_TIME.NUMBER_AM;
 			}
 		}
-		if (x >= 24) {
+		if (x >= AppConst.DATE_TIME.NUMBER_HOURS_PER_DAY) {
 			return null;
 		}
 		
 		hour = String.valueOf(x);
 		if (hour.length() < 2) {
-			hour = ZERO + hour;
-		}
-		System.out.println(hour);
-		
+			hour = AppConst.DATE_TIME.ZERO + hour;
+		}		
 		return hour;
 	}
 	
 	protected boolean isNumber(String st) {
-		for(int i=0; i<st.length(); i++) {
+		for(int i = 0; i < st.length(); i++) {
 			if (st.charAt(i)<'0' || st.charAt(i)>'9') {
 				return false;
 			}
@@ -397,9 +355,9 @@ public class DateTimeHelper {
 	protected String getTimeFromString(String dateTime, int flag) {
 		String time = "";
 		if (flag == 1) {
-			time = startDateTime;
+			time = AppConst.DATE_TIME.START_TIME;
 		} else if (flag == 2) {
-			time = endDateTime;
+			time = AppConst.DATE_TIME.END_TIME;
 		}
 		
 		String[] splits = dateTime.split(" ");
@@ -416,13 +374,13 @@ public class DateTimeHelper {
 		
 		int count = 0;
 		
-		for(int i=splits.length-1; i>=0; i--) {
+		for(int i = splits.length-1; i >= 0; i--) {
 		
-			if (splits[i].endsWith(AM) || splits[i].endsWith(PM)) {
-				if (splits[i].endsWith(PM)) {
+			if (splits[i].endsWith(AppConst.DATE_TIME.AM) || splits[i].endsWith(AppConst.DATE_TIME.PM)) {
+				if (splits[i].endsWith(AppConst.DATE_TIME.PM)) {
 					x = 2;
 				}
-				if (splits[i].equals(AM) || splits[i].equals(PM)) {
+				if (splits[i].equals(AppConst.DATE_TIME.AM) || splits[i].equals(AppConst.DATE_TIME.PM)) {
 					if (i > 0) {
 						hour = getHoursFromString(splits[i-1], x);
 						minute = getMinutesFromString(splits[i-1]);
@@ -464,12 +422,12 @@ public class DateTimeHelper {
 				return time;
 			}
 			if (hour.length()<2) {
-				hour = ZERO + hour;
+				hour = AppConst.DATE_TIME.ZERO + hour;
 			}
 			if (minute.length()<2) {
-				minute = ZERO + minute;
+				minute = AppConst.DATE_TIME.ZERO + minute;
 			}
-			return hour + ":" + minute;
+			return hour + AppConst.DATE_TIME.COLON + minute;
 		}
 		return null;
 	}
@@ -482,22 +440,22 @@ public class DateTimeHelper {
 		if (st == null || st.equals("")) {
 			return 0;
 		}
-		for(int i=0; i<months.length; i++) {
+		for(int i = 0; i < mMonths.length; i++) {
 			int j = 0, k = 0;
-			String st1 = months[i];
+			String st1 = mMonths[i];
 			if (st1.charAt(0) != st.charAt(0)) {
 				continue;
 			}
-			while (j<st.length() && k<st1.length()) {
-				while (k<st1.length() && st1.charAt(k)!=st.charAt(j)) {
+			while (j < st.length() && k < st1.length()) {
+				while (k < st1.length() && st1.charAt(k) != st.charAt(j)) {
 					k++;
 				}
-				if (k>=st1.length()) {
+				if (k >= st1.length()) {
 					break;
 				}
 				k++;  j++;
 			}
-			if (j>=st.length()) {
+			if (j >= st.length()) {
 				return i+1;
 			}
 		}
@@ -514,9 +472,9 @@ public class DateTimeHelper {
 		dateTime = dateTime.toLowerCase();
 		splits = dateTime.split(" ");
 		int count = 0, res = 0;
-		for(int i=0; i<splits.length; i++) {
+		for(int i = 0; i < splits.length; i++) {
 			int x = getMonthMatched(splits[i]);
-			if (x>0) {
+			if (x > 0) {
 				count++;
 				res = x;
 			}
@@ -526,8 +484,8 @@ public class DateTimeHelper {
 			return null;
 		} else if (count == 1) {
 			String result = String.valueOf(res);
-			if (result.length()<2) {
-				result = ZERO + result;
+			if (result.length() < 2) {
+				result = AppConst.DATE_TIME.ZERO + result;
 			}
 			return result;
 		}	
@@ -544,8 +502,8 @@ public class DateTimeHelper {
 		
 		st = st.toLowerCase();
 		
-		for(int i=st.length()-1; i>=0; i--) {
-			if (st.charAt(i)<'0'||st.charAt(i)>'9') {
+		for(int i = st.length()-1; i >= 0; i--) {
+			if (st.charAt(i) < '0' || st.charAt(i) > '9') {
 				break;
 			}
 			month = String.valueOf(st.charAt(i)) + month;
@@ -554,11 +512,11 @@ public class DateTimeHelper {
 			return null;
 		}
 		int x = Integer.parseInt(month);
-		if (x>12) {
+		if (x > AppConst.DATE_TIME.NUMBER_MONTHS) {
 			return null;
 		}
 		if (month.length() < 2) {
-			month = ZERO + month;
+			month = AppConst.DATE_TIME.ZERO + month;
 		}
 		return month;
 	}
@@ -566,8 +524,8 @@ public class DateTimeHelper {
 	// get date in a string date month
 	protected String getDate(String st) {
 		String date = "";
-		for(int i=0; i<st.length(); i++) {
-			if (st.charAt(i)<'0'||st.charAt(i)>'9') {
+		for(int i = 0; i < st.length(); i++) {
+			if (st.charAt(i) < '0' || st.charAt(i) > '9') {
 				if (i < st.length()-3) {
 					return null;
 				}
@@ -579,11 +537,11 @@ public class DateTimeHelper {
 			return null;
 		}
 		int x = Integer.parseInt(date);
-		if (x>31 || x <= 0) {
+		if (x > AppConst.DATE_TIME.MAX_NUMBER_DAYS_PER_MONTH || x <= 0) {
 			return null;
 		}
 		if (date.length() < 2) {
-			date = ZERO + date;
+			date = AppConst.DATE_TIME.ZERO + date;
 		}
 		return date;
 		
@@ -595,8 +553,8 @@ public class DateTimeHelper {
 			return -1;
 		}
 		day = day.toLowerCase();
-		for(int i=0; i<7; i++) {
-			if (days[i].startsWith(day)) {
+		for(int i = 0; i < AppConst.DATE_TIME.NUMBER_DAYS_PER_WEEK; i++) {
+			if (mDays[i].startsWith(day)) {
 				return i;
 			}
 		}
@@ -609,17 +567,17 @@ public class DateTimeHelper {
 		int day = getDayFromStringDate(date);
 		int month = getMonthFromStringDate(date);
 		int number = 0;
-		for(int i=1; i<month; i++) {
-			number += daysInMonth[i-1];
+		for(int i = 1; i < month; i++) {
+			number += mDaysInMonth[i-1];
 		}
 		number += day;
 		number += 3;
 		// 1/1/2015 is Thursday, we go back to Monday is 29/12/2014
-		number = number % 7;
+		number = number % AppConst.DATE_TIME.NUMBER_DAYS_PER_WEEK;
 		if (number == 0) {
-			number = 7;
+			number = AppConst.DATE_TIME.NUMBER_DAYS_PER_WEEK;
 		}
-		return number-1;
+		return number - 1;
 		
 	}
 	
@@ -630,7 +588,7 @@ public class DateTimeHelper {
 			return null;
 		}
 		int dayInWeek = getDayInWeekForDate(date);
-		String result = days[dayInWeek];
+		String result = mDays[dayInWeek];
 		return String.valueOf(result.charAt(0)).toUpperCase() + String.valueOf(result.charAt(1)) + String.valueOf(result.charAt(2));
 	}
 	
@@ -639,22 +597,22 @@ public class DateTimeHelper {
 		int day = getDayFromStringDate(currentDateTime);
 		int month = getMonthFromStringDate(currentDateTime);
 		day += number;
-		while (month < 12 && day > daysInMonth[month-1]) {
-			day -= daysInMonth[month-1];
+		while (month < AppConst.DATE_TIME.NUMBER_MONTHS && day > mDaysInMonth[month-1]) {
+			day -= mDaysInMonth[month-1];
 			month++;
 		}
 		
-		if (day > 0 && day < 32 && month > 0 && month < 13) {
+		if (month > 0 && month <= AppConst.DATE_TIME.NUMBER_MONTHS && day > 0 && day <= mDaysInMonth[month-1]) {
 		
 			String dayString = String.valueOf(day);
 			if (dayString.length() < 2) {
-				dayString = ZERO + dayString;
+				dayString = AppConst.DATE_TIME.ZERO + dayString;
 			}
 			String monthString = String.valueOf(month);
 			if (monthString.length() < 2) {
-				monthString = ZERO + monthString;
+				monthString = AppConst.DATE_TIME.ZERO + monthString;
 			}
-			return dayString + SLASH + monthString;
+			return dayString + AppConst.DATE_TIME.SLASH + monthString;
 		}
 		return null;
 	}
@@ -666,19 +624,19 @@ public class DateTimeHelper {
 		day -= number;
 		while (month > 1 && day <= 0) {
 			month--;
-			day += daysInMonth[month-1];
+			day += mDaysInMonth[month-1];
 		}
-		if (day > 0 && day < 32 && month > 0 && month < 13) {
+		if (month > 0 && month <= AppConst.DATE_TIME.NUMBER_MONTHS && day > 0 && day <= mDaysInMonth[month-1]) {
 			String dayString = String.valueOf(day);
 			if (dayString.length() < 2) {
-				dayString = ZERO + dayString;
+				dayString = AppConst.DATE_TIME.ZERO + dayString;
 			}
 			String monthString = String.valueOf(month);
 			if (monthString.length() < 2) {
-				monthString = ZERO + monthString;
+				monthString = AppConst.DATE_TIME.ZERO + monthString;
 			
 			}
-			return day + SLASH + month;
+			return day + AppConst.DATE_TIME.SLASH + month;
 		}	
 		return null;
 	}
@@ -702,29 +660,29 @@ public class DateTimeHelper {
 		
 		if (dayInWeek > currentDayInWeek) { 			
 			day += dayInWeek - currentDayInWeek;
-			if (day > daysInMonth[month-1]) {
-				day -= daysInMonth[month-1];
+			if (day > mDaysInMonth[month-1]) {
+				day -= mDaysInMonth[month-1];
 				month++;
 			}
 		} else {
 			day += dayInWeek - currentDayInWeek;
 			if (day <= 0 && month > 1) {
 				month--;
-				day += daysInMonth[month-1];
+				day += mDaysInMonth[month-1];
 			}
 		}
 		
-		if (day > 0 && day < 32 && month > 0 && month < 13) {
+		if (month > 0 && month <= AppConst.DATE_TIME.NUMBER_MONTHS && day > 0 && day <= mDaysInMonth[month-1]) {
 			String dayString = String.valueOf(day);
 			if (dayString.length() < 2) {
-				dayString = ZERO + dayString;
+				dayString = AppConst.DATE_TIME.ZERO + dayString;
 			}
 			String monthString = String.valueOf(month);
 			if (monthString.length() < 2) {
-				monthString = ZERO + monthString;
+				monthString = AppConst.DATE_TIME.ZERO + monthString;
 			
 			}
-			return dayString + SLASH + monthString;
+			return dayString + AppConst.DATE_TIME.SLASH + monthString;
 		}
 		
 		return null;
@@ -739,7 +697,7 @@ public class DateTimeHelper {
 		
 		dateTime = dateTime.toLowerCase();
 
-		if (dateTime.equals(NOW)) {
+		if (dateTime.equals(AppConst.DATE_TIME.NOW)) {
 			String result = getCurrentTimeString();
 			return result.substring(0, 5);
 		}
@@ -757,36 +715,35 @@ public class DateTimeHelper {
 		int numberResult = 0;
 		
 		if (!month.equals("")) {
-			for(int i=0; i<splits.length; i++) {
+			for(int i = 0; i < splits.length; i++) {
 				String st = splits[i];
-				System.out.println(st);
-				if (st.endsWith("th") || st.endsWith("st") || st.endsWith("rd") || st.endsWith("nd") || (st.length()<3 && isNumber(st))) {
+				if (st.endsWith(AppConst.DATE_TIME.TH) || st.endsWith(AppConst.DATE_TIME.ST) || st.endsWith(AppConst.DATE_TIME.RD) || st.endsWith(AppConst.DATE_TIME.ND) || (st.length() < 3 && isNumber(st))) {
 					date = getDate(st);
 					if (date != null && !date.equals("")) {
 						count++;
 					}
 				} 
 			}
-			if (count>1 || count==0) {
+			if (count > 1 || count == 0) {
 				return null;
 			}
 			if (date.length() < 2) {
-				date = ZERO + date;
+				date = AppConst.DATE_TIME.ZERO + date;
 			}
 			
 			if (month.length() < 2) {
-				month = ZERO + month;
+				month = AppConst.DATE_TIME.ZERO + month;
 			}
-			result = date + SLASH + month;
+			result = date + AppConst.DATE_TIME.SLASH + month;
 			numberResult = 1;
 			
 		}
 		
 		count = 0;
 		
-		for(int i=0; i<splits.length; i++) {
+		for(int i = 0; i < splits.length; i++) {
 			String st = splits[i];
-			if (st.contains(SLASH) || st.contains("-")) {
+			if (st.contains(AppConst.DATE_TIME.SLASH) || st.contains("-")) {
 				month = getMonth(st);
 				date = getDate(st);
 				if (month != null && date != null && !month.equals("") && !date.equals("")) {
@@ -803,17 +760,17 @@ public class DateTimeHelper {
 			numberResult = 1;
 			
 			if (date.length() < 2) {
-				date = ZERO + date;
+				date = AppConst.DATE_TIME.ZERO + date;
 			}
 			
 			if (month.length() < 2) {
-				month = ZERO + month;
+				month = AppConst.DATE_TIME.ZERO + month;
 			}
-			result = date + SLASH + month;
+			result = date + AppConst.DATE_TIME.SLASH + month;
 		}
 		
-		for(int i=0; i<splits.length; i++) {
-			if (splits[i].equals(YESTERDAY.toLowerCase()) || splits[i].equals(YTD)) {
+		for(int i = 0; i < splits.length; i++) {
+			if (splits[i].equals(AppConst.DATE_TIME.YESTERDAY.toLowerCase()) || splits[i].equals(AppConst.DATE_TIME.YTD)) {
 				if (numberResult > 0) {
 					return null;
 				}
@@ -821,7 +778,7 @@ public class DateTimeHelper {
 				result = getYesterday();
 			}
 			
-			if (splits[i].equals(TODAY.toLowerCase())) {
+			if (splits[i].equals(AppConst.DATE_TIME.TODAY.toLowerCase())) {
 				if (numberResult > 0) {
 					return null;
 				}
@@ -829,7 +786,7 @@ public class DateTimeHelper {
 				result = getToday();
 			}
 			
-			if (splits[i].equals(TOMORROW.toLowerCase()) || splits[i].equals(TMR)) {
+			if (splits[i].equals(AppConst.DATE_TIME.TOMORROW.toLowerCase()) || splits[i].equals(AppConst.DATE_TIME.TMR)) {
 				if (numberResult > 0) {
 					return null;
 				}
@@ -840,7 +797,7 @@ public class DateTimeHelper {
 		
 		int dayInWeek = -1;
 		count = 0;
-		for(int i=0; i<splits.length; i++) {
+		for(int i = 0; i < splits.length; i++) {
 			int x = getMatchedDayInWeek(splits[i]);
 			if (x != -1) {
 				count++;  dayInWeek = x;
@@ -855,8 +812,8 @@ public class DateTimeHelper {
 		int daysFromNow = 0;
 		int weeksFromNow = 0;	
 		
-		for(int i=0; i<splits.length; i++) {
-			if (splits[i].equals(THIS) || splits[i].equals(NEXT) || splits[i].equals(NXT) || splits[i].equals(LAST)) {
+		for(int i = 0; i < splits.length; i++) {
+			if (splits[i].equals(AppConst.DATE_TIME.THIS) || splits[i].equals(AppConst.DATE_TIME.NEXT) || splits[i].equals(AppConst.DATE_TIME.NXT) || splits[i].equals(AppConst.DATE_TIME.LAST)) {
 				count++;
 			}
 		}
@@ -866,8 +823,8 @@ public class DateTimeHelper {
 		
 		count = 0;
 		
-		for(int i=0; i<splits.length; i++) {
-			if (splits[i].equals(NEXT) || splits[i].equals(NXT)) {
+		for(int i = 0; i < splits.length; i++) {
+			if (splits[i].equals(AppConst.DATE_TIME.NEXT) || splits[i].equals(AppConst.DATE_TIME.NXT)) {
 				if (i >= splits.length - 1) {
 					break;
 				}
@@ -876,21 +833,21 @@ public class DateTimeHelper {
 						continue;
 					}
 					String st = splits[i+2];
-					if (st.equals(DAY) || st.equals(DAYS)) {
+					if (st.equals(AppConst.DATE_TIME.DAY) || st.equals(AppConst.DATE_TIME.DAYS)) {
 						daysFromNow = Integer.parseInt(splits[i+1]);
 						count++;
 						continue;
 					}
-					if (st.equals(WEEK) || st.equals(WEEKS)) {
+					if (st.equals(AppConst.DATE_TIME.WEEK) || st.equals(AppConst.DATE_TIME.WEEKS)) {
 						weeksFromNow = Integer.parseInt(splits[i+1]);
 						count++;
 						continue;
 					}
-				} else if (splits[i+1].equals(DAY) || splits[i+1].equals(DAYS)) {
+				} else if (splits[i+1].equals(AppConst.DATE_TIME.DAY) || splits[i+1].equals(AppConst.DATE_TIME.DAYS)) {
 					daysFromNow = 1;
 					count++;
 					continue;
-				} else if (splits[i+1].equals(WEEK) || splits[i+1].equals(WEEKS)) {
+				} else if (splits[i+1].equals(AppConst.DATE_TIME.WEEK) || splits[i+1].equals(AppConst.DATE_TIME.WEEKS)) {
 					weeksFromNow = 1;
 					count++;
 					continue;
@@ -900,7 +857,7 @@ public class DateTimeHelper {
 				}
 			}
 			
-			if (splits[i].equals(LAST)) {
+			if (splits[i].equals(AppConst.DATE_TIME.LAST)) {
 				if (i >= splits.length - 1) {
 					break;
 				}
@@ -909,21 +866,21 @@ public class DateTimeHelper {
 						continue;
 					}
 					String st = splits[i+2];
-					if (st.equals(DAY) || st.equals(DAYS)) {
+					if (st.equals(AppConst.DATE_TIME.DAY) || st.equals(AppConst.DATE_TIME.DAYS)) {
 						daysFromNow = -Integer.parseInt(splits[i+1]);
 						count++;
 						continue;
 					}
-					if (st.equals(WEEK) || st.equals(WEEKS)) {
+					if (st.equals(AppConst.DATE_TIME.WEEK) || st.equals(AppConst.DATE_TIME.WEEKS)) {
 						weeksFromNow = -Integer.parseInt(splits[i+1]);
 						count++;
 						continue;
 					}
-				} else if (splits[i+1].equals(DAY) || splits[i+1].equals(DAYS)) {
+				} else if (splits[i+1].equals(AppConst.DATE_TIME.DAY) || splits[i+1].equals(AppConst.DATE_TIME.DAYS)) {
 					daysFromNow = -1;
 					count++;
 					continue;
-				} else if (splits[i+1].equals(WEEK) || splits[i+1].equals(WEEKS)) {
+				} else if (splits[i+1].equals(AppConst.DATE_TIME.WEEK) || splits[i+1].equals(AppConst.DATE_TIME.WEEKS)) {
 					weeksFromNow = -1;
 					count++;
 					continue;
@@ -941,8 +898,8 @@ public class DateTimeHelper {
 			return null;
 		}
 		
-		for(int i=0; i<splits.length; i++) {
-			if (splits[i].equals(THIS)) {
+		for(int i = 0; i < splits.length; i++) {
+			if (splits[i].equals(AppConst.DATE_TIME.THIS)) {
 				if (i == splits.length - 1) {
 					break;
 				}
@@ -950,7 +907,7 @@ public class DateTimeHelper {
 					count++;
 					continue;
 				}
-				if (splits[i+1].equals(WEEK) || splits[i+1].equals(WEEKS)) {
+				if (splits[i+1].equals(AppConst.DATE_TIME.WEEK) || splits[i+1].equals(AppConst.DATE_TIME.WEEKS)) {
 					count++;
 					continue;
 				}
@@ -961,16 +918,15 @@ public class DateTimeHelper {
 			return null;
 		}
 		
-		if (count == 0 && dayInWeek!=-1) {
+		if (count == 0 && dayInWeek != -1) {
 			count++;
-		} else {
-			if (dayInWeek == -1 && daysFromNow == 0) {
-				if (flag == 1) {
-					dayInWeek = 0;
-				} else {
-					dayInWeek = 6;
-				}
+		} else if (dayInWeek == -1 && daysFromNow == 0) {
+			if (flag == 1) {
+				dayInWeek = 0;
+			} else {
+				dayInWeek = 6;
 			}
+
 		}
 		
 		if (count == 1 && numberResult > 0) {
@@ -990,36 +946,36 @@ public class DateTimeHelper {
 		}
 		
 		// get the date for dayInWeek for this current week
-		String dateForDayInWeek = getDateFromDayInCurrentWeek(days[dayInWeek]);
+		String dateForDayInWeek = getDateFromDayInCurrentWeek(mDays[dayInWeek]);
 		int day_ = getDayFromStringDate(dateForDayInWeek);
 		int month_ = getMonthFromStringDate(dateForDayInWeek);
-		int numberOfDays = weeksFromNow * 7;
+		int numberOfDays = weeksFromNow * AppConst.DATE_TIME.NUMBER_DAYS_PER_WEEK;
 		if (numberOfDays > 0) {
 			day_ += numberOfDays;
-			while (month_ <= 12 && day_ > daysInMonth[month_-1]) {
-				day_ -= daysInMonth[month_-1];
+			while (month_ <= AppConst.DATE_TIME.NUMBER_MONTHS && day_ > mDaysInMonth[month_-1]) {
+				day_ -= mDaysInMonth[month_-1];
 				month_++;
 			}
 		} else if (numberOfDays > 0) {
 			day_ -= numberOfDays;
 			while (day_ <= 0 && month_ > 1) {
 				month_--;
-				day_ += daysInMonth[month_-1];
+				day_ += mDaysInMonth[month_-1];
 			}
 		}
 		
-		if (month_ > 0 && month_ < 13 && day_ > 0 && day_ <= daysInMonth[month_-1]) {
+		if (month_ > 0 && month_ <= AppConst.DATE_TIME.NUMBER_MONTHS && day_ > 0 && day_ <= mDaysInMonth[month_-1]) {
 			
 			String dayString = String.valueOf(day_);
 			if (dayString.length() < 2) {
-				dayString = ZERO + dayString;
+				dayString = AppConst.DATE_TIME.ZERO + dayString;
 			}
 			String monthString = String.valueOf(month_);
 			if (monthString.length() < 2) {
-				monthString = ZERO + monthString;
+				monthString = AppConst.DATE_TIME.ZERO + monthString;
 			}
 			
-			return dayString + SLASH + monthString;
+			return dayString + AppConst.DATE_TIME.SLASH + monthString;
 		}
 		
 		return null;
@@ -1036,7 +992,7 @@ public class DateTimeHelper {
 		
 		dateTime = dateTime.toLowerCase();
 		
-		if (dateTime.equals(NOW)) {
+		if (dateTime.equals(AppConst.DATE_TIME.NOW)) {
 			return getCurrentTimeString();
 		}
 		
@@ -1045,9 +1001,7 @@ public class DateTimeHelper {
 		if (time == null || date == null) {
 			return null;
 		}
-		
-		System.out.println(date + " " + time);
-		
+				
 		if (date.equals("")) {
 			return null;
 		}
@@ -1060,15 +1014,15 @@ public class DateTimeHelper {
 	protected String getMonthStringForDateTime(String dateTime) {
 		String month = String.valueOf(dateTime.charAt(3)) + String.valueOf(dateTime.charAt(4));
 		int x = Integer.parseInt(month);
-		return months[x-1];
+		return mMonths[x-1];
 	}
 	
 	
 	// To get how many days from 1/1/2015 to day/month/2015
 	protected int getNumberOfDayFromThisYearForDate(int day, int month) {
 		int result = 0;
-		for(int i=1; i<month; i++) {
-			result += daysInMonth[i-1];
+		for(int i = 1; i < month; i++) {
+			result += mDaysInMonth[i-1];
 		}
 		result += day;
 		return result;
@@ -1077,56 +1031,62 @@ public class DateTimeHelper {
 	// To get date for numberOfDays from 1/1/2015
 	protected String getDateForNumberOfDays(int numberOfDays) {
 		int month = 1, day = numberOfDays;
-		while (month<=12) {
-			if (day<=daysInMonth[month-1]) {
+		while (month <= 12) {
+			if (day <= mDaysInMonth[month-1]) {
 				break;
 			}
-			day -= daysInMonth[month-1];
+			day -= mDaysInMonth[month-1];
 			month++;
 		}
 		if (day == 0) {
-			return "01/01";
+			return AppConst.DATE_TIME.START_DATE;
 		}
 		if (month > 12) {
-			return "31/12";
+			return AppConst.DATE_TIME.END_DATE;
 		}
 		String dayString = String.valueOf(day);
 		if (dayString.length() < 2) {
-			dayString = ZERO + dayString;
+			dayString = AppConst.DATE_TIME.ZERO + dayString;
 		}
 		String monthString = String.valueOf(month);
 		if (monthString.length() < 2) {
-			monthString = ZERO + monthString;
+			monthString = AppConst.DATE_TIME.ZERO + monthString;
 		}
-		return dayString + SLASH + monthString;
+		return dayString + AppConst.DATE_TIME.SLASH + monthString;
 	}
 	
 	// period has format: HH:mm HH:mm
+	// start time will be first HH:mm
 	protected int getStartTimeFromStringPeriod(String period) {
 		String hour = String.valueOf(period.charAt(0)) + String.valueOf(period.charAt(1));
 		String minute = String.valueOf(period.charAt(3)) + String.valueOf(period.charAt(4));
-		return Integer.parseInt(hour)*60 + Integer.parseInt(minute);
-	}
-	
-	protected String getStringStartTimeForStringPeriod(String period) {
-		String hour = String.valueOf(period.charAt(0)) + String.valueOf(period.charAt(1));
-		String minute = String.valueOf(period.charAt(3)) + String.valueOf(period.charAt(4));
-		return hour + ":" + minute;
+		return Integer.parseInt(hour) * AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR + Integer.parseInt(minute);
 	}
 	
 	// period has format: HH:mm HH:mm
+	// start time will be first HH:mm
+	protected String getStringStartTimeForStringPeriod(String period) {
+		String hour = String.valueOf(period.charAt(0)) + String.valueOf(period.charAt(1));
+		String minute = String.valueOf(period.charAt(3)) + String.valueOf(period.charAt(4));
+		return hour + AppConst.DATE_TIME.COLON + minute;
+	}
+	
+	// period has format: HH:mm HH:mm
+	// end time will be second HH:mm
 	protected int getEndTimeFromStringPeriod(String period) {
 		int length = period.length();
 		String hour = String.valueOf(period.charAt(length-5)) + String.valueOf(period.charAt(length-4));
 		String minute = String.valueOf(period.charAt(length-2)) + String.valueOf(period.charAt(length-1));
-		return Integer.parseInt(hour)*60 + Integer.parseInt(minute);
+		return Integer.parseInt(hour) * AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR + Integer.parseInt(minute);
 	}
 	
+	// period has format: HH:mm HH:mm
+	// end time will be second HH:mm
 	protected String getStringEndTimeForStringPeriod(String period) {
 		int length = period.length();
 		String hour = String.valueOf(period.charAt(length-5)) + String.valueOf(period.charAt(length-4));
 		String minute = String.valueOf(period.charAt(length-2)) + String.valueOf(period.charAt(length-1));
-		return hour + ":" + minute;
+		return hour + AppConst.DATE_TIME.COLON + minute;
 	}
 	
 	
@@ -1137,35 +1097,35 @@ public class DateTimeHelper {
 		int month = getMonthFromStringDate(currentTime);
 		int time = getEndTimeFromStringPeriod(currentTime);
 		time += minute;
-		while (time >= 24*60) {
-			time -= 24*60;
+		while (time >= AppConst.DATE_TIME.NUMBER_HOURS_PER_DAY * AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR) {
+			time -= AppConst.DATE_TIME.NUMBER_HOURS_PER_DAY * AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR;
 			day++;
-			if (day > daysInMonth[month-1]) {
-				day -= daysInMonth[month-1];
+			if (day > mDaysInMonth[month-1]) {
+				day -= mDaysInMonth[month-1];
 				month++;
 			}
 		}
 		String dayString = String.valueOf(day);
-		if (dayString.length()<2) {
-			dayString = ZERO + dayString;
+		if (dayString.length() < 2) {
+			dayString = AppConst.DATE_TIME.ZERO + dayString;
 		}
 		
 		String monthString = String.valueOf(month);
-		if (monthString.length()<2) {
-			monthString = ZERO + monthString;
+		if (monthString.length() < 2) {
+			monthString = AppConst.DATE_TIME.ZERO + monthString;
 		}
 		
-		String hourString = String.valueOf(time/60);
-		if (hourString.length()<2) {
-			hourString = ZERO + hourString;
+		String hourString = String.valueOf(time / AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR);
+		if (hourString.length() < 2) {
+			hourString = AppConst.DATE_TIME.ZERO + hourString;
 		}
 		
-		String minuteString = String.valueOf(time % 60);
-		if (minuteString.length()<2) {
-			minuteString = ZERO + minuteString;
+		String minuteString = String.valueOf(time % AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR);
+		if (minuteString.length() < 2) {
+			minuteString = AppConst.DATE_TIME.ZERO + minuteString;
 		}
 		
-		return dayString + SLASH + monthString + " " + hourString + ":" + minuteString;
+		return dayString + AppConst.DATE_TIME.SLASH + monthString + " " + hourString + ":" + minuteString;
 	}
 	
 	
@@ -1179,20 +1139,20 @@ public class DateTimeHelper {
 										boolean isHasPeriod2, 
 										String period2) {
 		int fromDay1 = getNumberOfDayFromThisYearForDate(getDayFromStringDate(fromDateTime1), getMonthFromStringDate(fromDateTime1));
-		int fromTime1 = getHourFromStringDate(fromDateTime1) * 60 + getMinuteFromStringDate(fromDateTime1);
+		int fromTime1 = getHourFromStringDate(fromDateTime1) * AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR + getMinuteFromStringDate(fromDateTime1);
 		int toDay1 = getNumberOfDayFromThisYearForDate(getDayFromStringDate(toDateTime1), getMonthFromStringDate(toDateTime1));
-		int toTime1 = getHourFromStringDate(toDateTime1) * 60 + getMinuteFromStringDate(toDateTime1);
+		int toTime1 = getHourFromStringDate(toDateTime1) * AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR + getMinuteFromStringDate(toDateTime1);
 		int fromDay2 = getNumberOfDayFromThisYearForDate(getDayFromStringDate(fromDateTime2), getMonthFromStringDate(fromDateTime2));
-		int fromTime2 = getHourFromStringDate(fromDateTime2) * 60 + getMinuteFromStringDate(fromDateTime2);
+		int fromTime2 = getHourFromStringDate(fromDateTime2) * AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR + getMinuteFromStringDate(fromDateTime2);
 		int toDay2 = getNumberOfDayFromThisYearForDate(getDayFromStringDate(toDateTime2), getMonthFromStringDate(toDateTime2));
-		int toTime2 = getHourFromStringDate(toDateTime2) * 60 + getMinuteFromStringDate(toDateTime2);
-		for(int i=fromDay1; i<=toDay1; i++) {
-			if (i>=fromDay2 && i<=toDay2) {
-				int startTime1 = 0, endTime1 = 23*60+59;
-				if (i==fromDay1) {
+		int toTime2 = getHourFromStringDate(toDateTime2) * AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR + getMinuteFromStringDate(toDateTime2);
+		for(int i = fromDay1; i <= toDay1; i++) {
+			if (i >= fromDay2 && i <= toDay2) {
+				int startTime1 = 0, endTime1 = AppConst.DATE_TIME.NUMBER_HOURS_PER_DAY * AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR - 1;
+				if (i == fromDay1) {
 					startTime1 = fromTime1;
 				}				
-				if (i==toDay1) {
+				if (i == toDay1) {
 					endTime1 = toTime1;
 				}
 				
@@ -1201,11 +1161,11 @@ public class DateTimeHelper {
 					endTime1 = getEndTimeFromStringPeriod(period1);
 				}
 				
-				int startTime2 = 0, endTime2 = 23*60+59;
-				if (i==fromDay2) {
+				int startTime2 = 0, endTime2 = AppConst.DATE_TIME.NUMBER_HOURS_PER_DAY * AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR - 1;
+				if (i == fromDay2) {
 					startTime2 = fromTime2;
 				}				
-				if (i==toDay2) {
+				if (i == toDay2) {
 					endTime2 = toTime2;
 				}
 				
@@ -1213,9 +1173,7 @@ public class DateTimeHelper {
 					startTime2 = getStartTimeFromStringPeriod(period2);
 					endTime2 = getEndTimeFromStringPeriod(period2);
 				}
-				
-				System.out.println("Get period: " + period1 + " " + period2);
-				
+								
 				if (startTime1 <= startTime2 && startTime2 < endTime1) {
 					return true;
 				}
@@ -1241,13 +1199,13 @@ public class DateTimeHelper {
 													String repeatedDay, 
 													String periodRepeated ) {
 		int fromDay = getNumberOfDayFromThisYearForDate(getDayFromStringDate(startDateTime), getMonthFromStringDate(startDateTime));
-		int fromTime = getHourFromStringDate(startDateTime) * 60 + getMinuteFromStringDate(startDateTime);
+		int fromTime = getHourFromStringDate(startDateTime) * AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR + getMinuteFromStringDate(startDateTime);
 		int toDay = getNumberOfDayFromThisYearForDate(getDayFromStringDate(endDateTime), getMonthFromStringDate(endDateTime));
-		int toTime = getHourFromStringDate(endDateTime) * 60 + getMinuteFromStringDate(endDateTime);	
+		int toTime = getHourFromStringDate(endDateTime) * AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR + getMinuteFromStringDate(endDateTime);	
 		int dayInWeekRepeated = getDayInWeekForDate(repeatedDay);								
 		for(int i=fromDay; i<=toDay; i++) {
 			
-			int startTime = 0, endTime = 23*60+59;
+			int startTime = 0, endTime = AppConst.DATE_TIME.NUMBER_HOURS_PER_DAY * AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR - 1;
 			if (i==fromDay) {
 				startTime = fromTime;
 			}				
@@ -1299,39 +1257,37 @@ public class DateTimeHelper {
 			}
 			
 			int fromDay = getNumberOfDayFromThisYearForDate(getDayFromStringDate(startDate), getMonthFromStringDate(startDate));
-			int fromTime = getHourFromStringDate(startDate) * 60 + getMinuteFromStringDate(startDate);
+			int fromTime = getHourFromStringDate(startDate) * AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR + getMinuteFromStringDate(startDate);
 			int toDay = getNumberOfDayFromThisYearForDate(getDayFromStringDate(endDate), getMonthFromStringDate(endDate));
-			int toTime = getHourFromStringDate(endDate) * 60 + getMinuteFromStringDate(endDate);
+			int toTime = getHourFromStringDate(endDate) * AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR + getMinuteFromStringDate(endDate);
 			
 			if (task.getRepeatedType() != AppConst.REPEATED_TYPE.EVERY_WEEK) {
 				if (day>=fromDay && day<=toDay) {
-					int startTime = 0, endTime = 24;
+					int startTime = 0, endTime = AppConst.DATE_TIME.NUMBER_HOURS_PER_DAY;
 					if (day == fromDay) {
-						startTime = fromTime / 60;
+						startTime = fromTime / AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR;
 					}
 					if (day == toDay) {
-						endTime = (toTime + 59) / 60;
+						endTime = (toTime + AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR - 1) / AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR;
 					}
-					if (task.getRepeatedType()>0) {
-						startTime = getStartTimeFromStringPeriod(task.getPeriod()) / 60;
-						endTime = (getEndTimeFromStringPeriod(task.getPeriod()) + 59) / 60;
+					if (task.getRepeatedType() > 0) {
+						startTime = getStartTimeFromStringPeriod(task.getPeriod()) / AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR;
+						endTime = (getEndTimeFromStringPeriod(task.getPeriod()) + AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR - 1) / AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR;
 					}
-					System.out.println(String.valueOf(startTime) + " " + String.valueOf(endTime));
-					for(int j=startTime; j<endTime; j++) {
-						if (j>=8 && j<=19) {
-							result[j-8] = i;
+					for(int j = startTime; j < endTime; j++) {
+						if (j >= AppConst.DATE_TIME.START_TIMETABLE_TIME && j < AppConst.DATE_TIME.END_TIMETABLE_TIME) {
+							result[j-AppConst.DATE_TIME.START_TIMETABLE_TIME] = i;
 						}
 					}
 				}
 			} else {
 				int fromDayInWeek = getDayInWeekForDate(startDate);
-				if (day>=fromDay && fromDayInWeek==dayInWeek) {
-					int startTime = getStartTimeFromStringPeriod(task.getPeriod()) / 60;
-					int endTime = (getEndTimeFromStringPeriod(task.getPeriod()) + 59) / 60;
-					System.out.println(String.valueOf(startTime) + " " + String.valueOf(endTime));
+				if (day >= fromDay && fromDayInWeek == dayInWeek) {
+					int startTime = getStartTimeFromStringPeriod(task.getPeriod()) / AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR;
+					int endTime = (getEndTimeFromStringPeriod(task.getPeriod()) + AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR - 1) / AppConst.DATE_TIME.NUMBER_MINUTES_PER_HOUR;
 					for(int j=startTime; j<endTime; j++) {
-						if (j>=8 && j<=19) {
-							result[j-8] = i;
+						if (j >= AppConst.DATE_TIME.START_TIMETABLE_TIME && j < AppConst.DATE_TIME.END_TIMETABLE_TIME) {
+							result[j-AppConst.DATE_TIME.START_TIMETABLE_TIME] = i;
 						}
 					}
 				}

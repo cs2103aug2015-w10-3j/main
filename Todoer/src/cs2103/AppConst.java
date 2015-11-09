@@ -42,6 +42,98 @@ public interface AppConst {
 		String FOR1 = " for ";
 		
 	}
+	
+	interface DATE_TIME {
+		int NUMBER_DAYS_PER_YEAR = 365;
+		int NUMBER_DAYS_PER_WEEK = 7;
+		int NUMBER_MINUTES_PER_HOUR = 60;
+		int NUMBER_HOURS_PER_DAY = 24;
+		int NUMBER_MONTHS = 12;
+		int NUMBER_AM = 12;
+		int MAX_NUMBER_DAYS_PER_MONTH = 31;
+		
+		String EVERY = "every";
+		String EVERYDAY = "everyday";
+		String DAY = "day";
+		String THIS_MON = "this mon";
+		String THIS_SUN = "this sun";
+		
+		String START_YEAR_DATE_TIME = "01/01 00:00";
+		String END_YEAR_DATE_TIME = "31/12 23:59";
+		String START_DATE = "01/01";
+		String END_DATE = "31/12";
+		String START_TIME = "00:00";
+		String END_TIME = "23:59";
+		int START_TIMETABLE_TIME = 8;
+		int END_TIMETABLE_TIME = 20;
+		
+		String TODAY = "Today";
+		String TOMORROW = "Tomorrow";
+		String YESTERDAY = "Yesterday";
+		String YTD = "ytd";
+		String TMR = "tmr";
+		String NOW = "now";
+		
+		String AM = "am";
+		String PM = "pm";
+		String NEXT = "next";
+		String NXT = "nxt";
+		String LAST = "last";
+		String WEEKS = "weeks";
+		String WEEK = "week";
+		String LATER = "later";
+		String DAYS = "days";
+		String THIS = "this";
+		String ZERO = "0";
+		String DOUBLE_ZERO = "00";
+		String SLASH = "/";
+		String COLON = ":";
+		String TH = "th";
+		String ST = "st";
+		String RD = "rd";
+		String ND = "nd";
+		String MINUTE = "m";
+		String HOUR = "h";
+		
+		String DATE_FORMAT = "dd:MM";
+		String DISPLAY_DATE_FORMAT = "dd MMM";
+		String TIME_FORMAT = "HH:mm";
+		
+		int[] NUMBER_DAYS_IN_MONTH = new int[] {31, 
+												28, 
+												31, 
+												30, 
+												31, 
+												30, 
+												31, 
+												31, 
+												30, 
+												31, 
+												30, 
+												31};
+		String[] MONTH_NAMES = new String[] {"january", 
+				 							 "february", 
+											 "march", 
+											 "april", 
+											 "may", 
+											 "june", 
+											 "july", 
+											 "august", 
+											 "september", 
+											 "october", 
+											 "november", 
+											 "december"
+											 };
+		String[] DAY_IN_WEEK = new String[] {  "monday",
+											   "tuesday",
+											   "wednesday",
+											   "thursday",
+											   "friday",
+											   "saturday",
+											   "sunday"
+											   };
+		
+	}
 
 	interface COMMAND_TYPE {
 	
@@ -87,6 +179,24 @@ public interface AppConst {
 		String REMIND = "remind";
 		String REPEAT = "repeat";
 		
+	}
+	
+	interface TASK_JSON_FIELD {
+		String NAME = "name";
+		String DEADLINE = "deadline";
+		String REMIND_TIME = "remind_time";
+		String START_DATE = "start_date";
+		String END_DATE = "end_date";
+		String PERIOD = "period";
+		String PRIORITY = "priority";
+		String GROUP = "group";
+		String STATUS = "status";
+		String TASK_INFO = "task_info";
+		String REPEATED_TYPE = "repeat_type";
+		String TASK_ID = "task_id";
+		String PARENT_TASK_ID = "parent_task_id";
+		String DATA_FILE_URL = "dataFileUrl";
+	
 	}
 	
 	interface TASK_FIELD {
@@ -193,8 +303,8 @@ public interface AppConst {
 		// Mark done/undone
 		String MARKED_DONE_SUCCESSFUL = "Task is marked 'done' successfully!\n";
 		String MARKED_UNDONE_SUCCESSFUL = "Task is marked 'undone' successfully. You can update the new deadline for this task by using 'update' command!\n";
-		String TASK_CLOSED = "Task is already closed!\n";
-		String TASK_OPENED = "Task is already opened!\n";
+		String TASK_CLOSED = "Task is already done!\n";
+		String TASK_OPENED = "Task is already undone!\n";
 		String TASKS_DONE = "Tasks are marked done successfully!\n";
 		String TASKS_UNDONE = "Tasks are marked undone successfully!\n";
 		
@@ -235,11 +345,12 @@ public interface AppConst {
 		static int DEFAULT_WINDOW_WIDTH = 95;
 		static double DEFAULT_RATIO = 0.08;
 		static int MAX_NUMBER_ROWS = 16;
+		static int MAX_NUMBER_TASKS_SEARCH_RESULT = 10;
 		static int DEFAULT_COLUMN_WIDTH = 150;
 		
 		// check deadline task for every 1 second
 	    static int DEFAULT_TIME_REMIND = 1 * 1000;
-	    static int DEFAULT_TIME_DISMISS = 30 * 1000;
+	    static int DEFAULT_TIME_DISMISS = 1 * 1000;
 		static int DEFAULT_TIME_PLAY_SOUND = 4 * 1000;
 		
 		String[] TASK_COLUMN_NAMES = new String[] {	"#", 

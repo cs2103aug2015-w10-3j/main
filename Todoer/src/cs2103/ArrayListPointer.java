@@ -1,14 +1,15 @@
 package cs2103;
 import java.util.*;
-public class ArrayListPointer{
+public class ArrayListPointer {
+	
 	private ArrayList<Task> pointer;
-	public ArrayListPointer(){
+	public ArrayListPointer() {
 		pointer = null;
 	}
-	public ArrayList<Task> getPointer(){
+	public ArrayList<Task> getPointer() {
 		return pointer;
 	}
-	public void setPointer(ArrayList<Task> newPointer){
+	public void setPointer(ArrayList<Task> newPointer) {
 		pointer = newPointer;	
 	}
 }

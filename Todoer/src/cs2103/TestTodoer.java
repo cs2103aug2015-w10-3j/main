@@ -49,7 +49,7 @@ public class TestTodoer {
 	public void testUpdateCommands() {
 		final String[] TEST_UPDATE_COMMANDS = {
 			"update id 2 TO priority high",
-			"update id 4 TO 10am to 11am repeat every tue",
+			"update id 4 TO from 10am to 11am repeat every tue",
 			"update id 2 TO by 10am tmr"
 		};
 		

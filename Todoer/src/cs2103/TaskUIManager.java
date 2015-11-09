@@ -17,6 +17,7 @@ import java.awt.event.ActionListener;
 import java.awt.FlowLayout;
 import java.awt.event.*;
 import java.awt.Rectangle;
+
 import javax.swing.text.DefaultCaret;
 
 public class TaskUIManager {
@@ -258,8 +259,8 @@ public class TaskUIManager {
 		public void run() {
 			
 			/*
-			** Get the list of tasks with the reminder time is coming
-			** User can set the reminder time for a task by using repeat id <id> <time>
+			* Get the list of tasks with the reminder time is coming
+			* User can set the reminder time for a task by using repeat id <id> <time>
 			*/
 			ArrayListPointer dataTaskListPointer = new ArrayListPointer();   
             dataTaskListPointer.setPointer(dataTaskList);
@@ -289,15 +290,15 @@ public class TaskUIManager {
 					public void run() {		
 		  				try {
 		  					/* 
-		  					** Turn on the sound and the notification
-		  					** User can turn off by press ENTER
-		  					** If not, after timeDismiss seconds, the notification will be turned off
+		  					* Turn on the sound and the notification
+		  					* User can turn off by press ENTER
+		  					* If not, after timeDismiss seconds, the notification will be turned off
 		  					*/
-		  					InputStream in = new FileInputStream(AppConst.UI_CONST.DEFAULT_SOUND_FILE_NAME);
-							AudioStream as = new AudioStream(in);	
-							AudioPlayer.player.start(as);  
-							Thread.sleep(AppConst.UI_CONST.DEFAULT_TIME_PLAY_SOUND);
-							AudioPlayer.player.stop(as);
+//		  					InputStream in = new FileInputStream(AppConst.UI_CONST.DEFAULT_SOUND_FILE_NAME);
+//							AudioStream as = new AudioStream(in);	
+//							AudioPlayer.player.start(as);  
+//							Thread.sleep(AppConst.UI_CONST.DEFAULT_TIME_PLAY_SOUND);
+//							AudioPlayer.player.stop(as);
 							Thread.sleep(AppConst.UI_CONST.DEFAULT_TIME_DISMISS);
 							dlg.dispose();
 						} catch (Throwable th) {

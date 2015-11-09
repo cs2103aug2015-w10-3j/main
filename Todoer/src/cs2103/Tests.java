@@ -1,8 +1,5 @@
 package cs2103;
-import java.io.*;
-import java.util.Scanner;
 import java.util.*;
-import java.lang.*;
 
 
 public class Tests {

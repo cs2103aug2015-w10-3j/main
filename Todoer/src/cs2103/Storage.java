@@ -5,23 +5,23 @@ import java.util.*;
 
 public class Storage {
 
-	private   String fileName = "default.txt";
-	private   BufferedReader br = null;
-	private   BufferedWriter bw = null;
-	private   JSONHelper jsonHelper = new JSONHelper();
+	private String fileName = "default.txt";
+	private BufferedReader br = null;
+	private BufferedWriter bw = null;
+	private JSONHelper jsonHelper = new JSONHelper();
 	
 	// Temporary internal arrayList for storage
-	private   ArrayList<Task> taskList = new ArrayList<Task>();
+	private ArrayList<Task> taskList = new ArrayList<Task>();
 	
 	public Storage() {
 		//Initialise the variables;		
 	}
 
-	public   void setFileURL(String fileURL){
+	public void setFileURL(String fileURL) {
 		fileName = fileURL;
 	}
 
-	public	 void rewriteContent(ArrayList<Task> allTasks) {
+	public void rewriteContent(ArrayList<Task> allTasks) {
 		taskList = allTasks;
 		try {
 			writeFileByLine();
@@ -39,7 +39,7 @@ public class Storage {
 		
 	}
 	
-	private   void handleException(IOException e) {
+	private void handleException(IOException e) {
 		e.printStackTrace();
 		System.exit(0);
 	}
@@ -50,11 +50,9 @@ public class Storage {
 			
 			return JSONHelper.stringToSettings( br.readLine() );
 			
-		}
-		catch (FileNotFoundException e){
+		} catch (FileNotFoundException e){
 			return new Settings();
-		}
-		catch (Exception e){
+		} catch (Exception e){
 			e.printStackTrace();
 			return null;
 		}
@@ -65,14 +63,13 @@ public class Storage {
 			bw = new BufferedWriter(new FileWriter(fileName));
 			bw.write(jsonHelper.convertSettingsToString(mSettings));
 			bw.close();
-		}
-		catch (Exception e){
+		} catch (Exception e){
 			e.printStackTrace();
 		}
 
 	}
 
-	public   ArrayList<Task> readContent() throws IOException {
+	public ArrayList<Task> readContent() throws IOException {
 		try {
 			readFileByLine();
         } catch (FileNotFoundException e) {
@@ -87,7 +84,7 @@ public class Storage {
 		return taskList;
 	}
 	
-	private   void readFileByLine() throws FileNotFoundException,
+	private void readFileByLine() throws FileNotFoundException,
 	IOException {
 		BufferedReader br = new BufferedReader(new FileReader(fileName));
 		ArrayList<Task> updatedTaskList = new ArrayList<Task>();
@@ -99,15 +96,15 @@ public class Storage {
 		br.close();
 	}
 	
-	private   void writeFileByLine() throws IOException {
+	private void writeFileByLine() throws IOException {
 		bw = new BufferedWriter(new FileWriter(fileName));
-		for (int i = 0; i < taskList.size(); i++) { 
+		for(int i = 0; i < taskList.size(); i++) { 
 		  bw.write(jsonHelper.convertTaskToString(taskList.get(i)));
 		  bw.newLine();
 		}
 	}
 
-	private   void closeReader() throws IOException {
+	private void closeReader() throws IOException {
 		if (br != null) {
 			br.close();
 		}

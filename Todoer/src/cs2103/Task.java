@@ -1,21 +1,14 @@
 package cs2103;
-import java.util.*;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONArray;
-import org.json.simple.parser.ParseException;
-import org.json.simple.parser.JSONParser;
-import java.io.*;
-import java.text.*;
 
 public class Task {
-	private String name;
-	private String priority="medium";
-	private String group="";
-	private String status="undone";
-	private String deadline="";
-	private String repeatTime = "";
-	private String startDate="";
-	private String endDate="";
+	private String name = "";
+	private String priority = AppConst.TASK_FIELD.MEDIUM;
+	private String group = "";
+	private String status = AppConst.TASK_FIELD.UNDONE;
+	private String deadline = "";
+	private String remindTime = "";
+	private String startDate = "";
+	private String endDate = "";
 	private String taskInfo;
 	private String period = "00:00 23:59";
 	private int repeatedType = 0;
@@ -24,47 +17,46 @@ public class Task {
 	
 	public Task(String newname) {
 		name = newname;
-		repeatedType = 0;
 	}
 
-	public String getName(){
+	public String getName() {
 		return name;
 	}
 
-	public void setName(String newname){
+	public void setName(String newname) {
 		name = newname;
 	}
 
-	public String getPriority(){
+	public String getPriority() {
 		return priority;
 	}
 
-	public void setPriority(String newPriority){
+	public void setPriority(String newPriority) {
 		priority = newPriority;
 	}
 
-	public String getGroup(){
+	public String getGroup() {
 		return group;
 	}
 
-	public void setGroup(String newGroup){
+	public void setGroup(String newGroup) {
 		group = newGroup;
 	}
 
-	public String getDeadline(){
+	public String getDeadline() {
 		return deadline;
 	}
 
-	public void setDeadline(String newDeadline){
+	public void setDeadline(String newDeadline) {
 		deadline = newDeadline;
 	}
 	
-	public String getRepeatTime() {
-		return repeatTime;	
+	public String getRemindTime() {
+		return remindTime;	
 	}	
 	
-	public void setRepeatTime(String newRepeatTime) {
-		repeatTime = newRepeatTime;
+	public void setRemindTime(String newRepeatTime) {
+		remindTime = newRepeatTime;
 	}
 	
 	public void setRepeatedType(int repeated) {
@@ -92,23 +84,23 @@ public class Task {
 		return startDate;
 	}
 
-	public void setStartDate(String newStartDate){
+	public void setStartDate(String newStartDate) {
 		startDate = newStartDate;
 	}
 
-	public String getEndDate(){
+	public String getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(String newEndDate){
+	public void setEndDate(String newEndDate) {
 		endDate = newEndDate;
 	}
 
-	public String getStatus(){
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(String newStatus){
+	public void setStatus(String newStatus) {
 		status = newStatus;
 	}
 	
@@ -139,7 +131,7 @@ public class Task {
 	public Task copy(){
 		Task newTask = new Task(name);
 		newTask.setDeadline(deadline);
-		newTask.setRepeatTime(repeatTime);
+		newTask.setRemindTime(remindTime);
 		newTask.setGroup(group);
 		newTask.setPriority(priority);
 		newTask.setStartDate(startDate);

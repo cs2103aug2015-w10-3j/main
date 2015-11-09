@@ -1,7 +1,7 @@
 package cs2103;
 import java.util.*;
 
-public class DataState{
+public class DataState {
 	private ArrayList<Task> allTasks;
 
 	public DataState() {
@@ -11,15 +11,15 @@ public class DataState{
 	public DataState(ArrayList<Task> tasks) {
 		//Initialise the variables;	
 		allTasks = new ArrayList<Task>();	
-		for (int i=0;i<tasks.size();i++)
+		for (int i = 0;i < tasks.size();i++)
 			allTasks.add(tasks.get(i).copy());
 	}
 
-	public ArrayList<Task> getAllTasks(){
+	public ArrayList<Task> getAllTasks() {
 		return allTasks;
 	}
 
-	public void setAllTasks(ArrayList<Task> tasks){
+	public void setAllTasks(ArrayList<Task> tasks) {
 		allTasks = tasks;
 	}
 	

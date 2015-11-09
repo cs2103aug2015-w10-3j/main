@@ -14,7 +14,7 @@ public class TableHelper {
 	
 	private DateTimeHelper mDateTimeHelper = new DateTimeHelper();
 	private CommandParser mCommandParser = new CommandParser();
-	private ArrayList<Task> dataTaskList = new ArrayList<Task>();
+	private ArrayList<Task> mDataTaskList = new ArrayList<Task>();
     
  // column to display in table
     String[] mColumnNames = AppConst.UI_CONST.TASK_COLUMN_NAMES;
@@ -79,28 +79,28 @@ public class TableHelper {
 	}
 	
 	protected void setDataListForTable(ArrayList<Task> tasks) {
-		dataTaskList = tasks;
+		mDataTaskList = tasks;
 	}
 	
 	/* Get the data to display in the table for a task	
-	** Column 0: index number of a task in the table, 
-	** user can use this index instead of task name for commands
-	** Column 1: Task name
-	** Column 2: Deadline for task
-	** Column 3: Start date/time for task,
-	** for event task, the value will be the start time and date of the event
-	** for recurrent task type repeat from date to date, the value will be the start date of event
-	** for recurrent task type repeat every day or a day in week, the value will the the start time of each day
-	** Column 4: End date/time for task,
-	** for event task, the value will be the end time and date of the event
-	** for recurrent task type repeat from date to date, the value will be the end date of event
-	** for recurrent task type repeat every day or a day in week, the value will the the end time of each day
-	** Column 5: Period of an recurrent task
-	** For recurrent task type repeat from date to date, the value will be the start and end time of each day
-	** For recurrent task type repeat every day or a day in week, the value will either "Every day" or "Every <a day in week>"
-	** Column 6: Priority of a task, for display, it's either High, Medium or Low, comes with the color
-	** Column 7: Group name of a task
-	** Column 8: Status of a task, either "done" or "undone"
+	* Column 0: index number of a task in the table, 
+	* user can use this index instead of task name for commands
+	* Column 1: Task name
+	* Column 2: Deadline for task
+	* Column 3: Start date/time for task,
+	* for event task, the value will be the start time and date of the event
+	* for recurrent task type repeat from date to date, the value will be the start date of event
+	* for recurrent task type repeat every day or a day in week, the value will the the start time of each day
+	* Column 4: End date/time for task,
+	* for event task, the value will be the end time and date of the event
+	* for recurrent task type repeat from date to date, the value will be the end date of event
+	* for recurrent task type repeat every day or a day in week, the value will the the end time of each day
+	* Column 5: Period of an recurrent task
+	* For recurrent task type repeat from date to date, the value will be the start and end time of each day
+	* For recurrent task type repeat every day or a day in week, the value will either "Every day" or "Every <a day in week>"
+	* Column 6: Priority of a task, for display, it's either High, Medium or Low, comes with the color
+	* Column 7: Group name of a task
+	* Column 8: Status of a task, either "done" or "undone"
 	*/
 	public String[] getDataFromTask(Task task, int i) {
 	
@@ -155,11 +155,11 @@ public class TableHelper {
 		
 		String[] keys = AppConst.KEY_WORD.keywords;
 		
-		for(int i=0; i<splits.length; i++) {
-			if (splits[i].startsWith(AppConst.UI_CONST.SLASH) && splits[i].length()>1) {
+		for(int i = 0; i < splits.length; i++) {
+			if (splits[i].startsWith(AppConst.UI_CONST.SLASH) && splits[i].length() > 1) {
 				String s = splits[i].substring(1, splits[i].length());
 				boolean isKeyword = false;
-				for(int j=0; j<keys.length; j++) {
+				for(int j = 0; j < keys.length; j++) {
 					if (keys[j].equals(s)) {
 						isKeyword = true;
 						break;
@@ -172,7 +172,7 @@ public class TableHelper {
 		}
 		
 		String result = "";
-		for(int i=0; i<splits.length; i++) {
+		for(int i = 0; i < splits.length; i++) {
 			if (i > 0) {
 				result += " ";
 			}
@@ -195,8 +195,8 @@ public class TableHelper {
         }
         
         // Set data for table
-        for (int i = 0; i < dataTaskList.size(); i++) {
-            String[] data = getDataFromTask(dataTaskList.get(i), i);
+        for (int i = 0; i < mDataTaskList.size(); i++) {
+            String[] data = getDataFromTask(mDataTaskList.get(i), i);
             tableModel.addRow(data);
         }
     
@@ -242,12 +242,12 @@ public class TableHelper {
 			
 			// TIME_ZERO = 00:00
 			date += AppConst.UI_CONST.TIME_ZERO;
-			int[] timetable = mDateTimeHelper.getTimetableForDate(date, dataTaskList);
+			int[] timetable = mDateTimeHelper.getTimetableForDate(date, mDataTaskList);
 			String[] data = new String[mTimeTableColumnNames.length];
 			data[0] = mDateTimeHelper.convertDateMonthToDisplayFormat(date) + " (" + mDateTimeHelper.getStringDayInWeekForDate(date) + ")";
-			for(int j=1; j<mTimeTableColumnNames.length; j++) {
+			for(int j = 1; j < mTimeTableColumnNames.length; j++) {
 				if (timetable[j-1] != -1) {
-					data[j] = dataTaskList.get(timetable[j-1]).getName() + AppConst.UI_CONST.SPACE + AppConst.TASK_FIELD.PRIORITY + dataTaskList.get(timetable[j-1]).getPriority();
+					data[j] = mDataTaskList.get(timetable[j - 1]).getName() + AppConst.UI_CONST.SPACE + AppConst.TASK_FIELD.PRIORITY + mDataTaskList.get(timetable[j - 1]).getPriority();
 				} else {
 					data[j] = "";
 				}
@@ -261,7 +261,7 @@ public class TableHelper {
 	private String removeSpace(String userCommand) {
 		String[] commands = userCommand.split(" ");
 		String result = "";
-		for(int i=0; i<commands.length; i++) {
+		for(int i = 0; i < commands.length; i++) {
 			if (!commands[i].equals("") && !commands[i].equals(" ")) {
 				if (result.length() > 0) {
 					result += " ";
