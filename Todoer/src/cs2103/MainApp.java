@@ -300,7 +300,7 @@ public class MainApp {
 		  		}).start();
 		  		dlg.setVisible(true);
 			}
-			toolkit.beep();
+			//toolkit.beep();
 		}
 	}
     
