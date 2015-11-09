@@ -48,13 +48,7 @@ Todoer's UI consists of two packages: `control` and `view`. The `control` packag
 UI maintains a reference to Logic, calling Logic’s methods directly to trigger processing of user-entered commands.
 
 ## `MainApp` Class
-This is the starting point of the whole program. It initialises an instance of the `MainLogic` class in `Logic` and an instance of the `TableHelper` class to be used throughout the lifetime of the program. It has a public method `handleKeyPress()` to be called by the `UIController` whenever the user presses a key on the command bar. Depending on the key pressed, the `MainApp` can pass the value of the user input to the `MainLogic` class to get back a feedback string. The `MainApp` then decides what to be displayed on the UI through calling methods of the `UIController` class.
-
-###### Notable API
-
-| Return type   | Method and Description                                            |
-|-------------|----------------------------------------------------------|
-| void | handleKeyPress(char key, String userInput): handler for when a key is pressed in the command bar   |
+This is the starting point and main driver of the whole program. It initialises an instance of the `MainLogic` class in `Logic` to be used throughout the lifetime of the program. `MainApp` can passes the value of the user input to the `MainLogic` class to get back a feedback string. The `MainApp` then decides what to be displayed on the UI through calling methods of the `TableHelper` class.
 
 ## `TableHelper` Class
 
@@ -64,18 +58,8 @@ This is the starting point of the whole program. It initialises an instance of t
 
 | Return type   | Method and Description                                            |
 |-------------|----------------------------------------------------------|
-| JTable | handleKeyPress(char key, String userInput): handler for when a key is pressed in the command bar   |
-
-## `UIController` Class
-This class defines the looks and feels of the `Text field` (or command bar) and `Display field`. It signals the `MainApp` whenever a key is pressed by calling the method `handleKeyPress()`. It also has public methods for the `MainApp` to change the content of the fields.
-
-###### Notable API
-
-| Return type   | Method and Description                                            |
-|-------------|----------------------------------------------------------|
-| void | clearCommandBar(): clear the command bar   |
-| void | clearDisplay(): clear the display panel   |
-| void | display(String s): add a string to the display panel   |
+| void | createTableToDisplayTasks(): creates the standard table view for the tasks passed to the UI   |
+| String | createTimeTable(String userCommand): returns the string data to be placed in the timetable  |
 
 # Logic Component
 
@@ -168,8 +152,6 @@ The diagram (see Figure 3) below demonstrates how the major components of the so
 
 The Parser component consists of a `CommandParser` class which receives the raw user input and creates a `Command` object which is executed by the `Logic` component
 
-The first element of the ArrayList is always the command keyword, while the remaining elements could be the task name or deadline, depending on the type of the command.
-
 ###### Notable API
 
 | Return type   | Method and Description                                            |
@@ -205,7 +187,10 @@ The `JSONConverter` class provide an `encodeTask` method to encode the details o
 
 # Testing
 
-JUnit is used to perform unit tests on the UI, Logic, Parser, and Storage components. Every method is unit tested to ensure everything works as intended.
+JUnit is used to perform unit tests on all the major commands in Todoer (add, delete, done, update etc.) to ensure everything works as intended. 
+
+Run TestTodoer.java in Eclipse IDE to test Todoer.
+
 
 # Future Development
 
@@ -216,4 +201,3 @@ We seek to develop the functionality to update/remind the Todoer user about urge
 
 ###### Further improved GUI
 We would like to implement additional helpful features such as auto-fill commands (by referencing the user’s past command history) and by displaying urgent/important tasks more prominently (perhaps with color coding).
-
