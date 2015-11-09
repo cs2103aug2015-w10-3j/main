@@ -2,6 +2,11 @@ import java.util.*;
 
 public interface AppConst {
 
+	String SETTINGS_FILE = "settings.txt";
+	String DATE_FORMAT = "dd/MM HH:mm:ss";
+	String ZERO_SECOND = "00";
+	int BIG_NUM = 100000;
+	
 	interface KEY_WORD {
 	
 		String[] keywords = new String[] {
