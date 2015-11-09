@@ -138,9 +138,7 @@ public interface AppConst {
 	interface COMMAND_TYPE {
 	
 		String ADD = "add";
-		
 		String CLEAR = "clear";
-		
 		String DELETE = "delete";
 		String DELETE_ALL = "deleteall";
 		String DELETE_BY = "deleteby";

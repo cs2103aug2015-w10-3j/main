@@ -18,7 +18,11 @@ public class MainLogic {
 	private DateTimeHelper mDateTimeHelper;
 	private Settings mSettings = new Settings();
 	private History mHistory = new History();
-
+	
+	/**
+	 * The contructor for MainLogic; it initialises all the instances of the required classes
+	 * 
+	 * */
 	public MainLogic() {
 		
 		mDateTimeHelper = new DateTimeHelper();
@@ -39,7 +43,6 @@ public class MainLogic {
 
 	/**
 	 * This function initilises the mAllTasks with data read from mDataStorage.
-	 * It also initialises the mHistory and mCurrentState
 	 * 
 	 * */
 	protected void initialiseTasks(){
@@ -47,7 +50,7 @@ public class MainLogic {
 		try{
 			mAllTasks = mDataStorage.readContent();
 			updateHistory();
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -56,10 +59,14 @@ public class MainLogic {
 		mHistory.updateHistory(mAllTasks);
 	}
 	
+	/**
+	 * Find the tasks that match with a Task task
+	 * 
+	 * */
 	private int findTasksMatched(Task task, ArrayList<Task> listTasks, ArrayListPointer returnTasks) {
 		ArrayList<Task> possibleTasks = new ArrayList<Task>();
 		int position = 0;
-		for(int i = 0; i < listTasks.size(); i++) {
+		for (int i = 0; i < listTasks.size(); i++) {
 			int x = isTasksMatched(task, listTasks.get(i));
 			if (x == 1) {
 				position = i;
@@ -79,7 +86,7 @@ public class MainLogic {
 	private ArrayList<Task> getTasksToDisplay(ArrayList<Task> tasks, int parentTaskId) {
 		ArrayList<Task> result = new ArrayList<Task>();
 		if (parentTaskId != -1) {
-			for(int i = 0; i < tasks.size(); i++) {
+			for (int i = 0; i < tasks.size(); i++) {
 				if (tasks.get(i).getParentTaskId() == parentTaskId && tasks.get(i).getTaskId() != parentTaskId) {
 					result.add(tasks.get(i));
 				}
@@ -94,7 +101,12 @@ public class MainLogic {
 		return result;
 	}
 
-	protected String executeAdd(Command mCommand,  ArrayListPointer feedbackTasks){
+	/**
+	 * The following functions handle the executions of different types of commands
+	 * 
+	 * */
+	 
+	protected String executeAdd(Command mCommand, ArrayListPointer feedbackTasks){
 		Task newTask = mCommand.getNewTask();
 		
 		if (newTask.getDeadline() == null || newTask.getStartDate() == null || newTask.getEndDate() == null) {
@@ -109,7 +121,7 @@ public class MainLogic {
 			return AppConst.MESSAGE.INVALID_TASK_NAME;
 		}
 
-		for(int i = 0; i < mAllTasks.size(); i++) {
+		for (int i = 0; i < mAllTasks.size(); i++) {
 			if (isTasksMatched(newTask, mAllTasks.get(i)) == 1) {
 				return AppConst.MESSAGE.TASK_EXISTS;
 			}
@@ -153,7 +165,7 @@ public class MainLogic {
 		
 		}
 		
-		// Check for the time overlap with other event, recurrent tasks or not
+		// Check for the time overlap with other events, recurrent tasks or not
 		if (isCheckOverlap(newTask, -1)) {
 			return AppConst.MESSAGE.OVERLAP_TIME_PERIOD;
 		}
@@ -180,7 +192,7 @@ public class MainLogic {
 			int start = mDateTimeHelper.getNumberOfDayFromThisYearForDate(mDateTimeHelper.getDayFromStringDate(newTask.getStartDate()), mDateTimeHelper.getMonthFromStringDate(newTask.getStartDate()));
 			int end = mDateTimeHelper.getNumberOfDayFromThisYearForDate(mDateTimeHelper.getDayFromStringDate(newTask.getEndDate()), mDateTimeHelper.getMonthFromStringDate(newTask.getEndDate()));
 			
-			for(int i = start; i <= end; i++) {
+			for (int i = start; i <= end; i++) {
 				String date = mDateTimeHelper.getDateForNumberOfDays(i);
 				
 				Task task = newTask.copy();
@@ -262,7 +274,7 @@ public class MainLogic {
 			return AppConst.MESSAGE.INVALID_ID;
 		}
 		
-		for(int i = 0; i < list.size(); i++) {
+		for (int i = 0; i < list.size(); i++) {
 			int x = list.get(i);
 			if (x < 1 || x > mPreviousTasks.size()) {
 				return AppConst.MESSAGE.INVALID_ID;
@@ -270,7 +282,7 @@ public class MainLogic {
 		}
 		
 		ArrayListPointer pointer = new ArrayListPointer();
-		for(int i = 0; i < list.size(); i++) {
+		for (int i = 0; i < list.size(); i++) {
 			int	x = list.get(i);
 			Task task = mPreviousTasks.get(x - 1);
 			int position = findTasksMatched(task, mAllTasks, pointer);
@@ -307,7 +319,6 @@ public class MainLogic {
 		String[] field = fieldToDelete.split(" ");
 		String userCommand = mCommand.getCommandType() + " " + fieldToDelete;
 		
-		
 		if (field.length < 2) {
 			return String.format(AppConst.MESSAGE.SYNTAX_ERROR, userCommand);
 		}
@@ -324,7 +335,7 @@ public class MainLogic {
 					return String.format(AppConst.MESSAGE.SYNTAX_ERROR, userCommand);
 				}
 				
-				for(int i = 0; i < mAllTasks.size(); i++) {
+				for (int i = 0; i < mAllTasks.size(); i++) {
 					if (!mAllTasks.get(i).getStatus().equals(field[1])) {
 						remainTaskList.add(mAllTasks.get(i));	
 					}
@@ -335,7 +346,7 @@ public class MainLogic {
 					return String.format(AppConst.MESSAGE.SYNTAX_ERROR, userCommand);
 				}
 				
-				for(int i = 0; i < mAllTasks.size(); i++) {
+				for (int i = 0; i < mAllTasks.size(); i++) {
 					if (!mAllTasks.get(i).getPriority().equals(field[1])) {
 						remainTaskList.add(mAllTasks.get(i));	
 					}
@@ -343,7 +354,7 @@ public class MainLogic {
 				break;
 			case AppConst.TASK_FIELD.GROUP:
 				String groupName = "";
-				for(int i = 1; i < field.length; i++) {
+				for (int i = 1; i < field.length; i++) {
 					if (i > 1) {
 						groupName += " ";
 					}
@@ -351,7 +362,7 @@ public class MainLogic {
 				}
 				taskFieldArg = groupName;
 				
-				for(int i = 0; i < mAllTasks.size(); i++) {
+				for (int i = 0; i < mAllTasks.size(); i++) {
 					if (!mAllTasks.get(i).getGroup().equals(groupName)) {
 						remainTaskList.add(mAllTasks.get(i));	
 					}
@@ -359,14 +370,14 @@ public class MainLogic {
 				break;
 			case AppConst.TASK_FIELD.DEADLINE:
 				String day = "";
-				for(int i = 1; i < field.length; i++) {
+				for (int i = 1; i < field.length; i++) {
 					if (i > 1) {
 						day += " ";
 					}
 					day += field[i];
 				}
 				taskFieldArg = day;
-				String date =  mDateTimeHelper.getDateMonthFromString(day, 2);
+				String date = mDateTimeHelper.getDateMonthFromString(day, 2);
 				
 				if (date == null || date.equals("")) {
 					feedbackTasks.setPointer(new ArrayList<Task>());
@@ -374,7 +385,7 @@ public class MainLogic {
 					return AppConst.MESSAGE.INVALID_DAY;
 				}
 				
-				for(int i = 0; i < mAllTasks.size(); i++) {
+				for (int i = 0; i < mAllTasks.size(); i++) {
 					String deadline = mAllTasks.get(i).getDeadline();
 					if (!deadline.equals("")) {
 						if (!deadline.substring(0, 5).equals(date)) {
@@ -407,7 +418,7 @@ public class MainLogic {
 			mAllTasks.remove(position);
 		} else {
 			ArrayList<Task> remainTaskList = new ArrayList<Task>();
-			for(int i = 0; i < mAllTasks.size(); i++) {
+			for (int i = 0; i < mAllTasks.size(); i++) {
 				if (mAllTasks.get(i).getParentTaskId() != parentTaskId) {
 					remainTaskList.add(mAllTasks.get(i));
 				}
@@ -536,7 +547,7 @@ public class MainLogic {
 			
 			updatedInfo.setStatus(mTask.getStatus());
 			
-			for(int i = 0; i < mAllTasks.size(); i++) {
+			for (int i = 0; i < mAllTasks.size(); i++) {
 				if (isTasksMatched(updatedInfo, mAllTasks.get(i)) == 1) {
 					return AppConst.MESSAGE.TASK_UPDATED_EXIST;
 				}
@@ -573,7 +584,7 @@ public class MainLogic {
 		
 	}
 
-	protected String executeShowby(Command mCommand,  ArrayListPointer feedbackTasks){
+	protected String executeShowby(Command mCommand, ArrayListPointer feedbackTasks){
 		
 		ArrayList<Task> mTasks = duplicate(mPreviousTasks);
 		feedbackTasks.setPointer(mTasks);
@@ -584,38 +595,36 @@ public class MainLogic {
 
 		switch (mCommand.getCommandArgument()){
 			case AppConst.TASK_FIELD.DEADLINE:
-				Collections.sort(mTasks,new Comparators.TaskDeadlineCompare());
+				Collections.sort(mTasks, new Comparators.TaskDeadlineCompare());
 				return AppConst.MESSAGE.DISPLAY_BY_DEADLINE;
 				
 			case AppConst.TASK_FIELD.START_DATE:
-				Collections.sort(mTasks,new Comparators.TaskStartDateCompare());
+				Collections.sort(mTasks, new Comparators.TaskStartDateCompare());
 				return AppConst.MESSAGE.DISPLAY_BY_START_DATE;
 				
 			case AppConst.TASK_FIELD.END_DATE:
-				Collections.sort(mTasks,new Comparators.TaskEndDateCompare());
+				Collections.sort(mTasks, new Comparators.TaskEndDateCompare());
 				return AppConst.MESSAGE.DISPLAY_BY_END_DATE;
 				
-
 			case AppConst.TASK_FIELD.PRIORITY:
-				Collections.sort(mTasks,new Comparators.TaskPriorityCompare());
+				Collections.sort(mTasks, new Comparators.TaskPriorityCompare());
 				return AppConst.MESSAGE.DISPLAY_BY_PRIORITY;
 
 			case AppConst.TASK_FIELD.GROUP:
-				Collections.sort(mTasks,new Comparators.TaskGroupCompare());
+				Collections.sort(mTasks, new Comparators.TaskGroupCompare());
 				return AppConst.MESSAGE.DISPLAY_BY_GROUP;
 		
 			default:
 				return AppConst.MESSAGE.NOT_RECOGNIZED_SYNTAX;
-				
 		}
 	}
 
-	protected String executeShow(Command mCommand,  ArrayListPointer feedbackTasks){
+	protected String executeShow(Command mCommand, ArrayListPointer feedbackTasks){
 		
 		ArrayList<Task> mTasks = new ArrayList<Task>();
 		feedbackTasks.setPointer(mTasks);
 		
-		// handle for show day
+		// handler for show day
 		String argument = mCommand.getCommandArgument();
 		String dateTimeArgument = "";
 		if (mCommand.getCommandType().equals(AppConst.COMMAND_TYPE.SHOW_DAY)) {
@@ -638,7 +647,7 @@ public class MainLogic {
 			ArrayList<Task> result = new ArrayList<Task>();
 			
 			if (mTask.getRepeatedType() == AppConst.REPEATED_TYPE.FROM_TO || mTask.getRepeatedType() == AppConst.REPEATED_TYPE.EVERY_WEEK) {
-				for(int i = 0; i < mAllTasks.size(); i++) {
+				for (int i = 0; i < mAllTasks.size(); i++) {
 					if (mAllTasks.get(i).getParentTaskId() == mTask.getParentTaskId() && mAllTasks.get(i).getTaskId() != mTask.getParentTaskId()) {
 						result.add(mAllTasks.get(i));
 					}
@@ -754,13 +763,13 @@ public class MainLogic {
 
 		ArrayList<MatchCount> matchCount = new ArrayList<MatchCount>();
 		
-		for(int i = 0; i < mAllTasks.size(); i++) {
+		for (int i = 0; i < mAllTasks.size(); i++) {
 			matchCount.add(i, new MatchCount());
 			matchCount.get(i).id = i;
 			matchCount.get(i).count = 0;
 			String[] args = mAllTasks.get(i).getTaskInfo().split(" ");
 			String task = "";
-			for(int j = 0; j < args.length; j++) {
+			for (int j = 0; j < args.length; j++) {
 				task = task + args[j] + " ";
 			}
 			task = task.toLowerCase();
@@ -769,9 +778,9 @@ public class MainLogic {
 				matchCount.get(i).count = AppConst.BIG_NUM;
 				continue;
 			}
-			for(int j = 0; j < arguments.length; j++) {
+			for (int j = 0; j < arguments.length; j++) {
 				String st = "";
-				for(int k = j; k < arguments.length; k++) {
+				for (int k = j; k < arguments.length; k++) {
 					st = st + arguments[k];
 					if (task.contains(st)) {
 						matchCount.get(i).count += k - j + 1;
@@ -786,7 +795,7 @@ public class MainLogic {
 		feedbackTasks.setPointer(mTasks);
 
 		boolean isMatched = false;
-		for(int i = 0; i < Math.min(matchCount.size(), AppConst.UI_CONST.MAX_NUMBER_TASKS_SEARCH_RESULT); i++) {
+		for (int i = 0; i < Math.min(matchCount.size(), AppConst.UI_CONST.MAX_NUMBER_TASKS_SEARCH_RESULT); i++) {
 			if (i == 0 && matchCount.get(i).count == 0) {
 				//Nothing matched!
 				break;
@@ -828,6 +837,7 @@ public class MainLogic {
 		if (taskToClose == null) {
 			return "";
 		}
+		
 		if (taskToClose.getDeadline() == null || taskToClose.getStartDate() == null || taskToClose.getEndDate() == null) {
 			return AppConst.MESSAGE.INVALID_DATE_TIME_FORMAT;
 		}
@@ -868,14 +878,14 @@ public class MainLogic {
 			return AppConst.MESSAGE.INVALID_ID;
 		}
 		
-		for(int i = 0; i < list.size(); i++) {
+		for (int i = 0; i < list.size(); i++) {
 			int x = list.get(i);
 			if (x < 1 || x > mPreviousTasks.size()) {
 				return AppConst.MESSAGE.INVALID_ID;
 			}
 		}
 		ArrayListPointer pointer = new ArrayListPointer();
-		for(int i = 0; i < list.size(); i++) {
+		for (int i = 0; i < list.size(); i++) {
 			int	x = list.get(i);
 			Task task = mPreviousTasks.get(x - 1);
 			int position = findTasksMatched(task, mAllTasks, pointer);
@@ -896,8 +906,10 @@ public class MainLogic {
 		if (taskId != parentTaskId) {
 			mAllTasks.get(position).setStatus(AppConst.TASK_FIELD.DONE);
 		} else {
-			for(int i = 0; i < mAllTasks.size(); i++) {
+
+			for (int i = 0; i < mAllTasks.size(); i++) {
 				if (mAllTasks.get(i).getParentTaskId() == parentTaskId) {
+
 					mAllTasks.get(i).setStatus(AppConst.TASK_FIELD.DONE);
 				}
 			}
@@ -957,16 +969,16 @@ public class MainLogic {
 		if (list == null) {
 			return AppConst.MESSAGE.INVALID_ID;
 		}
-		for(int i = 0; i < list.size(); i++) {
+		for (int i = 0; i < list.size(); i++) {
 			int x = list.get(i);
 			if (x < 1 || x > mPreviousTasks.size()) {
 				return AppConst.MESSAGE.INVALID_ID;
 			}
 		}
 		ArrayListPointer pointer = new ArrayListPointer();
-		for(int i = 0; i < list.size(); i++) {
+		for (int i = 0; i < list.size(); i++) {
 			int	x = list.get(i);
-			Task task = mPreviousTasks.get(x-1);
+			Task task = mPreviousTasks.get(x - 1);
 			int position = findTasksMatched(task, mAllTasks, pointer);
 			if (pointer.getPointer().size() == 1) {
 				markUndone(position);
@@ -985,8 +997,10 @@ public class MainLogic {
 		if (taskId != parentTaskId) {
 			mAllTasks.get(position).setStatus(AppConst.TASK_FIELD.UNDONE);
 		} else {
-			for(int i = 0; i < mAllTasks.size(); i++) {
+
+			for (int i = 0; i < mAllTasks.size(); i++) {
 				if (mAllTasks.get(i).getParentTaskId() == parentTaskId) {
+
 					mAllTasks.get(i).setStatus(AppConst.TASK_FIELD.UNDONE);
 				}
 			}
@@ -995,7 +1009,7 @@ public class MainLogic {
 	
 	protected String executeTimetable(Command mCommand, ArrayListPointer feedbackTasks) {
 		ArrayList<Task> result = new ArrayList<Task>();
-		for(int i = 0; i < mAllTasks.size(); i++) {
+		for (int i = 0; i < mAllTasks.size(); i++) {
 			if (mAllTasks.get(i).getRepeatedType() != AppConst.REPEATED_TYPE.EVERY_WEEK && mAllTasks.get(i).getRepeatedType() != AppConst.REPEATED_TYPE.FROM_TO) {
 				result.add(mAllTasks.get(i));
 			}
@@ -1017,7 +1031,7 @@ public class MainLogic {
 			return null;
 		}
 		boolean isHasDeadlineComming = false;
-		for(int i = 0; i < mAllTasks.size(); i++) {
+		for (int i = 0; i < mAllTasks.size(); i++) {
 			String repeatTime = mAllTasks.get(i).getRemindTime();
 			if (!repeatTime.equals("") && mDateTimeHelper.compareStringDates(currentTime, repeatTime)>=0 && mAllTasks.get(i).getStatus().equals(AppConst.TASK_FIELD.UNDONE)) {
 				if (currentTime.startsWith(repeatTime)) {
@@ -1053,7 +1067,7 @@ public class MainLogic {
 		}
 		
 		int time = 0;
-		for(int i = 0; i < commands[2].length() - 1; i++) {
+		for (int i = 0; i < commands[2].length() - 1; i++) {
 			if (commands[2].charAt(i) < '0' || commands[2].charAt(i) > '9') {
 				return AppConst.MESSAGE.INVALID_REPEAT_COMMAND;
 			}
@@ -1143,6 +1157,7 @@ public class MainLogic {
 		} else if (task1.getGroup().equals("") && !task2.getGroup().equals("")) {
 			isTheSame = false;
 		}
+		
 		if (!task2.getName().startsWith(task1.getName())) {
 			return -1;
 		} else if (!task1.getName().equals(task2.getName())) {
@@ -1181,7 +1196,7 @@ public class MainLogic {
 		
 		if (newTask.getRepeatedType() != AppConst.REPEATED_TYPE.EVERY_WEEK) {
 				
-			for(int i = 0; i < mAllTasks.size(); i++) {
+			for (int i = 0; i < mAllTasks.size(); i++) {
 				if (mAllTasks.get(i).getParentTaskId() != parentTaskId) {
 					
 					Task task = mAllTasks.get(i);
@@ -1200,9 +1215,8 @@ public class MainLogic {
 			}
 		}
 		
-		
 		if (newTask.getRepeatedType() == AppConst.REPEATED_TYPE.EVERY_WEEK) {
-			for(int i = 0; i < mAllTasks.size(); i++) {
+			for (int i = 0; i < mAllTasks.size(); i++) {
 				if (mAllTasks.get(i).getParentTaskId() != parentTaskId) {
 					
 					Task task = mAllTasks.get(i);
@@ -1227,7 +1241,7 @@ public class MainLogic {
 		
 		String[] commands = userCommand.split(" ");
 		String result = "";
-		for(int i = 0; i < commands.length; i++) {
+		for (int i = 0; i < commands.length; i++) {
 			if (!commands[i].equals("") && !commands[i].equals(" ")) {
 				if (result.length() > 0) {
 					result += " ";
@@ -1244,7 +1258,7 @@ public class MainLogic {
 		}
 		
 		int id = 0;
-		for(int i = 0; i < stringId.length(); i++) {
+		for (int i = 0; i < stringId.length(); i++) {
 			if (stringId.charAt(i) < '0' || stringId.charAt(i) > '9') {
 				return null;
 			}
@@ -1259,7 +1273,7 @@ public class MainLogic {
 	
 	private int getNextTaskId() {
 		int result = 0;
-		for(int i = 0; i < mAllTasks.size(); i++) {
+		for (int i = 0; i < mAllTasks.size(); i++) {
 			result = Math.max(result, mAllTasks.get(i).getTaskId());
 		}
 		return result + 1;

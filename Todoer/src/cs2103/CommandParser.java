@@ -87,7 +87,7 @@ public class CommandParser {
 		}
 		String result = "";
 		if (!splits[1].equals(AppConst.TASK_FIELD.ID)) {
-			for(int i = 1; i < splits.length; i++) {
+			for (int i = 1; i < splits.length; i++) {
 				if (splits[i].equals(AppConst.KEY_WORD.TO.toUpperCase())) {
 					break;
 				}
@@ -101,7 +101,7 @@ public class CommandParser {
 			if (splits.length < 3) {
 				return "";
 			}
-			for(int i = 0; i < splits[2].length(); i++) {
+			for (int i = 0; i < splits[2].length(); i++) {
 				if (splits[2].charAt(i) < '0' || splits[2].charAt(i) > '9') {
 					return "";
 				}
@@ -113,9 +113,9 @@ public class CommandParser {
 	private String getNewTaskInfoForUpdate(String userCommand) {
 		String[] splits = userCommand.split(" ");
 		String result = "";
-		for(int i = 1; i < splits.length; i++) {
+		for (int i = 1; i < splits.length; i++) {
 			if (splits[i].equals(AppConst.KEY_WORD.TO.toUpperCase())) {
-				for(int j = i+1; j < splits.length; j++) {
+				for (int j = i + 1; j < splits.length; j++) {
 					if (result.length() > 0) {
 						result += " ";
 					}
@@ -129,7 +129,7 @@ public class CommandParser {
 
 	private Task getTaskFromString(String commandType, String userCommand) {
 		String[] splits = userCommand.split(" ");
-		for(int i = 0; i < splits.length; i++) {
+		for (int i = 0; i < splits.length; i++) {
 			if (splits[i].equals(AppConst.KEY_WORD.REPEAT)) {
 				return getTaskRepeatFromString(commandType, userCommand);
 			}
@@ -210,7 +210,7 @@ public class CommandParser {
 		
 		String splits[] = userCommand.split(" ");
 		int position = 0;
-		for(int i = 0; i < splits.length; i++) {
+		for (int i = 0; i < splits.length; i++) {
 			if (splits[i].equals(AppConst.KEY_WORD.REPEAT)) {
 				position = i;
 				break;
@@ -270,7 +270,7 @@ public class CommandParser {
 	private String getPeriodForTask(String userCommand) {
 		String[] splits = userCommand.split(" ");
 		int position = 0;
-		for(int i = 0; i < splits.length; i++) {
+		for (int i = 0; i < splits.length; i++) {
 			if (splits[i].equals(AppConst.KEY_WORD.REPEAT)) {
 				position = i;
 				if (mPosition == -1) {
@@ -282,14 +282,14 @@ public class CommandParser {
 			}
 		}
 		String startTime = "";
-		for(int i = 0; i < position; i++) {
+		for (int i = 0; i < position; i++) {
 			if (splits[i].equals(AppConst.KEY_WORD.FROM)) {
 				if (mPosition == -1) {
 					mPosition = i;
 				} else {
 					mPosition = Math.min(mPosition, i);
 				}
-				for(int j = i + 1; j < position; j++) {
+				for (int j = i + 1; j < position; j++) {
 					if (splits[j].equals(AppConst.KEY_WORD.TO)) {
 						break;
 					} else {
@@ -301,14 +301,14 @@ public class CommandParser {
 		
 		
 		String endTime = "";
-		for(int i = 0; i < position; i++) {
+		for (int i = 0; i < position; i++) {
 			if (splits[i].equals(AppConst.KEY_WORD.TO)) {
 				if (mPosition == -1) {
 					mPosition = i;
 				} else {
 					mPosition = Math.min(mPosition, i);
 				}
-				for(int j = i+1; j < position; j++) {
+				for (int j = i + 1; j < position; j++) {
 					if (splits[j].equals(AppConst.KEY_WORD.REPEAT)) {
 						break;
 					} else {
@@ -335,7 +335,7 @@ public class CommandParser {
 	
 		String[] splits = userCommand.toLowerCase().split(" ");
 		int position = -1;
-		for(int i = 0; i < splits.length; i++) {
+		for (int i = 0; i < splits.length; i++) {
 			if (splits[i].equals(AppConst.KEY_WORD.REPEAT)) {
 				position = i;
 				if (mPosition == -1) {
@@ -353,7 +353,7 @@ public class CommandParser {
 			return null;
 		}
 		String startDate = "";
-		for(int i = position+2; i < splits.length; i++) {
+		for (int i = position + 2; i < splits.length; i++) {
 			if (splits[i].equals(AppConst.KEY_WORD.TO)) {
 				break;
 			}
@@ -380,7 +380,7 @@ public class CommandParser {
 	
 		String[] splits = userCommand.toLowerCase().split(" ");
 		int position = 0;
-		for(int i = 0; i < splits.length; i++) {
+		for (int i = 0; i < splits.length; i++) {
 			if (splits[i].equals(AppConst.KEY_WORD.REPEAT)) {
 				position = i;
 				break;
@@ -389,7 +389,7 @@ public class CommandParser {
 		String endDate = "";
 		for(int i = position+1; i < splits.length; i++) {
 			if (splits[i].equals(AppConst.KEY_WORD.TO)) {
-				for(int j = i + 1; j < splits.length; j++) {
+				for (int j = i + 1; j < splits.length; j++) {
 					if (splits[j].equals(AppConst.KEY_WORD.PRIORITY) || splits[j].equals(AppConst.KEY_WORD.GROUP) || splits[j].equals(AppConst.KEY_WORD.GRP) || splits[j].equals(AppConst.KEY_WORD.BY) || splits[j].equals(AppConst.KEY_WORD.BEFORE)) {
 						break;
 					}
@@ -409,7 +409,7 @@ public class CommandParser {
 
     private String getDeadlineForTask(String userCommand) {
         String[] splits = userCommand.split(" ");
-        for(int i = splits.length - 1; i >= 0; i--) {
+        for (int i = splits.length - 1; i >= 0; i--) {
             if (splits[i].equals(AppConst.KEY_WORD.BY) || splits[i].equals(AppConst.KEY_WORD.BEFORE)) {
                 String result = "";
                 if (mPosition == -1) {
@@ -420,7 +420,7 @@ public class CommandParser {
    				if (i == splits.length-1) { 
    					continue;
    				}
-                for(int j = i + 1; j < splits.length; j++) {
+                for (int j = i + 1; j < splits.length; j++) {
                     if (splits[j].equals(AppConst.KEY_WORD.GRP) || splits[j].equals(AppConst.KEY_WORD.GROUP) || splits[j].equals(AppConst.KEY_WORD.PRIORITY) || splits[j].equals(AppConst.KEY_WORD.FROM) || splits[j].equals(AppConst.KEY_WORD.TO)) {
                         break;
                     } else {
@@ -441,7 +441,7 @@ public class CommandParser {
 
     private String getPriorityForTask(String userCommand) {
         String[] splits = userCommand.split(" ");
-        for(int i = splits.length - 1; i >= 0; i--) {
+        for (int i = splits.length - 1; i >= 0; i--) {
             if (splits[i].equals(AppConst.KEY_WORD.PRIORITY)) {
             	if (mPosition == -1) {
                     mPosition = i;
@@ -465,7 +465,7 @@ public class CommandParser {
     private String getStringDateForStartDate(String userCommand) {
     	String[] splits = userCommand.split(" ");
     	String result = "";
-    	for(int i = 0; i < splits.length; i++) {
+    	for (int i = 0; i < splits.length; i++) {
     		if (splits[i].equals(AppConst.KEY_WORD.FROM)) {
    				if (mPosition == -1) {
    					mPosition = i;
@@ -475,7 +475,7 @@ public class CommandParser {
    				if (i == splits.length-1) { 
    					break;
    				}
-   				for(int j = i+1; j < splits.length; j++) {
+   				for (int j = i+1; j < splits.length; j++) {
    					if (splits[j].equals(AppConst.KEY_WORD.TO) || splits[j].equals(AppConst.KEY_WORD.PRIORITY) || splits[j].equals(AppConst.KEY_WORD.GROUP) || splits[j].equals(AppConst.KEY_WORD.GRP) || splits[j].equals(AppConst.KEY_WORD.BY) || splits[j].equals(AppConst.KEY_WORD.BEFORE)) {
    						break;
    					} else {
@@ -502,7 +502,7 @@ public class CommandParser {
     private String getEndDateForTask(String userCommand) {
    		String[] splits = userCommand.split(" ");
    		String time = "";
-   		for(int i = splits.length - 1; i >= 0; i--) {
+   		for (int i = splits.length - 1; i >= 0; i--) {
    			if (splits[i].equals(AppConst.KEY_WORD.TO)) {
    				if (mPosition == -1) {
    					mPosition = i;
@@ -512,7 +512,7 @@ public class CommandParser {
    				if (i == splits.length-1) { 
    					continue;
    				}
-   				for(int j = i+1; j < splits.length; j++) {
+   				for (int j = i + 1; j < splits.length; j++) {
    					if (splits[j].equals(AppConst.KEY_WORD.PRIORITY) || splits[j].equals(AppConst.KEY_WORD.GROUP) || splits[j].equals(AppConst.KEY_WORD.GRP) || splits[j].equals(AppConst.KEY_WORD.BY) || splits[j].equals(AppConst.KEY_WORD.BEFORE) || splits[j].equals(AppConst.KEY_WORD.FROM)) {
    						break;
    					} else {
@@ -533,7 +533,7 @@ public class CommandParser {
 
     private String getGroupForTask(String userCommand) {
         String[] splits = userCommand.split(" ");
-        for(int i = splits.length - 1; i >= 0; i--) {
+        for (int i = splits.length - 1; i >= 0; i--) {
             if (splits[i].equals(AppConst.KEY_WORD.GRP) || splits[i].equals(AppConst.KEY_WORD.GROUP)) {
                 if (mPosition == -1) {
    					mPosition = i;
@@ -544,7 +544,7 @@ public class CommandParser {
    					continue;
    				}
                 String result = "";
-                for(int j = i + 1; j < splits.length; j++) {
+                for (int j = i + 1; j < splits.length; j++) {
                 	if (splits[j].equals(AppConst.KEY_WORD.PRIORITY) || splits[j].equals(AppConst.KEY_WORD.BY) || splits[j].equals(AppConst.KEY_WORD.BEFORE) || splits[j].equals(AppConst.KEY_WORD.FROM) || splits[j].equals(AppConst.KEY_WORD.TO)) {
                 		break;
                 	}
@@ -569,7 +569,7 @@ public class CommandParser {
         }
         String result = "";
         if (mPosition > 1 ) {
-		    for(int i = 1; i < mPosition; i++) {
+		    for (int i = 1; i < mPosition; i++) {
 		        result += splits[i];
 		        if (i != mPosition - 1) {
 		            result += " ";
@@ -599,7 +599,7 @@ public class CommandParser {
     private String getCommandArgument(String userCommand) {
     	String[] splits = userCommand.split(" ");
         String result = "";
-        for(int i = 1; i < splits.length; i++) {
+        for (int i = 1; i < splits.length; i++) {
         	result += splits[i];
         	if (i != splits.length-1) {
         		result += " ";
@@ -622,9 +622,9 @@ public class CommandParser {
 		String[] commands = userCommand.toLowerCase().split(" ");
 		String result = "";
 		boolean isHasFrom = false;
-		for(int i = 0; i < commands.length; i++) {
+		for (int i = 0; i < commands.length; i++) {
 			if (commands[i].equals(AppConst.KEY_WORD.FROM)) {
-				for(int j = i + 1; j < commands.length; j++) {
+				for (int j = i + 1; j < commands.length; j++) {
 				
 					if (commands[j].equals(AppConst.KEY_WORD.TO)) {
 						break;	
@@ -636,7 +636,7 @@ public class CommandParser {
 			}
 		}
 		if (!isHasFrom) {
-			for(int i = 1; i < commands.length; i++) {
+			for (int i = 1; i < commands.length; i++) {
 				result += " " + commands[i];
 			}
 		}
@@ -662,9 +662,9 @@ public class CommandParser {
 		String[] commands = userCommand.toLowerCase().split(" ");
 		String result = "";
 		boolean isHasTo = false;
-		for(int i = 0; i < commands.length; i++) {
+		for (int i = 0; i < commands.length; i++) {
 			if (commands[i].equals(AppConst.KEY_WORD.TO)) {
-				for(int j = i + 1; j < commands.length; j++) {
+				for (int j = i + 1; j < commands.length; j++) {
 					result += " " + commands[j];
 				}
 				isHasTo = true;
@@ -672,7 +672,7 @@ public class CommandParser {
 			}
 		}
 		if (!isHasTo) {
-			for(int i = 1; i < commands.length; i++) {
+			for (int i = 1; i < commands.length; i++) {
 				result += " " + commands[i];
 			}
 		}
@@ -687,7 +687,7 @@ public class CommandParser {
 	
 	private int getNumberFromString(String st, int pos) {
 		int number = 0;
-		for(int i = pos; i < st.length(); i++) {
+		for (int i = pos; i < st.length(); i++) {
 			if (st.charAt(i) < '0' || st.charAt(i) > '9') {
 				break;
 			}
@@ -700,7 +700,7 @@ public class CommandParser {
 		if (st == null || st.length() == 0) {
 			return false;
 		}
-		for(int i = 0; i < st.length(); i++) {
+		for (int i = 0; i < st.length(); i++) {
 			if (st.charAt(i) < '0' || st.charAt(i) > '9') {
 				return false;
 			}
@@ -711,9 +711,9 @@ public class CommandParser {
 	protected ArrayList<Integer> getListOfId(String id) {
 		String[] ids = id.split(" ");
 		id = "";
-		for(int i = 0; i < ids.length; i++) {
+		for (int i = 0; i < ids.length; i++) {
 			if (i > 0) {
-				if (isNumber(ids[i]) && isNumber(ids[i-1])) {
+				if (isNumber(ids[i]) && isNumber(ids[i - 1])) {
 					id += " ";
 				} else if (isNumber(ids[i-1]) && ids[i].charAt(0) >= '0' && ids[i].charAt(i) <= '9') {
 					id += " ";
@@ -733,9 +733,9 @@ public class CommandParser {
 			} else if (id.charAt(i) == '-') {
 				if (pos != -1) {
 					int start = getNumberFromString(id, pos);
-					int end = getNumberFromString(id, i+1);
+					int end = getNumberFromString(id, i + 1);
 					if (start <= end && start != 0) {
-						for(int j = start; j <= end; j++) {
+						for (int j = start; j <= end; j++) {
 							result.add(j);
 						}
 					} else {
@@ -751,13 +751,13 @@ public class CommandParser {
 				} else {
 					return null;
 				}
-			} else if (id.charAt(i) == '.' && i < id.length()-1 && id.charAt(i+1) == '.') {
+			} else if (id.charAt(i) == '.' && i < id.length()-1 && id.charAt(i + 1) == '.') {
 				i++;
 				if (pos != -1) {
 					int start = getNumberFromString(id, pos);
-					int end = getNumberFromString(id, i+1);
+					int end = getNumberFromString(id, i + 1);
 					if (start <= end && start != 0) {
-						for(int j = start; j <= end; j++) {
+						for (int j = start; j <= end; j++) {
 							result.add(j);
 						}
 					} else {
