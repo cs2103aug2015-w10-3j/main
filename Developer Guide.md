@@ -13,7 +13,7 @@ This guide describes the design and implementation of Todoer. It will help you u
 - [Logic Component](#logiccomponent)
   - [MainLogic Class](#mainlogic-class)
   - [Task Class](#task-class)
-- [CommandParser Component](#commandparsercomponent)
+- [Parser Component](#commandparsercomponent)
 - [Storage Component](#storagecomponent)
   - [JSONConverter Class](#jsonconverter-class)
 - [Testing](#testing)
@@ -35,7 +35,7 @@ Architecture is made up of 4 main components. Users can use Todoer through the U
 
 3. The **`parser`** component is responsible for processing the raw user commands and passing the semantics of the command to the logic component to handle its execution.
 
-4. The **`storage`** component reads and writes the tasks' content to the file system. It also stores configuration files for to store user settings.
+4. The **`storage`** component reads and writes the tasks' content to the file system. 
 
 # UI Component
 The UI component consists of a `MainApp` class that is responsible for managing the input obtained from the UI and output to be displayed on the UI. The UI itself is created by the `UIController` class which manages the appearance and behaviour of the UI.
@@ -145,7 +145,7 @@ The diagram (see Figure 3) below demonstrates how the major components of the so
 |-------------|----------------------------------------------------------|
 | void | updateHistory(): update history after user modifications to task data |
 
-# CommandParser Component
+# Parser Component
 
 <br>
 ![add image](doc/images/V0.5/parserDiagram.png)
@@ -164,7 +164,7 @@ The first element of the ArrayList is always the command keyword, while the rema
 # Storage Component
 
 <br>
-![add image](doc/images/storageDiagram.png)
+![add image](doc/images/V0.5/storageDiagram.png)
 > Figure 5: Structure of the Storage Component
 
 The `Storage` component consists of a `Storage` class that manages the reading and writing of data between the program and the file system. Since we are storing tasks as JSON strings in the data files, there is also a `JSONConverter` class that encodes and decodes between JSON strings and `Task` objects.
