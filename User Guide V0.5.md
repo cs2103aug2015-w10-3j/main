@@ -87,10 +87,6 @@ To learn more details of Todoer features, refer to the 'Feature Details' section
   * every \<day_of_week>
 
   > Example: **`add CS2103 lecture from 2pm to 4pm repeat every Friday`**
-  
-  * every <day_of_week> from \<start_date> to \<end_date>
-
-  > Example: **`add practice guitar from 6pm to 7pm repeat every Mon from 16/12 to 30/12`**
   <br>
   ![add image](doc/images/V0.5/add recurrent.JPG)
 
