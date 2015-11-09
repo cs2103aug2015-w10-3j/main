@@ -67,7 +67,7 @@ This class defines the looks and feels of the `Text field` (or command bar) and 
 # Logic Component
 
 <br>
-![add image](doc/images/logicDiagram.png)
+![add image](doc/images/V0.5/logicDiagram.png)
 > Figure 2: Structure of the Logic Component
 
 At the heart of the Logic component is the `MainLogic` class that is responsible for executing the user’s commands. A `Task` class is also used to represent the tasks to be done. 
@@ -137,6 +137,10 @@ The diagram (see Figure 3) below demonstrates how the major components of the so
 
 # CommandParser Component
 
+<br>
+![add image](doc/images/V0.5/parserDiagram.png)
+> Figure 4: Structure of the Logic Component
+
 The Parser component only consists of a `CommandParser` class which receives the raw user input and returns the details of the command in the form of an ArrayList of String objects.
 
 The first element of the ArrayList is always the command keyword, while the remaining elements could be the task name or deadline, depending on the type of the command.
@@ -151,7 +155,7 @@ The first element of the ArrayList is always the command keyword, while the rema
 
 <br>
 ![add image](doc/images/storageDiagram.png)
-> Figure 4: Structure of the Storage Component
+> Figure 5: Structure of the Storage Component
 
 The `Storage` component consists of a `Storage` class that manages the reading and writing of data between the program and the file system. Since we are storing tasks as JSON strings in the data files, there is also a `JSONConverter` class that encodes and decodes between JSON strings and `Task` objects.
 
