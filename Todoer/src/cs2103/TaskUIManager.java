@@ -1,11 +1,7 @@
 package cs2103;
-import java.io.*;
 import java.util.*;
 
 import javax.swing.*;
-
-import  sun.audio.*; 
-
 import java.awt.Toolkit;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -288,19 +284,13 @@ public class TaskUIManager {
 													
 		  		final JDialog dlg = opt.createDialog(AppConst.UI_CONST.NOTIFICATION);
 		  		new Thread(new Runnable() {
-					@SuppressWarnings("restriction")
 					public void run() {		
 		  				try {
 		  					/* 
-		  					* Turn on the sound and the notification
+		  					* Turn on the notification
 		  					* User can turn off by press ENTER
 		  					* If not, after timeDismiss seconds, the notification will be turned off
 		  					*/
-//		  					InputStream in = new FileInputStream(AppConst.UI_CONST.DEFAULT_SOUND_FILE_NAME);
-//							AudioStream as = new AudioStream(in);	
-//							AudioPlayer.player.start(as);  
-//							Thread.sleep(AppConst.UI_CONST.DEFAULT_TIME_PLAY_SOUND);
-//							AudioPlayer.player.stop(as);
 							Thread.sleep(AppConst.UI_CONST.DEFAULT_TIME_DISMISS);
 							dlg.dispose();
 						} catch (Throwable th) {

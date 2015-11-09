@@ -351,8 +351,8 @@ public interface AppConst {
 		
 		// check deadline task for every 1 second
 	    static int DEFAULT_TIME_REMIND = 1 * 1000;
-	    static int DEFAULT_TIME_DISMISS = 1 * 1000;
-		static int DEFAULT_TIME_PLAY_SOUND = 4 * 1000;
+	    static int DEFAULT_TIME_DISMISS = 4 * 1000;
+		static int DEFAULT_TIME_PLAY_SOUND = 1 * 1000;
 		
 		String[] TASK_COLUMN_NAMES = new String[] {	"#", 
 													"Task Name",
