@@ -17,6 +17,7 @@ Todoer is a keystroke-orientated task scheduler that provides functionality for 
   - [Settings](#settings)
   - [Exiting](#exiting)
   - [Help](#help)
+  - [Notifications](#notifications)
 - [Cheatsheet](#cheatsheet)
 
 <!-- /MarkdownTOC -->
@@ -27,7 +28,7 @@ Todoer is a keystroke-orientated task scheduler that provides functionality for 
 
 2. **Launch Todoer**: by simply double-clicking the `Todoer.exe file`.
 
-3. You will be greeted with an interface that has (*see below*) a main panel (**A**), a console (**B**), and a command bar (**C**). This command bar is where you enter commands to tell Todoer what to do. The console displays helpful feedback for your actions and the main panel displays your tasks. <br> ![add image](doc/images/V0.5/interface empty.JPG)
+3. You will be greeted with an interface that has (*see below*) a main panel (**A**), a console (**B**), and a command bar (**C**). This command bar is where you enter commands to tell Todoer what to do. The console displays helpful feedback for your actions while the main panel displays your tasks. <br> ![add image](doc/images/V0.5/interface empty.JPG)
  
 
 4. **Try adding a task!**: Type `add do homework by tomorrow` in the command bar. You will see your first task added to the table in the main panel. The deadline for this task is tomorrow and its exact date will be added into the `deadline` column.
@@ -179,6 +180,10 @@ This section describes the different ways in which you can view your tasks, eith
 ## Help
 1. Type `help` in the command bar. (Type `showall` to revert back to the default view)
 
+# Notifications
+
+Todoer will alert you with a pop-up and audio when you have tasks nearing deadline.
+
 # Cheatsheet
 
 | Command            | Usage                                                                                      |
@@ -190,5 +195,5 @@ This section describes the different ways in which you can view your tasks, eith
 | show               | <ul><li>**showday** \<date></li><li>**showpriority** \<high/medium/low></li><li>**showgroup** \<groupname></li><li>**showby** \<column_field></li><li>**showall**</li></ul>                            |
 | timetable	| <ul><li>**timetable** to show this week</li><li>**timetable from** \<startdate> **to** \<enddate></li><li>**timetable next** \<period></li></ul> |
 | setfile           | **setfile** \<file_path>                                                   |
-| help               | Display the helpsheet                       |
+| help               | Display the cheatsheet                                                     |
 | exit               | Exit Todoer                                                                        |
