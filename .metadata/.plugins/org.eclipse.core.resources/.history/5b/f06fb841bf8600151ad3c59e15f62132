@@ -1,0 +1,265 @@
+package cs2103;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.util.ArrayList;
+
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+
+public class TableHelper {
+	
+	private static DateTimeHelper mDateTimeHelper = new DateTimeHelper();
+	private static CommandParser mCommandParser = new CommandParser();
+	private static ArrayList<Task> dataTaskList = new ArrayList<Task>();
+	static JTable table;
+	static int userScrollCount = 0;
+    static int mTableRowCount = 0;
+    static int rowHeightDefault = 25;
+    
+ // column to display in table
+    static String[] columnNames = new String[] {"#", "Task Name",
+                        "Deadline",
+                        "Start Date/Time",
+                        "End Date/Time",
+                        "Period",
+                        "Prioriry",
+                        "Group",
+                        "Status"
+                        };
+                        
+    static String[] timeTableColumnNames = new String[] { 	"#",
+    														"8-9", 
+    														"9-10", 
+    														"10-11", 
+    														"11-12", 
+    														"12-13", 
+    														"13-14", 
+    														"14-15",
+    														"15-16", 
+    														"16-17", 
+    														"17-18", 
+    														"18-19", 
+    														"19-20"
+    														};
+    static int[] columnWidth = new int[] {	40,
+    										350,
+    										130,
+    										130,
+    										130,
+    										100,
+    										80,
+    										130,
+    										80
+    										};
+    
+ // String to display for priority
+    private static final String HIGH = "High";
+    private static final String MEDIUM = "Medium";
+    private static final String LOW = "Low";
+    
+    private static String SLASH = "\\";
+    private static int MAX_NUMBER_ROWS = 16;
+    private static String EVERYDAY = "Everyday";
+    private static String EVERY = "Every ";
+    static int windowHeight = 5;
+	static int windowWidth = 95;
+    
+    private static JTable mTable;
+    
+	public TableHelper() {
+		
+		// Create table to display tasks
+	    table = new JTable() {
+		    @Override
+			public Component prepareRenderer(TableCellRenderer renderer, int row, int col) {
+				Component comp = super.prepareRenderer(renderer, row, col);
+				Object value = getModel().getValueAt(row, col);
+				comp.setBackground(Color.white);
+				
+				/*
+				** If the table is displaying list of tasks, column 6 will display the priority of tasks
+				** either High, Medium, or Low.
+				** otherwise, the table is displaying the timetable
+				** Check the value of column 6 to check which data the table is displaying.
+				*/
+				Object checkValue = getModel().getValueAt(row, 6);
+				if (checkValue.equals(HIGH) || checkValue.equals(MEDIUM) || checkValue.equals(LOW)) {
+					if (col == 6) {
+						if (value.equals(HIGH)) {
+							comp.setBackground(Color.red);
+						} else if (value.equals(MEDIUM)) {
+							comp.setBackground(Color.yellow);
+						} else if (value.equals(LOW)) {
+							comp.setBackground(Color.green);
+						}
+					}
+				} else {
+					String st = (String)value;
+					if (st.endsWith(AppConst.TASK_FIELD.HIGH)) {
+						comp.setBackground(Color.red);
+					} else if (st.endsWith(AppConst.TASK_FIELD.MEDIUM)) {
+						comp.setBackground(Color.yellow);
+					} else if (st.endsWith(AppConst.TASK_FIELD.LOW)) {
+						comp.setBackground(Color.green);
+					}
+				}
+				return comp;
+			}
+	    };
+	   
+	    table.setRowHeight(rowHeightDefault);   
+	    
+	    createTableToDisplayTasks();
+	}
+	
+	protected JTable getTable() {
+		return mTable;
+	}
+	
+	protected void setDataListForTable(ArrayList<Task> tasks) {
+		dataTaskList = tasks;
+	}
+	
+	/* Get the data to display in the table for a task	
+	** Column 0: index number of a task in the table, 
+	** user can use this index instead of task name for commands
+	** Column 1: Task name
+	** Column 2: Deadline for task
+	** Column 3: Start date/time for task,
+	** for event task, the value will be the start time and date of the event
+	** for recurrent task type repeat from date to date, the value will be the start date of event
+	** for recurrent task type repeat every day or a day in week, the value will the the start time of each day
+	** Column 4: End date/time for task,
+	** for event task, the value will be the end time and date of the event
+	** for recurrent task type repeat from date to date, the value will be the end date of event
+	** for recurrent task type repeat every day or a day in week, the value will the the end time of each day
+	** Column 5: Period of an recurrent task
+	** For recurrent task type repeat from date to date, the value will be the start and end time of each day
+	** For recurrent task type repeat every day or a day in week, the value will either "Every day" or "Every <a day in week>"
+	** Column 6: Priority of a task, for display, it's either High, Medium or Low, comes with the color
+	** Column 7: Group name of a task
+	** Column 8: Status of a task, either "done" or "undone"
+	*/
+	public String[] getDataFromTask(Task task, int i) {
+	
+		String[] data = new String[columnNames.length];
+		data[0] = String.valueOf(i + 1);
+		data[1] = removeSlash(task.getName());
+		data[2] = mDateTimeHelper.convertToDisplayFormat(task.getDeadline());
+		
+		int repeatedType = task.getRepeatedType();
+		switch (repeatedType) {
+			case AppConst.REPEATED_TYPE.FROM_TO: 
+				data[5] = task.getPeriod();
+				data[3] = mDateTimeHelper.convertDateMonthToDisplayFormat(task.getStartDate());
+				data[4] = mDateTimeHelper.convertDateMonthToDisplayFormat(task.getEndDate());
+				break;
+			case AppConst.REPEATED_TYPE.EVERY_WEEK:
+			case AppConst.REPEATED_TYPE.EVERYDAY:
+				data[3] = mDateTimeHelper.getStringStartTimeForStringPeriod(task.getPeriod());
+				data[4] = mDateTimeHelper.getStringEndTimeForStringPeriod(task.getPeriod());
+				if (repeatedType == AppConst.REPEATED_TYPE.EVERY_WEEK) { 
+					data[5] = EVERY + mDateTimeHelper.getStringDayInWeekForDate(task.getStartDate());
+				} else {
+					data[5] = EVERYDAY;
+				}
+				break;
+			
+			default: 
+				data[3] = mDateTimeHelper.convertToDisplayFormat(task.getStartDate());
+				data[4] = mDateTimeHelper.convertToDisplayFormat(task.getEndDate());
+				data[5] = "";
+		}
+		data[6] = task.getPriority();
+		data[6] = data[6].substring(0, 1).toUpperCase() + data[6].substring(1);
+		data[7] = removeSlash(task.getGroup());
+		data[8] = task.getStatus();
+		return data;
+	}
+	
+	/*
+	** Users have to use slash "\" in front if they use a key word in the task name or task group.
+	** for display, we remove the slash before displaying
+	*/
+	protected String removeSlash(String st) {
+		if (st == null || st.equals("")) {
+			return st;
+		}
+		
+		String splits[] = st.split(" ");
+		if (st.length() == 0) {
+			return st;
+		}
+		
+		String[] keys = AppConst.KEY_WORD.keywords;
+		
+		for(int i=0; i<splits.length; i++) {
+			if (splits[i].startsWith(SLASH) && splits[i].length()>1) {
+				String s = splits[i].substring(1, splits[i].length());
+				boolean isKeyword = false;
+				for(int j=0; j<keys.length; j++) {
+					if (keys[j].equals(s)) {
+						isKeyword = true;
+						break;
+					}
+				}
+				if (isKeyword) {
+					splits[i] = s;
+				}
+			}
+		}
+		
+		String result = "";
+		for(int i=0; i<splits.length; i++) {
+			if (i > 0) {
+				result += " ";
+			}
+			result += splits[i];
+		}
+		return result;
+		
+	}
+	
+	protected void createTableToDisplayTasks() {
+    	DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
+        tableModel.setColumnIdentifiers(columnNames);
+        tableModel.setRowCount(0);
+        
+        for (int i = 0 ; i < columnNames.length; i++) {
+        	if (i != 8) {
+        		table.getColumnModel().getColumn(i).setPreferredWidth(columnWidth[i]);
+        		table.getColumnModel().getColumn(i).setMaxWidth(columnWidth[i]);
+        	}
+        }
+        
+        // Set data for table
+        for (int i = 0; i < dataTaskList.size(); i++) {
+            String[] data = getDataFromTask(dataTaskList.get(i), i);
+            tableModel.addRow(data);
+        }
+    
+    	DefaultTableCellRenderer centerRender = new DefaultTableCellRenderer();
+		centerRender.setHorizontalAlignment(SwingConstants.CENTER);
+		for (int i = 0 ; i < columnNames.length; i++) {
+			/* The column 1 is the task name
+			** The column 7 is the task group
+			** not fix the width for these 2 columns
+			*/
+			if (i != 7 && i != 1 ) {
+				table.getColumnModel().getColumn(i).setCellRenderer(centerRender);
+        	}
+        }
+       
+        ((DefaultTableCellRenderer)table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+    	table.setModel(tableModel);
+        tableModel.fireTableDataChanged();
+    }
+	
+	
+}
