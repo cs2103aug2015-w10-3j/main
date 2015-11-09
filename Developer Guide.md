@@ -157,6 +157,8 @@ The diagram (see Figure 3) below demonstrates how the major components of the so
 | Return type   | Method and Description                                            |
 |-------------|----------------------------------------------------------|
 | void | updateHistory(): update history after user modifications to task data |
+| ArrayList<Task> | undo(): returns the list of tasks before last user modification |
+| ArrayList<Task> | redo(): returns the list of tasks after the next user modification |
 
 # Parser Component
 
@@ -212,6 +214,6 @@ There are several additions that can be made to Todoer to further increase its u
 ###### Notifications/Events
 We seek to develop the functionality to update/remind the Todoer user about urgent tasks or tasks that are nearing due date with say, pop-ups or audio notifications.
 
-###### GoodGUI
-Current GUI is minimalistic. We would like to implement additional helpful features such as auto-fill commands (by referencing the user’s past command history) and by displaying urgent/important tasks more prominently (perhaps with color coding).
+###### Further improved GUI
+We would like to implement additional helpful features such as auto-fill commands (by referencing the user’s past command history) and by displaying urgent/important tasks more prominently (perhaps with color coding).
 
