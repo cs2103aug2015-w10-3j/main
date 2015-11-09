@@ -129,6 +129,7 @@ public class TaskUIManager {
         }
         
         ArrayListPointer dataTaskListPointer = new ArrayListPointer();
+        
         // Input a showall command upon launching Todoer
         String message = mMainLogic.process(AppConst.COMMAND_TYPE.SHOW_ALL, dataTaskListPointer);
         dataTaskList = dataTaskListPointer.getPointer();
@@ -140,72 +141,36 @@ public class TaskUIManager {
         assert message != null;
         displayMessage(message);
         
+        // Set schedule for reminding
         toolkit = Toolkit.getDefaultToolkit();
 	    timer = new Timer();
 		timer.scheduleAtFixedRate(new RemindTask(), 0, timeRemind);
         
 	}
-	
-	public static class RemindTask extends TimerTask {
-	
-		public void run() {
-			
-			/*
-			* 
-			*
-			*/
-			ArrayListPointer dataTaskListPointer = new ArrayListPointer();   
-            dataTaskListPointer.setPointer(dataTaskList);
-			String message = mMainLogic.process(AppConst.COMMAND_TYPE.REMIND, dataTaskListPointer);
-			if (message != null) {				
-				dataTaskList = dataTaskListPointer.getPointer();
-				mTableRowCount = dataTaskList.size();
-				userScrollCount = 0;
-				updateTable();
-				output.setText("");
-				displayMessage(message);
-				
-				// show notification to users
-				// option pane with no buttons.
-				JOptionPane opt = new JOptionPane(	AppConst.MESSAGE.NOTIFICATIONS, 
-													JOptionPane.INFORMATION_MESSAGE, 
-													JOptionPane.DEFAULT_OPTION, 
-													null, 
-													new Object[]{OK_BUTTON}); 
-													
-		  		final JDialog dlg = opt.createDialog(NOTIFICATION);
-		  		new Thread(new Runnable() {
-		  			public void run() {		
-		  				try {
-		  					InputStream in = new FileInputStream("sound1.wav");
-							AudioStream as = new AudioStream(in);	
-							AudioPlayer.player.start(as);  
-							Thread.sleep(timePlaySound);
-							AudioPlayer.player.stop(as);
-						} catch (Throwable th) {
-							
-						}
-		  			}
-		  		}).start();
-		  		new Thread(new Runnable() {
-		  		
-					public void run() {	 
-						try {
-		  					Thread.sleep(timeDismiss);
-							dlg.dispose();
-						} catch (Throwable th) {
-						}
-											
-				  	}
-				}).start();
-		  		dlg.setVisible(true);
-			}
-			toolkit.beep();
-		}
-	}
 
+	/* Get the data to display in the table for a task	
+	** Column 0: index number of a task in the table, 
+	** user can use this index instead of task name for commands
+	** Column 1: Task name
+	** Column 2: Deadline for task
+	** Column 3: Start date/time for task,
+	** for event task, the value will be the start time and date of the event
+	** for recurrent task type repeat from date to date, the value will be the start date of event
+	** for recurrent task type repeat every day or a day in week, the value will the the start time of each day
+	** Column 4: End date/time for task,
+	** for event task, the value will be the end time and date of the event
+	** for recurrent task type repeat from date to date, the value will be the end date of event
+	** for recurrent task type repeat every day or a day in week, the value will the the end time of each day
+	** Column 5: Period of an recurrent task
+	** For recurrent task type repeat from date to date, the value will be the start and end time of each day
+	** For recurrent task type repeat every day or a day in week, the value will either "Every day" or "Every <a day in week>"
+	** Column 6: Priority of a task, for display, it's either High, Medium or Low, comes with the color
+	** Column 7: Group name of a task
+	** Column 8: Status of a task, either "done" or "undone"
+	*/
 	public static String[] getDataFromTask(Task task, int i) {
-		String[] data = new String[9];
+	
+		String[] data = new String[columnNames.length];
 		data[0] = String.valueOf(i + 1);
 		data[1] = removeSlash(task.getName());
 		data[2] = mDateTimeHelper.convertToDisplayFormat(task.getDeadline());
@@ -240,6 +205,10 @@ public class TaskUIManager {
 		return data;
 	}
 	
+	/*
+	** Users have to use slash "\" in front if they use a key word in the task name or task group.
+	** for display, we remove the slash before displaying
+	*/
 	private static String removeSlash(String st) {
 		if (st == null || st.equals("")) {
 			return st;
@@ -280,13 +249,17 @@ public class TaskUIManager {
 	}
 
 	
-	
+	// Display message in the display message box
 	private static void displayMessage(String message) {
 		output.append(message);
 	}
 
-
+	/* 
+	** The window contains a table box to display table, a display message box to display message,
+	** and the user input field for user typing commands
+	*/
 	private static void openToDoListWindow() {
+	
         // Create a window for app
         frame = new JFrame(APP_NAME);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -311,6 +284,12 @@ public class TaskUIManager {
 				Object value = getModel().getValueAt(row, col);
 				comp.setBackground(Color.white);
 				
+				/*
+				** If the table is displaying list of tasks, column 6 will display the priority of tasks
+				** either High, Medium, or Low.
+				** otherwise, the table is displaying the timetable
+				** Check the value of column 6 to check which data the table is displaying.
+				*/
 				Object checkValue = getModel().getValueAt(row, 6);
 				if (checkValue.equals(HIGH) || checkValue.equals(MEDIUM) || checkValue.equals(LOW)) {
 					if (col == 6) {
@@ -336,33 +315,9 @@ public class TaskUIManager {
     		}
         };
        
-        table.setRowHeight(rowHeightDefault);
+        table.setRowHeight(rowHeightDefault);   
         
-        DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
-        tableModel.setColumnIdentifiers(columnNames);
-        
-        for (int i = 0 ; i <= 8; i++) {
-        	if (i != 1) {
-        		table.getColumnModel().getColumn(i).setPreferredWidth(columnWidth[i]);
-        		table.getColumnModel().getColumn(i).setMaxWidth(columnWidth[i]);
-        	}
-        }
-        
-        // Set data for table
-        for (int i = 0; i < dataTaskList.size(); i++) {
-            String[] data = getDataFromTask(dataTaskList.get(i), i);
-            tableModel.addRow(data);
-        }
-        
-        DefaultTableCellRenderer centerRender = new DefaultTableCellRenderer();
-		centerRender.setHorizontalAlignment(SwingConstants.CENTER);
-		for (int i = 0 ; i <= 8; i++) {
-			if (i != 7 && i != 1 ) {
-				table.getColumnModel().getColumn(i).setCellRenderer(centerRender);
-        	}
-        }
-       
-        ((DefaultTableCellRenderer)table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+        createTableToDisplayTasks();
         
 		// Create scroll bar if table area is full        
         JScrollPane scroller = new JScrollPane(table);
@@ -390,6 +345,7 @@ public class TaskUIManager {
             }
         });
         
+        // Added the table box, display message box and the input to the panel
         DefaultCaret caret = (DefaultCaret) output.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         panel.add(scroller);
@@ -407,71 +363,49 @@ public class TaskUIManager {
         userCommandCount = 0;
         displayMessage(COMMAND_MESSAGE);
     }  
-
-	// Support historical user commands by press key UP and DOWN
-    private static void panelKeyPressAction(KeyEvent event) {
-        if (event.getKeyCode() == KeyEvent.VK_UP || event.getKeyCode() == KeyEvent.VK_DOWN) {
-            String userCommand = "";
-            if (event.getKeyCode() == KeyEvent.VK_UP) {
-                userCommandCount++;
-                if (userCommandCount > mMainLogic.getOldUserCommandSize()) {
-                    userCommandCount--;
-                }
-                userCommand = mMainLogic.getOldUserCommand(userCommandCount);
-            } else {
-                userCommandCount--;
-                if (userCommandCount < 0) {
-                    userCommandCount = 0;
-                } else {
-                    userCommand = mMainLogic.getOldUserCommand(userCommandCount);
-                }
-            }
-            input.requestFocus();
-            input.setText(userCommand);
-            input.setCaretPosition(userCommand.length());
+    
+    private static void createTableToDisplayTasks() {
+    	DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
+        tableModel.setColumnIdentifiers(columnNames);
+        tableModel.setRowCount(0);
+        
+        for (int i = 0 ; i < columnNames.length; i++) {
+        	if (i != 1) {
+        		table.getColumnModel().getColumn(i).setPreferredWidth(columnWidth[i]);
+        		table.getColumnModel().getColumn(i).setMaxWidth(columnWidth[i]);
+        	}
         }
         
-        if (event.getKeyCode() == KeyEvent.VK_PAGE_DOWN) {
-        	userScrollCount++;
-        	if (userScrollCount + MAX_NUMBER_ROWS > mTableRowCount) {
-        		userScrollCount--;
-        	}
-        	
-        	table.scrollRectToVisible(new Rectangle(0, 
-        											userScrollCount * table.getRowHeight(), 
-        											table.getWidth(), 
-        											MAX_NUMBER_ROWS * table.getRowHeight()));
-        	
+        // Set data for table
+        for (int i = 0; i < dataTaskList.size(); i++) {
+            String[] data = getDataFromTask(dataTaskList.get(i), i);
+            tableModel.addRow(data);
         }
-        if (event.getKeyCode() == KeyEvent.VK_PAGE_UP) {
-        	
-        	userScrollCount--;
-        	if (userScrollCount < 0) {
-        		userScrollCount++;
+    
+    	DefaultTableCellRenderer centerRender = new DefaultTableCellRenderer();
+		centerRender.setHorizontalAlignment(SwingConstants.CENTER);
+		for (int i = 0 ; i < columnNames.length; i++) {
+			/* The column 1 is the task name
+			** The column 7 is the task group
+			** not fix the width for these 2 columns
+			*/
+			if (i != 7 && i != 1 ) {
+				table.getColumnModel().getColumn(i).setCellRenderer(centerRender);
         	}
-        	
-        	table.scrollRectToVisible(new Rectangle(0, 
-        											userScrollCount * table.getRowHeight(), 
-        											table.getWidth(), 
-        											MAX_NUMBER_ROWS * table.getRowHeight()));
         }
+       
+        ((DefaultTableCellRenderer)table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
+    	table.setModel(tableModel);
+        tableModel.fireTableDataChanged();
     }
     
     public static void updateTable() {
          
         ((DefaultTableCellRenderer)table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
     	DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
-        tableModel.setRowCount(0);
-        tableModel.setColumnIdentifiers(columnNames);
-        DefaultTableCellRenderer centerRender = new DefaultTableCellRenderer();
-		centerRender.setHorizontalAlignment(SwingConstants.CENTER);
-		for(int i = 0; i <= 8; i++) {
-			if (i != 7 && i != 1 ) {
-				table.getColumnModel().getColumn(i).setCellRenderer(centerRender);
-        	}
-        }
         
-        for(int i = 0; i <= 8; i++) {
+        
+        for(int i = 0; i < columnNames.length; i++) {
         	if (i != 1) {
         		table.getColumnModel().getColumn(i).setPreferredWidth(columnWidth[i]);
         		table.getColumnModel().getColumn(i).setMaxWidth(columnWidth[i]);
@@ -482,8 +416,7 @@ public class TaskUIManager {
         	String[] data = getDataFromTask(dataTaskList.get(i), i);
 			tableModel.addRow(data);
 		}
-		table.setModel(tableModel);
-        tableModel.fireTableDataChanged();
+		
     }
     
     
@@ -495,7 +428,7 @@ public class TaskUIManager {
     	String startDate = mCommandParser.getStartDateForTimetable(userCommand);
     	String endDate = mCommandParser.getEndDateForTimetable(userCommand);
     	if (startDate == null || startDate.equals("") || endDate == null || endDate.equals("")) {
-    		updateTable();
+    		createTableToDisplayTasks();
     		displayMessage(AppConst.MESSAGE.INVALID_DATE_TIME_FORMAT);
     		return;
     	}
@@ -504,7 +437,7 @@ public class TaskUIManager {
     	int to = mDateTimeHelper.getNumberOfDayFromThisYearForDate(mDateTimeHelper.getDayFromStringDate(endDate), mDateTimeHelper.getMonthFromStringDate(endDate));
 		if (from > to) {
 			displayMessage(AppConst.MESSAGE.INVALID_DATE_TIME_FORMAT);
-			updateTable();
+			createTableToDisplayTasks();
 			return;
 		}
 		DefaultTableModel tableModel = (DefaultTableModel)table.getModel();
@@ -572,7 +505,7 @@ public class TaskUIManager {
                     		frame.setVisible(false);
                     		frame.dispose();
                     	} else {
-                    		updateTable();
+                    		createTableToDisplayTasks();
                     		displayMessage(message);
                     	}
                     }
@@ -583,5 +516,114 @@ public class TaskUIManager {
             input.requestFocus();
         }
     }
+    
+    // Support historical user commands by press key UP and DOWN
+	// Support scroll table by press key PgUp and PgDn
+    private static void panelKeyPressAction(KeyEvent event) {
+    
+        if (event.getKeyCode() == KeyEvent.VK_UP || event.getKeyCode() == KeyEvent.VK_DOWN) {
+            String userCommand = "";
+            if (event.getKeyCode() == KeyEvent.VK_UP) {
+                userCommandCount++;
+                if (userCommandCount > mMainLogic.getOldUserCommandSize()) {
+                    userCommandCount--;
+                }
+                userCommand = mMainLogic.getOldUserCommand(userCommandCount);
+            } else {
+                userCommandCount--;
+                if (userCommandCount < 0) {
+                    userCommandCount = 0;
+                } else {
+                    userCommand = mMainLogic.getOldUserCommand(userCommandCount);
+                }
+            }
+            input.requestFocus();
+            input.setText(userCommand);
+            input.setCaretPosition(userCommand.length());
+        }
+        
+        if (event.getKeyCode() == KeyEvent.VK_PAGE_DOWN) {
+        	userScrollCount++;
+        	if (userScrollCount + MAX_NUMBER_ROWS > mTableRowCount) {
+        		userScrollCount--;
+        	}
+        	
+        	table.scrollRectToVisible(new Rectangle(0, 
+        											userScrollCount * table.getRowHeight(), 
+        											table.getWidth(), 
+        											MAX_NUMBER_ROWS * table.getRowHeight()));
+        	
+        }
+        if (event.getKeyCode() == KeyEvent.VK_PAGE_UP) {
+        	
+        	userScrollCount--;
+        	if (userScrollCount < 0) {
+        		userScrollCount++;
+        	}
+        	
+        	table.scrollRectToVisible(new Rectangle(0, 
+        											userScrollCount * table.getRowHeight(), 
+        											table.getWidth(), 
+        											MAX_NUMBER_ROWS * table.getRowHeight()));
+        }
+    }
+    
+    public static class RemindTask extends TimerTask {
+	
+		@Override
+		public void run() {
+			
+			/*
+			** Get the list of tasks with the reminder time is comming
+			** User can set the reminder time for a task by using repeat id <id> <time>
+			*/
+			ArrayListPointer dataTaskListPointer = new ArrayListPointer();   
+            dataTaskListPointer.setPointer(dataTaskList);
+			String message = mMainLogic.process(AppConst.COMMAND_TYPE.REMIND, dataTaskListPointer);
+			
+			if (message != null) {				
+				
+				dataTaskList = dataTaskListPointer.getPointer();
+				mTableRowCount = dataTaskList.size();
+				userScrollCount = 0;
+				createTableToDisplayTasks();
+				output.setText("");
+				displayMessage(message);
+				
+				// show notification to users
+				// option pane with no buttons.
+				JOptionPane opt = new JOptionPane(	AppConst.MESSAGE.NOTIFICATIONS, 
+													JOptionPane.INFORMATION_MESSAGE, 
+													JOptionPane.DEFAULT_OPTION, 
+													null, 
+													new Object[]{OK_BUTTON}); 
+													
+		  		final JDialog dlg = opt.createDialog(NOTIFICATION);
+		  		new Thread(new Runnable() {
+		  			public void run() {		
+		  				try {
+		  					/* 
+		  					** Turn on the sound and the notification
+		  					** User can turn off by press ENTER
+		  					** If not, after timeDismiss seconds, the notification will be turned off
+		  					*/
+		  					InputStream in = new FileInputStream("sound1.wav");
+							AudioStream as = new AudioStream(in);	
+							AudioPlayer.player.start(as);  
+							Thread.sleep(timePlaySound);
+							AudioPlayer.player.stop(as);
+							Thread.sleep(timeDismiss);
+							dlg.dispose();
+						} catch (Throwable th) {
+							
+						}
+		  			}
+		  		}).start();
+		  		dlg.setVisible(true);
+			}
+			toolkit.beep();
+		}
+	}
+    
 
 }
