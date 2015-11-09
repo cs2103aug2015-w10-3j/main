@@ -16,6 +16,7 @@ This guide describes the design and implementation of Todoer. It will help you u
   - [History Class](#history-class)
 - [Parser Component](#commandparsercomponent)
 - [Storage Component](#storagecomponent)
+  - [Storage Class](#storage-class)
   - [JSONConverter Class](#jsonconverter-class)
 - [Testing](#testing)
 - [Future Development](#futuredevelopment)
