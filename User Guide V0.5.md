@@ -151,8 +151,9 @@ This section describes the different ways in which you can view your tasks, eith
 1. Type:
   * `timetable <date to display>` **or**
   * `timetable from <date> to <date>` **or**
-  * `timetable` to display the view for this week:<br>
-![add image](doc/images/V0.5/timetable.JPG)
+  * `timetable` to display the view for this week:
+  <br>
+  ![add image](doc/images/V0.5/timetable.JPG)
 
 > Tip: Use the `Page Up`/`Page Down` keys to scroll up and down!
 
