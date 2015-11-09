@@ -143,10 +143,7 @@ The diagram (see Figure 3) below demonstrates how the major components of the so
 
 | Return type   | Method and Description                                            |
 |-------------|----------------------------------------------------------|
-| String | getName(): get the name of the task  |
-| void | setName(String newname): set a new name for the task  |
-| String | getDeadline(): get the deadline of the task  |
-| void | setDeadline(String newdeadline): set a new deadline for the task  |
+| void | updateHistory(): update history after user modifications to task data |
 
 # CommandParser Component
 
