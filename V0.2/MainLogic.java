@@ -8,28 +8,19 @@ public class MainLogic {
 
 	CommandParser mTaskCommandParse = new CommandParser();
 
-	//constants
-	private static final String ENTER = "Enter";
-    private static final String SETTINGS_FILE = "settings.txt";
-    private static final String DATE_FORMAT = "dd/MM HH:mm:ss";
-    private static final String ZERO_SECOND = "00";
-    private static final int BIG_NUM = 100000;
-	
 	//the parser and the storage objects
 	private CommandParser mCommandParser;
 	private Storage mDataStorage;
 	private Storage mSettingsStorage;
 
 	//global variables for storing internal data
-	private ArrayList<DataState> mHistory;
-	private int mCurrentState;
 	private ArrayList<Task> mAllTasks;
 	private ArrayList<Task> mPreviousTasks;
 	private ArrayList<String> mAllUserCommands;
 	private Storage mStorage;
 	private DateTimeHelper mDateTimeHelper;
-	
 	private Settings mSettings = new Settings();
+	private History mHistory = new History();
 
 	public MainLogic() {
 		
@@ -39,9 +30,9 @@ public class MainLogic {
 		mCommandParser = new CommandParser();
 		
 		mSettingsStorage = new Storage();
-		mSettingsStorage.setFileURL(SETTINGS_FILE);
-		//mSettings = mSettingsStorage.readSettings();
-		mSettings.setDataFileUrl("test.txt");
+		mSettingsStorage.setFileURL(AppConst.SETTINGS_FILE);
+		mSettings = mSettingsStorage.readSettings();
+		// mSettings.setDataFileUrl("test.txt");
 		mDataStorage = new Storage();
 		mDataStorage.setFileURL(mSettings.getDataFileUrl());
 		
@@ -50,7 +41,6 @@ public class MainLogic {
 	}
 
 
-	
 	/**
 	 * This function initilises the mAllTasks with data read from mDataStorage.
 	 * It also initialises the mHistory and mCurrentState
@@ -58,147 +48,19 @@ public class MainLogic {
 	 * */
 	protected void initialiseTasks(){
 		mAllTasks = new ArrayList<Task>();
-		mHistory = new ArrayList<DataState>();
 		try{
 			mAllTasks = mDataStorage.readContent();
-			mHistory.add(new DataState(mAllTasks));
-			mCurrentState = 0;
+			updateHistory();
 		} catch (Exception e){
 			e.printStackTrace();
 		}
 	}
 
-	/**
-	 * This function update the mHistory after each change in mAllTasks.
-	 * So that we could redo/undo changes in mAllTasks
-	 * 
-	 * */
-	protected void updateHistory(){
-		if (mCurrentState < mHistory.size()-1){
-			while (mHistory.size()>mCurrentState+1)
-				mHistory.remove(mCurrentState+1);
-		}
-		mHistory.add(new DataState(mAllTasks));
-		mCurrentState++;
-	}
-
-	/**
-	 * These are the comparator classes for comparing Task according to different fields
-	 * 
-	 * */
-	private class TaskPriorityCompare implements Comparator<Task> {
-	    @Override
-	    public int compare(Task o1, Task o2) {
-	        // write comparison logic here like below , it's just a sample
-	        String p1 = o1.getPriority();
-	        String p2 = o2.getPriority();
-	        if (p1.equals(AppConst.TASK_FIELD.LOW)) p1 = "n";
-	        if (p2.equals(AppConst.TASK_FIELD.LOW)) p2 = "n";
-	        return p1.compareTo(p2);
-	    }
-	}
-	private class TaskDeadlineCompare implements Comparator<Task> {
-	    @Override
-	    public int compare(Task o1, Task o2) {
-	        // write comparison logic here like below , it's just a sample
-	        if (o1.getDeadline().equals("")) {
-	        	return 1;
-	        }
-	        if (o2.getDeadline().equals("")) {
-	        	return -1;
-	        }
-	        int x = mDateTimeHelper.compareStringDates(o1.getDeadline(), o2.getDeadline());
-	        if (x != 0) {
-	        	return x;
-	        }
-	        
-	        x = 2;
-			if (o1.getPriority().equals(AppConst.TASK_FIELD.HIGH)) {
-				x = 3;
-			} else if (o1.getPriority().equals(AppConst.TASK_FIELD.LOW)) {
-				x = 1;
-			}
-			
-			int y = 2;
-			if (o2.getPriority().equals(AppConst.TASK_FIELD.HIGH)) {
-				y = 3;
-			} else if (o2.getPriority().equals(AppConst.TASK_FIELD.LOW)) {
-				y = 1;
-			}
-			
-			if (x > y) {
-				return -1;
-			}
-			return 1;
-	    }
-	}
-	
-	private class TaskNotificationCompare implements Comparator<Task> {
-		@Override
-		public int compare(Task o1, Task o2) {
-			String s1 = o1.getDeadline();
-			String s2 = o2.getDeadline();
-			int x = 2;
-			if (o1.getPriority().equals(AppConst.TASK_FIELD.HIGH)) {
-				x = 3;
-			} else if (o1.getPriority().equals(AppConst.TASK_FIELD.LOW)) {
-				x = 1;
-			}
-			
-			int y = 2;
-			if (o2.getPriority().equals(AppConst.TASK_FIELD.HIGH)) {
-				y = 3;
-			} else if (o2.getPriority().equals(AppConst.TASK_FIELD.LOW)) {
-				y = 1;
-			}
-			int xx = mDateTimeHelper.compareStringDates(s2, s1);
-			if (xx != 0) {
-				return xx;
-			}
-			if (x > y) {
-				return -1;
-			}
-			return 1;
-		}
-	}
-	
-	private class TaskStartDateCompare implements Comparator<Task> {
-	    @Override
-	    public int compare(Task o1, Task o2) {
-	        // write comparison logic here like below , it's just a sample
-	        if (o1.getStartDate().equals("")) {
-	        	return 1;
-	        }
-	        if (o2.getStartDate().equals("")) {
-	        	return -1;
-	        }
-	        return mDateTimeHelper.compareStringDates(o1.getStartDate(), o2.getStartDate());
-	    }
+	private void updateHistory(){
+		mHistory.updateHistory(mAllTasks);
 	}
 	
 	
-	private class TaskEndDateCompare implements Comparator<Task> {
-	    @Override
-	    public int compare(Task o1, Task o2) {
-	        // write comparison logic here like below , it's just a sample
-	        if (o1.getEndDate().equals("")) {
-	        	return 1;
-	        }
-	        if (o2.getEndDate().equals("")) {
-	        	return -1;
-	        }
-	        return mDateTimeHelper.compareStringDates(o1.getEndDate(), o2.getEndDate());
-	    }
-	}
-	
-	
-	private class TaskGroupCompare implements Comparator<Task> {
-	    @Override
-	    public int compare(Task o1, Task o2) {
-	        // write comparison logic here like below , it's just a sample
-	       	return o1.getGroup().compareTo(o2.getGroup());
-	    }
-	}
 	
 	// Get the list of tasks to be displayed 
 	private ArrayList<Task> getTasksToDisplay(ArrayList<Task> tasks, int parentTaskId) {
@@ -692,24 +554,24 @@ public class MainLogic {
 
 		switch (mCommand.getCommandArgument()){
 			case AppConst.TASK_FIELD.DEADLINE:
-				Collections.sort(mTasks,new TaskDeadlineCompare());
+				Collections.sort(mTasks,new Comparators.TaskDeadlineCompare());
 				return AppConst.MESSAGE.DISPLAY_BY_DEADLINE;
 				
 			case AppConst.TASK_FIELD.START_DATE:
-				Collections.sort(mTasks,new TaskStartDateCompare());
+				Collections.sort(mTasks,new Comparators.TaskStartDateCompare());
 				return AppConst.MESSAGE.DISPLAY_BY_START_DATE;
 				
 			case AppConst.TASK_FIELD.END_DATE:
-				Collections.sort(mTasks,new TaskEndDateCompare());
+				Collections.sort(mTasks,new Comparators.TaskEndDateCompare());
 				return AppConst.MESSAGE.DISPLAY_BY_END_DATE;
 				
 
 			case AppConst.TASK_FIELD.PRIORITY:
-				Collections.sort(mTasks,new TaskPriorityCompare());
+				Collections.sort(mTasks,new Comparators.TaskPriorityCompare());
 				return AppConst.MESSAGE.DISPLAY_BY_PRIORITY;
 
 			case AppConst.TASK_FIELD.GROUP:
-				Collections.sort(mTasks,new TaskGroupCompare());
+				Collections.sort(mTasks,new Comparators.TaskGroupCompare());
 				return AppConst.MESSAGE.DISPLAY_BY_GROUP;
 		
 			default:
@@ -810,25 +672,43 @@ public class MainLogic {
 	}
 	
 	protected String executeUndo(Command mCommand, ArrayListPointer feedbackTasks){
-		if (mCurrentState>0) {
-			mCurrentState--;
-			mAllTasks = mHistory.get(mCurrentState).getAllTasks();
-			mDataStorage.rewriteContent(mAllTasks);
+		
+		ArrayList<Task> mTasks = mHistory.undo();
+		if (mTasks == null) {
 			feedbackTasks.setPointer(getTasksToDisplay(mAllTasks, -1));
-			return AppConst.MESSAGE.UNDID_SUCCESSFUL;
+			return AppConst.MESSAGE.NOTHING_UNDONE;
 		}
-		return AppConst.MESSAGE.NOTHING_UNDONE;
+
+		mAllTasks = mTasks;
+		feedbackTasks.setPointer(getTasksToDisplay(mAllTasks, -1));
+		
+		return AppConst.MESSAGE.UNDID_SUCCESSFUL;
 	}
 
 	protected String executeRedo(Command mCommand,  ArrayListPointer feedbackTasks){
-		if (mCurrentState < mHistory.size()-1){
-			mCurrentState++;
-			mAllTasks = mHistory.get(mCurrentState).getAllTasks();
-			mDataStorage.rewriteContent(mAllTasks);
+		ArrayList<Task> mTasks = mHistory.redo();
+		if (mTasks == null) {
 			feedbackTasks.setPointer(getTasksToDisplay(mAllTasks, -1));
-			return AppConst.MESSAGE.REDID_SUCCESSFUL;
+			return AppConst.MESSAGE.NOTHING_REDONE;
 		}
-		return AppConst.MESSAGE.NOTHING_REDONE;
+
+		mAllTasks = mTasks;
+		feedbackTasks.setPointer(getTasksToDisplay(mAllTasks, -1));
+		
+		return AppConst.MESSAGE.REDID_SUCCESSFUL;
+	}
+
+	private class TaskSearchMatchCountCompare implements Comparator<MatchCount> {
+
+	    @Override
+	    public int compare(MatchCount o1, MatchCount o2) {
+	        // write comparison logic here like below , it's just a sample
+	        if (o1.count <= o2.count) {
+	        	return 1;
+	        }
+	        return -1;
+	    }
+
 	}
 
 	protected String executeSearch(Command mCommand, ArrayListPointer feedbackTasks) {
@@ -848,7 +728,7 @@ public class MainLogic {
 			task = task.toLowerCase();
 
 			if (task.contains(mCommand.getCommandArgument())) {
-				matchCount.get(i).count = BIG_NUM;
+				matchCount.get(i).count = AppConst.BIG_NUM;
 				continue;
 			}
 			for(int j=0; j<arguments.length; j++) {
@@ -875,10 +755,10 @@ public class MainLogic {
 				break;
 			}
 			int point = matchCount.get(i).count;
-			if (point >= BIG_NUM) {
+			if (point >= AppConst.BIG_NUM) {
 				isMatched = true;
 			}
-			if (point < BIG_NUM && isMatched) {
+			if (point < AppConst.BIG_NUM && isMatched) {
 				break;
 			}
 			if (point > 0) {
@@ -1051,11 +931,11 @@ public class MainLogic {
 		ArrayList<Task> result = new ArrayList<Task>();
 	
 		// get current time, exactly for 1 seconds
-		SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+		SimpleDateFormat dateFormat = new SimpleDateFormat(AppConst.DATE_FORMAT);
 		String currentTime = dateFormat.format(new Date());
 		
 		// only execute when the second is 00
-		if (!currentTime.endsWith(ZERO_SECOND)) {
+		if (!currentTime.endsWith(AppConst.ZERO_SECOND)) {
 			return null;
 		}
 		boolean isHasDeadlineComming = false;
@@ -1072,7 +952,7 @@ public class MainLogic {
 			return null;
 		}
 		
-		Collections.sort(result,new TaskNotificationCompare());
+		Collections.sort(result,new Comparators.TaskNotificationCompare());
 		feedbackTasks.setPointer(result);
 		return AppConst.MESSAGE.REMIND_DEADLINE;
 	}
@@ -1397,18 +1277,7 @@ public class MainLogic {
 		int id, count;
 	}
 
-	private class TaskSearchMatchCountCompare implements Comparator<MatchCount> {
-
-	    @Override
-	    public int compare(MatchCount o1, MatchCount o2) {
-	        // write comparison logic here like below , it's just a sample
-	        if (o1.count <= o2.count) {
-	        	return 1;
-	        }
-	        return -1;
-	    }
-
-	}
+	
 	
 	protected ArrayList<Task> duplicate(ArrayList<Task> tasks){
 		ArrayList<Task> newTasks = new ArrayList<Task>();

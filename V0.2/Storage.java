@@ -46,9 +46,12 @@ public class Storage {
 	public Settings readSettings(){
 		try{
 			br = new BufferedReader(new FileReader(fileName));
-			br.close();
-			return jsonHelper.stringToSettings( br.readLine() );
 			
+			return JSONHelper.stringToSettings( br.readLine() );
+			
+		}
+		catch (FileNotFoundException e){
+			return new Settings();
 		}
 		catch (Exception e){
 			e.printStackTrace();
