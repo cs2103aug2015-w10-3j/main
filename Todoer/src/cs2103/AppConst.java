@@ -207,5 +207,85 @@ public interface AppConst {
 		String TASK_HAS_NO_DEADLINE = "Task has no deadline!\n";
 		String TURN_OFF_REPEAT_SUCCESSFUL = "Turn off repeat successful!\n";
 	}
+	
+	interface UI_CONST { 
+		static int ROW_HEIGHT_DEFAULT = 25;
+		String TIME_ZERO = " 00:00";
+		
+		// String to display for priority
+	    static final String HIGH = "High";
+	    static final String MEDIUM = "Medium";
+	    static final String LOW = "Low";
+	    static String ENTER = "Enter";
+	    static String APP_NAME = "Todoer";
+	    static String COMMAND_MESSAGE = "$Todoer: ";
+	    static String NEW_LINE = "\n";
+	    static String DEFAULT_SOUND_FILE_NAME = "sound1.wav";
+	    static String SLASH = "\\";
+	    static String EVERYDAY = "Everyday";
+	    static String EVERY = "Every ";
+	    
+	    
+	    static String NOTIFICATION = "Notification!";
+	    static String OK_BUTTON = "OK";
+	    static String SPACE = "                        ";
+	    
+	    
+	    static int DEFAULT_WINDOW_HEIGHT = 5;
+		static int DEFAULT_WINDOW_WIDTH = 95;
+		static double DEFAULT_RATIO = 0.08;
+		static int MAX_NUMBER_ROWS = 16;
+		static int DEFAULT_COLUMN_WIDTH = 150;
+		
+		// check deadline task for every 1 second
+	    static int DEFAULT_TIME_REMIND = 1 * 1000;
+	    static int DEFAULT_TIME_DISMISS = 30 * 1000;
+		static int DEFAULT_TIME_PLAY_SOUND = 4 * 1000;
+		
+		String[] TASK_COLUMN_NAMES = new String[] {	"#", 
+													"Task Name",
+													"Deadline",
+													"Start Date/Time",
+													"End Date/Time",
+													"Period",
+													"Prioriry",
+													"Group",
+													"Status"
+													};
+		int COLUMN_INDEX = 0;
+		int COLUMN_TASK_NAME = 1;
+		int COLUMN_DEADLINE = 2;
+		int COLUMN_START_DATE_TIME = 3;
+		int COLUMN_END_DATE_TIME = 4;
+		int COLUMN_PERIOD = 5;
+		int COLUMN_PRIORITY = 6;
+		int COLUMN_GROUP = 7;
+		int COLUMN_STATUS = 8;
+		
+		String[] TIMETABLE_COLUMN_NAMES = new String[] { 	"#",
+															"8-9", 
+															"9-10", 
+															"10-11", 
+															"11-12", 
+															"12-13", 
+															"13-14", 
+															"14-15",
+															"15-16", 
+															"16-17", 
+															"17-18", 
+															"18-19", 
+															"19-20"
+															};
+		int[] TASK_COLUMN_WIDTH = new int[] {	40,
+												350,
+												130,
+												130,
+												130,
+												100,
+												80,
+												130,
+												80
+												};
+	}
 
 }

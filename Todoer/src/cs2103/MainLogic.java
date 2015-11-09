@@ -943,11 +943,11 @@ public class MainLogic {
 				result.add(mAllTasks.get(i));
 			}
 		}
-		if (result.size() == 0 || !isHasDeadlineComming) {
+		if (result == null || result.size() == 0 || !isHasDeadlineComming) {
 			return null;
 		}
 		
-		Collections.sort(result,new Comparators.TaskNotificationCompare());
+		Collections.sort(result, new Comparators.TaskNotificationCompare());
 		feedbackTasks.setPointer(result);
 		return AppConst.MESSAGE.REMIND_DEADLINE;
 	}

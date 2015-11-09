@@ -1,7 +1,7 @@
 package cs2103;
 import java.util.*;
 public class Comparators{
-	private static DateTimeHelper mDateTimeHelper;
+	private static DateTimeHelper mDateTimeHelper = new DateTimeHelper();
 	/**
 	 * These are the comparator classes for comparing Task according to different fields
 	 * 
