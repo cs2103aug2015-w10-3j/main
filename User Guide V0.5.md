@@ -26,7 +26,7 @@ Todoer is a keystroke-orientated task scheduler that provides functionality for 
 
 1. **Download Todoer**: You can save Todoer into any folder of your choice. All your data will be saved in this folder.
 
-2. **Launch Todoer**: by simply double-clicking the `Todoer.exe file`.
+2. **Launch Todoer**: by simply double-clicking the `Todoer.jar file`.
 
 3. You will be greeted with an interface that has (*see below*) a main panel (**A**), a console (**B**), and a command bar (**C**). This command bar is where you enter commands to tell Todoer what to do. The console displays helpful feedback for your actions while the main panel displays your tasks. <br> ![add image](doc/images/V0.5/interface empty.JPG)
  
@@ -162,6 +162,7 @@ This section describes the different ways in which you can view your tasks, eith
 ## Updating a task
 1. Type `update <task_to_be_updated> TO <keyword> <new value>`
 2. Refer to the [Keyword List](https://github.com/cs2103aug2015-w10-3j/main/blob/master/User%20Guide%20V0.5.md#keyword-list) in the add section for the list of \<keyword>.
+
 > Example: `update id 1 TO priority low`
 
 > Take note that the keyword `TO` is capitalized
