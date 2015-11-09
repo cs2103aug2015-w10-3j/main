@@ -18,8 +18,8 @@ public class TableHelper {
     
  // column to display in table
     String[] mColumnNames = AppConst.UI_CONST.TASK_COLUMN_NAMES;
-                        
     String[] mTimeTableColumnNames = AppConst.UI_CONST.TIMETABLE_COLUMN_NAMES;
+    String[] mHelpColumnNames = AppConst.UI_CONST.HELP_TABLE_COLUMN_NAMES;
     int[] mColumnWidth = AppConst.UI_CONST.TASK_COLUMN_WIDTH;
     
     private static JTable mTable;
@@ -28,18 +28,28 @@ public class TableHelper {
 		
 		// Create table to display tasks
 	    mTable = new JTable() {
+	    	
 		    @Override
 			public Component prepareRenderer(TableCellRenderer renderer, int row, int col) {
 				Component comp = super.prepareRenderer(renderer, row, col);
 				Object value = getModel().getValueAt(row, col);
 				comp.setBackground(Color.white);
 				
+				// Help document table
+				if (getModel().getColumnCount() == AppConst.UI_CONST.HELP_TABLE_COLUMN_NAMES.length) {
+					if (row == AppConst.UI_CONST.COMMAND_ROW1 || row == AppConst.UI_CONST.COMMAND_ROW2) {
+						comp.setBackground(Color.green);
+					}
+					return comp;
+				}
+				
 				/*
-				** If the table is displaying list of tasks, column priority will display the priority of tasks
-				** either High, Medium, or Low.
-				** otherwise, the table is displaying the timetable
-				** Check the value of column priority to check which data the table is displaying.
+				* If the table is displaying list of tasks, column priority will display the priority of tasks
+				* either High, Medium, or Low.
+				* otherwise, the table is displaying the timetable
+				* Check the value of column priority to check which data the table is displaying.
 				*/
+				
 				Object checkValue = getModel().getValueAt(row, AppConst.UI_CONST.COLUMN_PRIORITY);
 				if (checkValue.equals(AppConst.UI_CONST.HIGH) || checkValue.equals(AppConst.UI_CONST.MEDIUM) || checkValue.equals(AppConst.UI_CONST.LOW)) {
 					if (col == AppConst.UI_CONST.COLUMN_PRIORITY) {
@@ -64,7 +74,7 @@ public class TableHelper {
 				return comp;
 			}
 	    };
-	   
+	    
 	    mTable.setRowHeight(AppConst.UI_CONST.ROW_HEIGHT_DEFAULT);   
 	    
 	    createTableToDisplayTasks();
@@ -136,6 +146,7 @@ public class TableHelper {
 		data[AppConst.UI_CONST.COLUMN_PRIORITY] = data[AppConst.UI_CONST.COLUMN_PRIORITY].substring(0, 1).toUpperCase() + data[AppConst.UI_CONST.COLUMN_PRIORITY].substring(1);
 		data[AppConst.UI_CONST.COLUMN_GROUP] = removeSlash(task.getGroup());
 		data[AppConst.UI_CONST.COLUMN_STATUS] = task.getStatus();
+		data[AppConst.UI_CONST.COLUMN_STATUS] = data[AppConst.UI_CONST.COLUMN_STATUS].substring(0, 1).toUpperCase() + data[AppConst.UI_CONST.COLUMN_STATUS].substring(1);
 		return data;
 	}
 	
@@ -213,6 +224,26 @@ public class TableHelper {
         tableModel.fireTableDataChanged();
     }
 	
+	public void createTableForHelpDocument() {
+		DefaultTableModel tableModel = (DefaultTableModel)mTable.getModel();
+		tableModel.setRowCount(0);
+		tableModel.setDataVector(AppConst.UI_CONST.HELP_ROW, mHelpColumnNames);
+		
+		for (int i = 0 ; i < mHelpColumnNames.length; i++) {
+        	if (AppConst.UI_CONST.HELP_COLUMN_WIDTH[i] != 0) {
+        		mTable.getColumnModel().getColumn(i).setPreferredWidth(AppConst.UI_CONST.HELP_COLUMN_WIDTH[i]);
+        		mTable.getColumnModel().getColumn(i).setMaxWidth(AppConst.UI_CONST.HELP_COLUMN_WIDTH[i]);
+        	}
+        }
+		DefaultTableCellRenderer centerRender = new DefaultTableCellRenderer();
+		centerRender.setHorizontalAlignment(SwingConstants.CENTER);
+		for (int i = 0 ; i < mHelpColumnNames.length; i++) {
+			mTable.getColumnModel().getColumn(i).setCellRenderer(centerRender);
+        }
+		
+        mTable.setModel(tableModel);
+        tableModel.fireTableDataChanged();
+	}
 	
 	public String createTimetable(String userCommand) {
 	    

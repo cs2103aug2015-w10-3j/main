@@ -715,6 +715,8 @@ public class CommandParser {
 			if (i > 0) {
 				if (isNumber(ids[i]) && isNumber(ids[i-1])) {
 					id += " ";
+				} else if (isNumber(ids[i-1]) && ids[i].charAt(0) >= '0' && ids[i].charAt(i) <= '9') {
+					id += " ";
 				}
 			}
 			id += ids[i];

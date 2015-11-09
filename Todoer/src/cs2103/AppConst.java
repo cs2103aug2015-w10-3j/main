@@ -178,6 +178,7 @@ public interface AppConst {
 		
 		String REMIND = "remind";
 		String REPEAT = "repeat";
+		String HELP = "help";
 		
 	}
 	
@@ -359,7 +360,7 @@ public interface AppConst {
 													"Start Date/Time",
 													"End Date/Time",
 													"Period",
-													"Prioriry",
+													"Priority",
 													"Group",
 													"Status"
 													};
@@ -372,6 +373,121 @@ public interface AppConst {
 		int COLUMN_PRIORITY = 6;
 		int COLUMN_GROUP = 7;
 		int COLUMN_STATUS = 8;
+		
+		int COMMAND_ROW1 = 0;
+		int COMMAND_ROW2 = 8;
+		
+		int[] HELP_COLUMN_WIDTH = new int[] {   280,
+												150,
+												220,
+												0,
+												220,
+											};
+		
+		
+		String[] HELP_TABLE_COLUMN_NAMES = new String[] {   "HELP",
+															"",
+															"",
+															"",
+															"",		
+															};
+				
+		String[][] HELP_ROW = new String[][] { 
+				{
+					"add", 
+					"done",
+					"delete",
+					"update",
+					"show",
+				},
+				{	"add <task_name> ",
+					"done <task_name>",
+					"delete <task_name>",
+					"update <task_name> TO <keyword> <new_value>",
+					"showday <date>",
+				},
+				{
+					"by <deadline>",
+					"done id <id_number>",
+					"delete id ",
+					"",
+					"showpriority <high/medium/low>",
+				},
+				{
+					"priority <high/medium/low>",
+					"",
+					"deleteby <field> <value_of_field>",
+					"",
+					"showgroup <groupname>",
+				},
+				{
+					"group <group_name>",
+					"",
+					"deleteall",
+					"",
+					"showby <column_field>",
+					"",
+					"",
+					"",
+					"",
+				},
+				{
+					"from <start_datetime> to <end_datetime>",
+					"",
+					"",
+					"",
+					"showall",
+				},
+				{
+					"repeat <period>",
+					"",
+					"",
+					"",
+					"",
+				},
+				{
+					"",
+					"",
+					"",
+					"",
+					"",
+				},
+				{
+					"timetable",
+					"setfile",
+					"help",
+					"exit",
+					"",
+				},
+				{
+					"only 'timetable' to show this week",
+					"setfile <file_path>",
+					"Display the helpsheet",
+					"Exit Todoer",
+					"",
+				},
+				{
+					"timetable from <startdate> to <enddate>",
+					"",
+					"",
+					"",
+					"",
+				},
+				{
+					"timetable next <period>",
+					"",
+					"",
+					"",
+					"",
+				},
+				{
+					"",
+					"",
+					"",
+					"",
+					"",
+				}
+		};
 		
 		String[] TIMETABLE_COLUMN_NAMES = new String[] { 	"#",
 															"8-9", 

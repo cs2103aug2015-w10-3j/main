@@ -877,7 +877,7 @@ public class MainLogic {
 		ArrayListPointer pointer = new ArrayListPointer();
 		for(int i = 0; i < list.size(); i++) {
 			int	x = list.get(i);
-			Task task = mPreviousTasks.get(x-1);
+			Task task = mPreviousTasks.get(x - 1);
 			int position = findTasksMatched(task, mAllTasks, pointer);
 			if (pointer.getPointer().size() == 1) {
 				markDone(position);
@@ -897,7 +897,7 @@ public class MainLogic {
 			mAllTasks.get(position).setStatus(AppConst.TASK_FIELD.DONE);
 		} else {
 			for(int i = 0; i < mAllTasks.size(); i++) {
-				if (mAllTasks.get(i).getParentTaskId() != parentTaskId) {
+				if (mAllTasks.get(i).getParentTaskId() == parentTaskId) {
 					mAllTasks.get(i).setStatus(AppConst.TASK_FIELD.DONE);
 				}
 			}
@@ -986,7 +986,7 @@ public class MainLogic {
 			mAllTasks.get(position).setStatus(AppConst.TASK_FIELD.UNDONE);
 		} else {
 			for(int i = 0; i < mAllTasks.size(); i++) {
-				if (mAllTasks.get(i).getParentTaskId() != parentTaskId) {
+				if (mAllTasks.get(i).getParentTaskId() == parentTaskId) {
 					mAllTasks.get(i).setStatus(AppConst.TASK_FIELD.UNDONE);
 				}
 			}

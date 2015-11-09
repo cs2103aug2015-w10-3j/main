@@ -185,6 +185,8 @@ public class TaskUIManager {
                         if (commands[0].equals(AppConst.COMMAND_TYPE.TIMETABLE)) {
                         	displayMessage(mTableHelper.createTimetable(userCommand));
                         	mTableRowCount = mTableHelper.getTableRowCount();
+                        } else if (commands[0].equals(AppConst.COMMAND_TYPE.HELP)) {
+                        	mTableHelper.createTableForHelpDocument();
                         } else if (message == null) {
                     		displayMessage(AppConst.MESSAGE.GOODBYE);
                     		frame.setVisible(false);
