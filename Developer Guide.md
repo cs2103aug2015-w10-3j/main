@@ -70,11 +70,11 @@ This class defines the looks and feels of the `Text field` (or command bar) and 
 ![add image](doc/images/V0.5/logicDiagram.png)
 > Figure 2: Structure of the Logic Component
 
-At the heart of the Logic component is the `MainLogic` class that is responsible for executing the user’s commands. A `Task` class is also used to represent the tasks to be done. 
+At the heart of the Logic component is the `MainLogic` class that is responsible for executing the user’s commands. A `Task` class is also used to represent the tasks to be done. A `History` class stores a record of the data state in `DataState` objects after each user action modification. There are also several helper classes: `DateTimeHelper`, `Settings`, and `Comparators`.
 
 ## `MainLogic` Class 
 
-The `MainLogic` class has a public method `process()` for the UI to call and pass the user’s input into. `MainLogic` will then pass the user’s input to the `TaskCommandParser` class to get back the command’s details. Finally, it will execute the command depending on what type of command it is and return the feedback to the UI. While executing the command, `MainLogic` makes use of the `TaskStorage` class to do any input/output operation.
+The `MainLogic` class has a public method `process()` for the UI to call and pass the user’s input into. `MainLogic` will then pass the user’s input to the `CommandParser` class to get back the command’s details. Finally, it will execute the command depending on what type of command it is and return the feedback to the UI. While executing the command, `MainLogic` makes use of the `Storage` class to do any input/output operation.
 
 ``` java
 public MainLogic() {
@@ -135,13 +135,26 @@ The diagram (see Figure 3) below demonstrates how the major components of the so
 | String | getDeadline(): get the deadline of the task  |
 | void | setDeadline(String newdeadline): set a new deadline for the task  |
 
+## `History` Class
+
+`History` class is used to store snapshots of the program after each user modification to the task data. It creates and saves previous states of the data in `DataState` objects. This facilitates the `undo`/`redo` commands which toggle between the data states and hence reverse user actions.
+
+###### Notable API
+
+| Return type   | Method and Description                                            |
+|-------------|----------------------------------------------------------|
+| String | getName(): get the name of the task  |
+| void | setName(String newname): set a new name for the task  |
+| String | getDeadline(): get the deadline of the task  |
+| void | setDeadline(String newdeadline): set a new deadline for the task  |
+
 # CommandParser Component
 
 <br>
 ![add image](doc/images/V0.5/parserDiagram.png)
-> Figure 4: Structure of the Logic Component
+> Figure 4: Structure of the Parser Component
 
-The Parser component only consists of a `CommandParser` class which receives the raw user input and returns the details of the command in the form of an ArrayList of String objects.
+The Parser component consists of a `CommandParser` class which receives the raw user input and creates a `Command` object which is executed by the `Logic` component
 
 The first element of the ArrayList is always the command keyword, while the remaining elements could be the task name or deadline, depending on the type of the command.
 
