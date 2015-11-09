@@ -38,20 +38,33 @@ Architecture is made up of 4 main components. Users can use Todoer through the U
 4. The **`storage`** component reads and writes the tasks' content to the file system. 
 
 # UI Component
-The UI component consists of a `MainApp` class that is responsible for managing the input obtained from the UI and output to be displayed on the UI. The UI itself is created by the `UIController` class which manages the appearance and behaviour of the UI.
 
-Todoer’s UI consists of two parts: `Text field` and `Display field`.
+<br>
+![add image](doc/images/V0.5/UIDiagram.png)
+> Figure 2: Structure of the UI Component
 
-Both fields are implemented using Java’s JFrame class to create a simple Window where the Text field gets the user’s command, and Display field displays messages to the user (scrollable). UI maintains a reference to Logic, calling Logic’s methods directly to trigger processing of user-entered commands.
+Todoer's UI consists of two packages: `control` and `view`. The `control` package contains files that control what users see and the `view` package contains the layout of the Todoer UI implemented using Java's JFrame class.
+
+UI maintains a reference to Logic, calling Logic’s methods directly to trigger processing of user-entered commands.
 
 ## `MainApp` Class
-This is the starting point of the whole program. It initialises an instance of the `MainLogic` class and an instance of the `UIController` class to be used throughout the lifetime of the program. It has a public method `handleKeyPress()` to be called by the `UIController` whenever the user presses a key on the command bar. Depending on the key pressed, the `MainApp` can pass the value of the user input to the `MainLogic` class to get back a feedback string. The `MainApp` then decide what to be displayed on the UI through calling methods of the `UIController` class.
+This is the starting point of the whole program. It initialises an instance of the `MainLogic` class in `Logic` and an instance of the `TableHelper` class to be used throughout the lifetime of the program. It has a public method `handleKeyPress()` to be called by the `UIController` whenever the user presses a key on the command bar. Depending on the key pressed, the `MainApp` can pass the value of the user input to the `MainLogic` class to get back a feedback string. The `MainApp` then decides what to be displayed on the UI through calling methods of the `UIController` class.
 
 ###### Notable API
 
 | Return type   | Method and Description                                            |
 |-------------|----------------------------------------------------------|
 | void | handleKeyPress(char key, String userInput): handler for when a key is pressed in the command bar   |
+
+## `TableHelper` Class
+
+`TableHelper` is responsible for creating the table and timetable displays in Todoer. It uses `DateTimeHelper` methods to display date times appropriately.
+
+###### Notable API
+
+| Return type   | Method and Description                                            |
+|-------------|----------------------------------------------------------|
+| JTable | handleKeyPress(char key, String userInput): handler for when a key is pressed in the command bar   |
 
 ## `UIController` Class
 This class defines the looks and feels of the `Text field` (or command bar) and `Display field`. It signals the `MainApp` whenever a key is pressed by calling the method `handleKeyPress()`. It also has public methods for the `MainApp` to change the content of the fields.
@@ -68,7 +81,7 @@ This class defines the looks and feels of the `Text field` (or command bar) and 
 
 <br>
 ![add image](doc/images/V0.5/logicDiagram.png)
-> Figure 2: Structure of the Logic Component
+> Figure 3: Structure of the Logic Component
 
 At the heart of the Logic component is the `MainLogic` class that is responsible for executing the user’s commands. A `Task` class is also used to represent the tasks to be done. A `History` class stores a record of the data state in `DataState` objects after each user action modification. There are also several helper classes: `DateTimeHelper`, `Settings`, and `Comparators`.
 
@@ -114,7 +127,7 @@ The code snippets above show how the list of all tasks is represented as an Arra
 The diagram (see Figure 3) below demonstrates how the major components of the software interact in a typical cycle of command execution. The raw user command “delete task1” in this example would first be fed from the UI to the Logic, and then to the CommandParser. Upon receiving the command’s details from the CommandParser, the Logic can either read or write the tasks’ content from the Storage however it sees fit and finally, return a feedback string to the UI to be displayed to the user.
 
 ![add image](doc/images/del seqDiagram.png)
-> Figure 3: Object interactions for execution of 'delete' command in Todoer
+> Figure 4: Object interactions for execution of 'delete' command in Todoer
 
 ###### Notable API
 
@@ -144,12 +157,14 @@ The diagram (see Figure 3) below demonstrates how the major components of the so
 | Return type   | Method and Description                                            |
 |-------------|----------------------------------------------------------|
 | void | updateHistory(): update history after user modifications to task data |
+| ArrayList<Task> | undo(): returns the list of tasks before last user modification |
+| ArrayList<Task> | redo(): returns the list of tasks after the next user modification |
 
 # Parser Component
 
 <br>
 ![add image](doc/images/V0.5/parserDiagram.png)
-> Figure 4: Structure of the Parser Component
+> Figure 5: Structure of the Parser Component
 
 The Parser component consists of a `CommandParser` class which receives the raw user input and creates a `Command` object which is executed by the `Logic` component
 
@@ -165,7 +180,7 @@ The first element of the ArrayList is always the command keyword, while the rema
 
 <br>
 ![add image](doc/images/V0.5/storageDiagram.png)
-> Figure 5: Structure of the Storage Component
+> Figure 6: Structure of the Storage Component
 
 The `Storage` component consists of a `Storage` class that manages the reading and writing of data between the program and the file system. Since we are storing tasks as JSON strings in the data files, there is also a `JSONConverter` class that encodes and decodes between JSON strings and `Task` objects.
 
@@ -199,6 +214,6 @@ There are several additions that can be made to Todoer to further increase its u
 ###### Notifications/Events
 We seek to develop the functionality to update/remind the Todoer user about urgent tasks or tasks that are nearing due date with say, pop-ups or audio notifications.
 
-###### GoodGUI
-Current GUI is minimalistic. We would like to implement additional helpful features such as auto-fill commands (by referencing the user’s past command history) and by displaying urgent/important tasks more prominently (perhaps with color coding).
+###### Further improved GUI
+We would like to implement additional helpful features such as auto-fill commands (by referencing the user’s past command history) and by displaying urgent/important tasks more prominently (perhaps with color coding).
 
