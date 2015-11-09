@@ -43,20 +43,28 @@ Architecture is made up of 4 main components. Users can use Todoer through the U
 ![add image](doc/images/V0.5/UIDiagram.png)
 > Figure 2: Structure of the UI Component
 
-The UI component consists of a `MainApp` class that is responsible for managing the input obtained from the UI and output to be displayed on the UI. The UI itself is created by the `UIController` class which manages the appearance and behaviour of the UI.
+Todoer's UI consists of two packages: `control` and `view`. The `control` package contains files that control what users see and the `view` package contains the layout of the Todoer UI implemented using Java's JFrame class.
 
-Todoer’s UI consists of two parts: `Text field` and `Display field`.
-
-Both fields are implemented using Java’s JFrame class to create a simple Window where the Text field gets the user’s command, and Display field displays messages to the user (scrollable). UI maintains a reference to Logic, calling Logic’s methods directly to trigger processing of user-entered commands.
+UI maintains a reference to Logic, calling Logic’s methods directly to trigger processing of user-entered commands.
 
 ## `MainApp` Class
-This is the starting point of the whole program. It initialises an instance of the `MainLogic` class and an instance of the `UIController` class to be used throughout the lifetime of the program. It has a public method `handleKeyPress()` to be called by the `UIController` whenever the user presses a key on the command bar. Depending on the key pressed, the `MainApp` can pass the value of the user input to the `MainLogic` class to get back a feedback string. The `MainApp` then decide what to be displayed on the UI through calling methods of the `UIController` class.
+This is the starting point of the whole program. It initialises an instance of the `MainLogic` class in `Logic` and an instance of the `TableHelper` class to be used throughout the lifetime of the program. It has a public method `handleKeyPress()` to be called by the `UIController` whenever the user presses a key on the command bar. Depending on the key pressed, the `MainApp` can pass the value of the user input to the `MainLogic` class to get back a feedback string. The `MainApp` then decides what to be displayed on the UI through calling methods of the `UIController` class.
 
 ###### Notable API
 
 | Return type   | Method and Description                                            |
 |-------------|----------------------------------------------------------|
 | void | handleKeyPress(char key, String userInput): handler for when a key is pressed in the command bar   |
+
+## `TableHelper` Class
+
+`TableHelper` is responsible for creating the table and timetable displays in Todoer. It uses `DateTimeHelper` methods to display date times appropriately.
+
+###### Notable API
+
+| Return type   | Method and Description                                            |
+|-------------|----------------------------------------------------------|
+| JTable | handleKeyPress(char key, String userInput): handler for when a key is pressed in the command bar   |
 
 ## `UIController` Class
 This class defines the looks and feels of the `Text field` (or command bar) and `Display field`. It signals the `MainApp` whenever a key is pressed by calling the method `handleKeyPress()`. It also has public methods for the `MainApp` to change the content of the fields.
